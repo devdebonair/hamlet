@@ -1,10 +1,26 @@
 PODS:
   - Alamofire (4.0.1)
+  - ModelMapper (5.0.0-beta.2)
+  - SnapKit (3.0.1)
 
 DEPENDENCIES:
   - Alamofire (~> 4.0.1)
+  - ModelMapper (from `https://github.com/lyft/mapper`, branch `swift-3.0`)
+  - SnapKit (~> 3.0.0)
+
+EXTERNAL SOURCES:
+  ModelMapper:
+    :branch: swift-3.0
+    :git: https://github.com/lyft/mapper
+
+CHECKOUT OPTIONS:
+  ModelMapper:
+    :commit: eead7f57eacbcda5257925e3ceb99cd73a611fac
+    :git: https://github.com/lyft/mapper
 
 SPEC CHECKSUMS:
   Alamofire: 7682d43245de14874acd142ec137b144aa1dd335
+  ModelMapper: b306e689e231331896d447a36a54643c5da0bacd
+  SnapKit: f818b8326d45b4e1c777d0ab27b5c0a3624bfdeb
 
 COCOAPODS: 0.39.0
