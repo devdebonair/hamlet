@@ -6,41 +6,90 @@
 //  Copyright © 2016 Vincent Moore. All rights reserved.
 //
 
+import Mapper
 import Alamofire
 
-struct Subreddit {
+struct Subreddit: Mappable {
+    
+    let bannerImageUrl: String?
+    let submitRules: String?
+    let displayName: String?
+    let headerImageUrl: String?
+    let title: String?
+    let isNSFW: Bool?
+    let iconImageUrl: String?
+    let headerTitle: String?
+    let description: String?
+    let numberOfSubscribers: Int?
+    let keyColorHex: String?
+    let name: String?
+    let createdDate: Double?
+    let url: String?
+    let publicDescription: String?
+    let type: String?
+    let kind: String?
+    
+    init(map: Mapper) throws {
+        bannerImageUrl = map.optionalFrom("data.banner_img")
+        submitRules = map.optionalFrom("data.submit_text")
+        displayName = map.optionalFrom("data.display_name")
+        headerImageUrl = map.optionalFrom("data.display_name")
+        title = map.optionalFrom("data.title")
+        isNSFW = map.optionalFrom("data.over18")
+        iconImageUrl = map.optionalFrom("data.icon_img")
+        headerTitle = map.optionalFrom("data.header_title")
+        description = map.optionalFrom("data.description")
+        numberOfSubscribers = map.optionalFrom("data.subscribers")
+        keyColorHex = map.optionalFrom("data.key_color")
+        name = map.optionalFrom("data.name")
+        createdDate = map.optionalFrom("data.created_utc")
+        url = map.optionalFrom("data.url")
+        publicDescription = map.optionalFrom("data.public_description")
+        type = map.optionalFrom("data.subreddit_type")
+        kind = map.optionalFrom("kind")
+    }
     
 }
 
 extension Subreddit {
     
-    static private func fetchListing(subreddit: String, sort: Listing.SortType, after: Listing? = nil, completion: @escaping (([Listing])->())) {
-        Alamofire.request("https://api.reddit.com/r/\(subreddit)/\(sort.rawValue)").responseJSON { response in
-            if let json = response.result.value as? NSDictionary, let data = json["data"] as? NSDictionary, let children = data["children"] as? NSArray {
-                guard let listings = Listing.from(children) else {
-                    return completion([])
-                }
-                completion(listings)
-            } else {
-                completion([])
-            }
-        }
-    }
-    
-    static func fetchHotListing(subreddit: String, completion: @escaping (([Listing])->())) {
+    static func fetchHotListing(subreddit: String, completion: @escaping ([Listing])->Void) {
         fetchListing(subreddit: subreddit, sort: .hot, completion: completion)
     }
     
-    static func fetchNewListing(subreddit: String, completion: @escaping (([Listing])->())) {
+    static func fetchNewListing(subreddit: String, completion: @escaping ([Listing])->Void) {
         fetchListing(subreddit: subreddit, sort: .new, completion: completion)
     }
     
-    static func fetchTopListing(subreddit: String, completion: @escaping (([Listing])->())) {
+    static func fetchTopListing(subreddit: String, completion: @escaping ([Listing])->Void) {
         fetchListing(subreddit: subreddit, sort: .top, completion: completion)
     }
     
-    static func fetchControversialListing(subreddit: String, completion: @escaping (([Listing])->())) {
+    static func fetchControversialListing(subreddit: String, completion: @escaping ([Listing])->Void) {
         fetchListing(subreddit: subreddit, sort: .controversial, completion: completion)
+    }
+    
+    static private func fetchListing(subreddit: String, sort: Listing.SortType, after: Listing? = nil, completion: @escaping (([Listing])->())) {
+        Alamofire.request("https://api.reddit.com/r/\(subreddit)/\(sort.rawValue)").responseJSON { response in
+            completion(responseParser(response: response, target: Listing.self))
+        }
+    }
+    
+    static func search(query: String, completion: @escaping ([Subreddit])->Void) {
+        let parameters = ["q": query]
+        let url = "https://api.reddit.com/subreddits/search"
+        Alamofire.request(url, method: .get, parameters: parameters, encoding: URLEncoding.methodDependent, headers: nil).responseJSON { response in
+            print(response.result.value)
+            completion(responseParser(response: response, target: Subreddit.self))
+        }
+    }
+    
+    static private func responseParser <T> (response: DataResponse<Any>, target: T.Type) -> [T] where T:Mappable {
+        if let json = response.result.value as? NSDictionary, let data = json["data"] as? NSDictionary, let children = data["children"] as? NSArray, let responseData = T.from(children) {
+            return responseData
+        } else {
+            return []
+        }
     }
     
 }
