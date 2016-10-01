@@ -37,6 +37,7 @@ struct Listing: Mappable {
     let name: String
     let isVisited: Bool
     let kind: String
+    let previewImage: Preview?
     
     init(map: Mapper) throws {
         try kind = map.from("kind")
@@ -58,5 +59,6 @@ struct Listing: Mappable {
         try description = map.from("data.selftext")
         try name = map.from("data.name")
         try isVisited = map.from("data.visited")
+        previewImage = map.optionalFrom("data.preview")
     }
 }
