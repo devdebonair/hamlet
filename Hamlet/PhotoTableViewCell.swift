@@ -11,9 +11,14 @@ import SnapKit
 
 class PhotoTableViewCell: UITableViewCell {
 
+    override class var IDENTIFIER: String {
+        return "PhotoTableCell"
+    }
+    
     var imagePhoto: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
+        iv.clipsToBounds = true
         return iv
     }()
     
