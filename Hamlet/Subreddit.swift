@@ -79,7 +79,6 @@ extension Subreddit {
         let parameters = ["q": query]
         let url = "https://api.reddit.com/subreddits/search"
         Alamofire.request(url, method: .get, parameters: parameters, encoding: URLEncoding.methodDependent, headers: nil).responseJSON { response in
-            print(response.result.value)
             completion(responseParser(response: response, target: Subreddit.self))
         }
     }
