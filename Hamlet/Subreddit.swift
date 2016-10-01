@@ -11,6 +11,13 @@ import Alamofire
 
 struct Subreddit: Mappable {
     
+    enum SortType: String {
+        case popular = "popular"
+        case new = "new"
+        case gold = "gold"
+        case def = "default"
+    }
+    
     let bannerImageUrl: String?
     let submitRules: String?
     let displayName: String?
@@ -75,10 +82,32 @@ extension Subreddit {
         }
     }
     
+    static func searchPopular(completion: @escaping ([Subreddit])->Void) {
+        searchWhere(sort: .popular, completion: completion)
+    }
+    
+    static func searchNew(completion: @escaping ([Subreddit])->Void) {
+        searchWhere(sort: .new, completion: completion)
+    }
+    
+    static func searchGold(completion: @escaping ([Subreddit])->Void) {
+        searchWhere(sort: .gold, completion: completion)
+    }
+    
+    static func searchDefault(completion: @escaping ([Subreddit])->Void) {
+        searchWhere(sort: .def, completion: completion)
+    }
+    
     static func search(query: String, completion: @escaping ([Subreddit])->Void) {
         let parameters = ["q": query]
         let url = "https://api.reddit.com/subreddits/search"
         Alamofire.request(url, method: .get, parameters: parameters, encoding: URLEncoding.methodDependent, headers: nil).responseJSON { response in
+            completion(responseParser(response: response, target: Subreddit.self))
+        }
+    }
+    
+    static private func searchWhere(sort: SortType, completion: @escaping ([Subreddit])->Void) {
+        Alamofire.request("https://api.reddit.com/subreddits/\(sort.rawValue)").responseJSON { response in
             completion(responseParser(response: response, target: Subreddit.self))
         }
     }
