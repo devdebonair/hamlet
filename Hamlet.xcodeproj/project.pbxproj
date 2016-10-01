@@ -10,12 +10,14 @@
 		55CC3F678EE7C4E3B2278B2E /* Pods_Hamlet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652DF315F77A61E37614AEB8 /* Pods_Hamlet.framework */; };
 		5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5674BA711D9F867C00A4A974 /* Subreddit.swift */; };
 		568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568119B51D9CC9D100B31FCB /* AppDelegate.swift */; };
-		568119B81D9CC9D100B31FCB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568119B71D9CC9D100B31FCB /* ViewController.swift */; };
+		568119B81D9CC9D100B31FCB /* FeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568119B71D9CC9D100B31FCB /* FeedViewController.swift */; };
 		568119BD1D9CC9D100B31FCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 568119BC1D9CC9D100B31FCB /* Assets.xcassets */; };
 		568119C01D9CC9D100B31FCB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 568119BE1D9CC9D100B31FCB /* LaunchScreen.storyboard */; };
 		56CB7E611D9FFF58008AA2CB /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E601D9FFF58008AA2CB /* Preview.swift */; };
 		56CB7E651DA01F3D008AA2CB /* PhotoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E641DA01F3D008AA2CB /* PhotoTableViewCell.swift */; };
 		56CB7E681DA024BC008AA2CB /* UITableViewCell+Identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E671DA024BC008AA2CB /* UITableViewCell+Identifier.swift */; };
+		56CB7E6A1DA02812008AA2CB /* LabelTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E691DA02812008AA2CB /* LabelTableViewCell.swift */; };
+		56CB7E6C1DA0360A008AA2CB /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E6B1DA0360A008AA2CB /* Math.swift */; };
 		56D161741D9CE6A80027553A /* Listing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D161731D9CE6A80027553A /* Listing.swift */; };
 		56D161761D9CEAB90027553A /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D161751D9CEAB90027553A /* Image.swift */; };
 /* End PBXBuildFile section */
@@ -25,13 +27,15 @@
 		5674BA711D9F867C00A4A974 /* Subreddit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Subreddit.swift; sourceTree = "<group>"; };
 		568119B21D9CC9D100B31FCB /* Hamlet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hamlet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		568119B51D9CC9D100B31FCB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		568119B71D9CC9D100B31FCB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		568119B71D9CC9D100B31FCB /* FeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewController.swift; sourceTree = "<group>"; };
 		568119BC1D9CC9D100B31FCB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		568119BF1D9CC9D100B31FCB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		568119C11D9CC9D100B31FCB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		56CB7E601D9FFF58008AA2CB /* Preview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
 		56CB7E641DA01F3D008AA2CB /* PhotoTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoTableViewCell.swift; sourceTree = "<group>"; };
 		56CB7E671DA024BC008AA2CB /* UITableViewCell+Identifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+Identifier.swift"; sourceTree = "<group>"; };
+		56CB7E691DA02812008AA2CB /* LabelTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelTableViewCell.swift; sourceTree = "<group>"; };
+		56CB7E6B1DA0360A008AA2CB /* Math.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
 		56D161731D9CE6A80027553A /* Listing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Listing.swift; sourceTree = "<group>"; };
 		56D161751D9CEAB90027553A /* Image.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Image.swift; sourceTree = "<group>"; };
 		5DA60A4BB2CA1EAAF4F82D8E /* Pods-Hamlet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hamlet.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet.debug.xcconfig"; sourceTree = "<group>"; };
@@ -87,6 +91,7 @@
 				568119BC1D9CC9D100B31FCB /* Assets.xcassets */,
 				568119BE1D9CC9D100B31FCB /* LaunchScreen.storyboard */,
 				568119C11D9CC9D100B31FCB /* Info.plist */,
+				56CB7E6B1DA0360A008AA2CB /* Math.swift */,
 			);
 			path = Hamlet;
 			sourceTree = "<group>";
@@ -94,7 +99,7 @@
 		56CB7E621DA01E9B008AA2CB /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				568119B71D9CC9D100B31FCB /* ViewController.swift */,
+				568119B71D9CC9D100B31FCB /* FeedViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -103,6 +108,7 @@
 			isa = PBXGroup;
 			children = (
 				56CB7E641DA01F3D008AA2CB /* PhotoTableViewCell.swift */,
+				56CB7E691DA02812008AA2CB /* LabelTableViewCell.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -259,13 +265,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				56CB7E651DA01F3D008AA2CB /* PhotoTableViewCell.swift in Sources */,
-				568119B81D9CC9D100B31FCB /* ViewController.swift in Sources */,
+				568119B81D9CC9D100B31FCB /* FeedViewController.swift in Sources */,
 				56D161761D9CEAB90027553A /* Image.swift in Sources */,
 				56D161741D9CE6A80027553A /* Listing.swift in Sources */,
 				56CB7E681DA024BC008AA2CB /* UITableViewCell+Identifier.swift in Sources */,
+				56CB7E6A1DA02812008AA2CB /* LabelTableViewCell.swift in Sources */,
 				5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */,
 				56CB7E611D9FFF58008AA2CB /* Preview.swift in Sources */,
 				568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */,
+				56CB7E6C1DA0360A008AA2CB /* Math.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -85,11 +85,13 @@ strip_invalid_archs() {
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "Pods-Hamlet/Alamofire.framework"
+  install_framework "Pods-Hamlet/Kingfisher.framework"
   install_framework "Pods-Hamlet/Mapper.framework"
   install_framework "Pods-Hamlet/SnapKit.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "Pods-Hamlet/Alamofire.framework"
+  install_framework "Pods-Hamlet/Kingfisher.framework"
   install_framework "Pods-Hamlet/Mapper.framework"
   install_framework "Pods-Hamlet/SnapKit.framework"
 fi
