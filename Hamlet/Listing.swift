@@ -15,6 +15,7 @@ struct Listing: Mappable {
         case hot = "hot"
         case new = "new"
         case top = "top"
+        case controversial = "controversial"
     }
     
     let author: String

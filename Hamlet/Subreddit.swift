@@ -14,7 +14,7 @@ struct Subreddit {
 
 extension Subreddit {
     
-    static private func fetchListing(subreddit: String, sort: Listing.SortType, completion: @escaping (([Listing])->())) {
+    static private func fetchListing(subreddit: String, sort: Listing.SortType, after: Listing? = nil, completion: @escaping (([Listing])->())) {
         Alamofire.request("https://api.reddit.com/r/\(subreddit)/\(sort.rawValue)").responseJSON { response in
             if let json = response.result.value as? NSDictionary, let data = json["data"] as? NSDictionary, let children = data["children"] as? NSArray {
                 guard let listings = Listing.from(children) else {
@@ -37,6 +37,10 @@ extension Subreddit {
     
     static func fetchTopListing(subreddit: String, completion: @escaping (([Listing])->())) {
         fetchListing(subreddit: subreddit, sort: .top, completion: completion)
+    }
+    
+    static func fetchControversialListing(subreddit: String, completion: @escaping (([Listing])->())) {
+        fetchListing(subreddit: subreddit, sort: .controversial, completion: completion)
     }
     
 }
