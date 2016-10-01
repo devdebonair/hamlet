@@ -18,13 +18,13 @@ struct Subreddit: Mappable {
         case def = "default"
     }
     
-    let bannerImageUrl: String?
+    let bannerImageUrl: URL?
     let submitRules: String?
     let displayName: String?
-    let headerImageUrl: String?
+    let headerImageUrl: URL?
     let title: String?
     let isNSFW: Bool?
-    let iconImageUrl: String?
+    let iconImageUrl: URL?
     let headerTitle: String?
     let description: String?
     let numberOfSubscribers: Int?

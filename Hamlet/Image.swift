@@ -9,11 +9,11 @@
 import Mapper
 
 struct Image: Mappable {
-    let url: String
+    let url: URL
     let height: Int
     let width: Int
     
-    init(url: String, height: Int, width: Int) {
+    init(url: URL, height: Int, width: Int) {
         self.url = url
         self.height = height
         self.width = width
@@ -28,7 +28,7 @@ struct Image: Mappable {
 
 extension Image: Convertible {
     static func fromMap(_ value: Any) throws -> Image {
-        guard let image = value as? NSDictionary, let url = image["url"] as? String, let height = image["height"] as? Int, let width = image["width"] as? Int else {
+        guard let image = value as? NSDictionary, let urlString = image["url"] as? String, let url = URL(string: urlString), let height = image["height"] as? Int, let width = image["width"] as? Int else {
             throw MapperError.convertibleError(value: value, type: Image.self)
         }
         return Image(url: url, height: height, width: width)
