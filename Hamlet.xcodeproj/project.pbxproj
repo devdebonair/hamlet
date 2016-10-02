@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		55CC3F678EE7C4E3B2278B2E /* Pods_Hamlet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652DF315F77A61E37614AEB8 /* Pods_Hamlet.framework */; };
 		5636AC2E1DA0C630006EF7B3 /* UIView+Border.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC2D1DA0C630006EF7B3 /* UIView+Border.swift */; };
+		5636AC301DA179BD006EF7B3 /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC2F1DA179BD006EF7B3 /* VideoPlayer.swift */; };
+		5636AC321DA17A37006EF7B3 /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC311DA17A37006EF7B3 /* VideoView.swift */; };
+		5636AC341DA17CE7006EF7B3 /* VideoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC331DA17CE7006EF7B3 /* VideoTableViewCell.swift */; };
 		5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5674BA711D9F867C00A4A974 /* Subreddit.swift */; };
 		568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568119B51D9CC9D100B31FCB /* AppDelegate.swift */; };
 		568119B81D9CC9D100B31FCB /* FeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568119B71D9CC9D100B31FCB /* FeedViewController.swift */; };
@@ -27,6 +30,9 @@
 /* Begin PBXFileReference section */
 		45162716B5E74825E4396D91 /* Pods-Hamlet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hamlet.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet.release.xcconfig"; sourceTree = "<group>"; };
 		5636AC2D1DA0C630006EF7B3 /* UIView+Border.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Border.swift"; sourceTree = "<group>"; };
+		5636AC2F1DA179BD006EF7B3 /* VideoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoPlayer.swift; sourceTree = "<group>"; };
+		5636AC311DA17A37006EF7B3 /* VideoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
+		5636AC331DA17CE7006EF7B3 /* VideoTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoTableViewCell.swift; sourceTree = "<group>"; };
 		5674BA711D9F867C00A4A974 /* Subreddit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Subreddit.swift; sourceTree = "<group>"; };
 		568119B21D9CC9D100B31FCB /* Hamlet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hamlet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		568119B51D9CC9D100B31FCB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -114,6 +120,9 @@
 				56CB7E641DA01F3D008AA2CB /* PhotoTableViewCell.swift */,
 				56CB7E691DA02812008AA2CB /* LabelTableViewCell.swift */,
 				569BAB741DA082F2006C6531 /* ActionTableViewCell.swift */,
+				5636AC2F1DA179BD006EF7B3 /* VideoPlayer.swift */,
+				5636AC311DA17A37006EF7B3 /* VideoView.swift */,
+				5636AC331DA17CE7006EF7B3 /* VideoTableViewCell.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -278,10 +287,13 @@
 				56CB7E6A1DA02812008AA2CB /* LabelTableViewCell.swift in Sources */,
 				5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */,
 				56CB7E611D9FFF58008AA2CB /* Preview.swift in Sources */,
+				5636AC321DA17A37006EF7B3 /* VideoView.swift in Sources */,
 				5636AC2E1DA0C630006EF7B3 /* UIView+Border.swift in Sources */,
 				568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */,
 				569BAB751DA082F2006C6531 /* ActionTableViewCell.swift in Sources */,
 				56CB7E6C1DA0360A008AA2CB /* Math.swift in Sources */,
+				5636AC301DA179BD006EF7B3 /* VideoPlayer.swift in Sources */,
+				5636AC341DA17CE7006EF7B3 /* VideoTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
