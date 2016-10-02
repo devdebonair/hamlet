@@ -10,14 +10,14 @@ import UIKit
 import SnapKit
 
 class PhotoTableViewCell: UITableViewCell {
-
     override class var IDENTIFIER: String {
         return "PhotoTableCell"
     }
     
     var imagePhoto: UIImageView = {
         let iv = UIImageView()
-        iv.contentMode = .scaleAspectFill
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
         return iv
     }()
@@ -29,6 +29,7 @@ class PhotoTableViewCell: UITableViewCell {
         
         imagePhoto.snp.makeConstraints { (make) in
             make.edges.equalTo(contentView)
+            make.height.equalTo(0).priority(750)
         }
     }
     
@@ -40,10 +41,14 @@ class PhotoTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
+    override func prepareForReuse() {
+        imagePhoto.image = nil
+        setPhotoHeight(0)
+    }
+    
     func setPhotoHeight(_ height: CGFloat) {
-        imagePhoto.snp.makeConstraints { (make) in
-            make.height.equalTo(height)
+        imagePhoto.snp.updateConstraints { (make) in
+            make.height.equalTo(height).priority(750)
         }
     }
-
 }
