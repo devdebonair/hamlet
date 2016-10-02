@@ -57,7 +57,6 @@ extension Gfycat {
             guard let json = response.result.value as? NSDictionary, let gfyData = json["gfyItem"] as? NSDictionary else {
                 return completion(nil)
             }
-            print(gfyData)
             let gfycat = Gfycat.from(gfyData)
             completion(gfycat)
         }
