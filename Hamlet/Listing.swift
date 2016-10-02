@@ -11,11 +11,18 @@ import Alamofire
 
 struct Listing: Mappable {
     
+    let VALID_VIDEO_FORMATS = ["gifv", "mov", "mp4"]
+    
     enum SortType: String {
         case hot = "hot"
         case new = "new"
         case top = "top"
         case controversial = "controversial"
+    }
+    
+    enum Domain: String {
+        case imgur = "i.imgur.com"
+        case gfycat = "gfycat.com"
     }
     
     let author: String?
@@ -39,6 +46,14 @@ struct Listing: Mappable {
     let kind: String?
     let previewImage: Preview?
     let subreddit: String?
+    
+    var isVideo: Bool {
+        guard let url = url, let domain = domain else {
+            return false
+        }
+        let fileExtension = url.pathExtension
+        return (VALID_VIDEO_FORMATS.contains(fileExtension) || domain == Domain.gfycat.rawValue)
+    }
     
     init(map: Mapper) throws {
         kind = map.optionalFrom("kind")
