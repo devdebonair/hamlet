@@ -77,7 +77,9 @@ extension Subreddit {
     }
     
     static private func fetchListing(subreddit: String, sort: Listing.SortType, after: Listing? = nil, completion: @escaping (([Listing])->())) {
-        Alamofire.request("https://api.reddit.com/r/\(subreddit)/\(sort.rawValue)").responseJSON { response in
+        let url = "https://api.reddit.com/r/\(subreddit)/\(sort.rawValue)"
+        let headers = ["User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36"]
+        Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
             completion(responseParser(response: response, target: Listing.self))
         }
     }
