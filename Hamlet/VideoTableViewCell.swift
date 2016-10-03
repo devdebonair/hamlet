@@ -71,7 +71,6 @@ class VideoTableViewCell: UITableViewCell {
     // Default values
     override func prepareForReuse() {
         super.prepareForReuse()
-//        videoPlayer.clean()
         videoPlayer.alpha = 0.0
         posterImage.alpha = 1.0
         posterImage.image = nil
