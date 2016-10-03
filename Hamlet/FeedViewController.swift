@@ -14,10 +14,11 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
 
     enum CellType: Int {
         case media = 0
-        case action = 1
-        case description = 2
-        case submission = 3
-        case blank = 4
+        case flash = 1
+        case action = 2
+        case description = 3
+        case submission = 4
+        case blank = 5
     }
     
     lazy var tableView: UITableView = {
@@ -34,6 +35,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         tv.register(ActionTableViewCell.self, forCellReuseIdentifier: ActionTableViewCell.IDENTIFIER)
         tv.register(AsyncVideoTableViewCell.self, forCellReuseIdentifier: AsyncVideoTableViewCell.IDENTIFIER)
         tv.register(BlankTableViewCell.self, forCellReuseIdentifier: BlankTableViewCell.IDENTIFIER)
+        tv.register(FlashTableViewCell.self, forCellReuseIdentifier: FlashTableViewCell.IDENTIFIER)
         tv.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.IDENTIFIER)
         return tv
     }()
@@ -102,6 +104,8 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         switch indexPath.row {
         case CellType.media.rawValue:
             identifier = listing.isVideo ? AsyncVideoTableViewCell.IDENTIFIER : PhotoTableViewCell.IDENTIFIER
+        case CellType.flash.rawValue:
+            identifier = FlashTableViewCell.IDENTIFIER
         case CellType.action.rawValue:
             identifier = ActionTableViewCell.IDENTIFIER
         case CellType.description.rawValue:
@@ -155,6 +159,22 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
                     cell.setVideoUrl(url: nil)
                 }
             }
+        }
+        
+        if let cell = cell as? FlashTableViewCell {
+            let colorOfProgress = UIColor(red: 0/255, green: 132/255, blue: 180/255, alpha: 1.0)
+            
+            cell.colorProgress = colorOfProgress
+            cell.labelMessage.textColor = .white
+            cell.labelMessage.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightBold)
+            cell.message = "album".uppercased()
+            cell.setProgression(progress: 1.0)
+            cell.contentView.superview?.backgroundColor = colorOfProgress
+            let imageView = UIImageView(image: #imageLiteral(resourceName: "disclose"))
+            imageView.frame.size = CGSize(width: 13, height: 13)
+            imageView.contentMode = .scaleAspectFit
+            cell.accessoryView = imageView
+            cell.accessoryView?.tintColor = cell.labelMessage.textColor
         }
         
         if indexPath.row == CellType.action.rawValue {
