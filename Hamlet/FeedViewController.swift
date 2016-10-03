@@ -31,7 +31,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         tv.register(PhotoTableViewCell.self, forCellReuseIdentifier: PhotoTableViewCell.IDENTIFIER)
         tv.register(LabelTableViewCell.self, forCellReuseIdentifier: LabelTableViewCell.IDENTIFIER)
         tv.register(ActionTableViewCell.self, forCellReuseIdentifier: ActionTableViewCell.IDENTIFIER)
-        tv.register(VideoTableViewCell.self, forCellReuseIdentifier: VideoTableViewCell.IDENTIFIER)
+        tv.register(AsyncVideoTableViewCell.self, forCellReuseIdentifier: AsyncVideoTableViewCell.IDENTIFIER)
         tv.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.IDENTIFIER)
         return tv
     }()
@@ -50,7 +50,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             make.top.equalTo(view).offset(20)
         }
         
-        Subreddit.fetchHotListing(subreddit: "porninfifteenseconds") { (listings) in
+        Subreddit.fetchHotListing(subreddit: "rocketleague") { (listings) in
             self.listings = listings
             self.tableView.reloadData()
         }
@@ -99,7 +99,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         switch indexPath.row {
         case CellType.media.rawValue:
-            identifier = listing.isVideo ? VideoTableViewCell.IDENTIFIER : PhotoTableViewCell.IDENTIFIER
+            identifier = listing.isVideo ? AsyncVideoTableViewCell.IDENTIFIER : PhotoTableViewCell.IDENTIFIER
         case CellType.action.rawValue:
             identifier = ActionTableViewCell.IDENTIFIER
         case CellType.description.rawValue:
@@ -127,28 +127,23 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.separatorInset = .zero
         }
         
-        if let cell = cell as? VideoTableViewCell, let preview = listing.previewImage, listing.isVideo, let domain = listing.domain, let url = listing.url {
+        if let cell = cell as? AsyncVideoTableViewCell, let preview = listing.previewImage, listing.isVideo, let domain = listing.domain, let url = listing.url {
             
             let height = aspectHeight(tableView.frame.size, CGSize(width: preview.source.width, height: preview.source.height))
-            cell.setMediaHeight(height)
+            cell.setMediaHeight(height: height)
             cell.separatorInset = .zero
-            cell.posterImage.kf.setImage(with: url)
-            cell.onReadyToPlay = {
-                cell.videoPlayer.play()
-            }
             
             switch domain {
             case Listing.Domain.imgur.rawValue:
-                print(Imgur.replaceGIFV(url: url)?.absoluteString)
-                cell.videoPlayer.url = Imgur.replaceGIFV(url: url)?.absoluteString
+                cell.setVideoUrl(url: Imgur.replaceGIFV(url: url))
             case Listing.Domain.gfycat.rawValue:
                 Gfycat.fetch(url: url, completion: { (gfycat) in
                     if let gfycat = gfycat {
-                        cell.videoPlayer.url = gfycat.urlMP4?.absoluteString
+                        cell.setVideoUrl(url: gfycat.urlMP4)
                     }
                 })
             default:
-                cell.videoPlayer.url = ""
+                cell.setVideoUrl(url: nil)
             }
         }
         
@@ -173,9 +168,6 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? PhotoTableViewCell {
             cell.imagePhoto.kf.cancelDownloadTask()
-        }
-        if let cell = cell as? VideoTableViewCell {
-            cell.videoPlayer.clean()
         }
     }
 
