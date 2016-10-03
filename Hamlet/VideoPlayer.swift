@@ -13,7 +13,6 @@ class VideoPlayer: VideoView {
     internal let MAX_VOLUME: Float = 1.0
     internal let MIN_VOLUME: Float = 0.0
     
-    
     internal var autoplay = false
     internal var onReadyToPlay: (()->())?
     
@@ -38,7 +37,7 @@ class VideoPlayer: VideoView {
     init(frame: CGRect = .zero, autoplay: Bool = false) {
         self.autoplay = autoplay
         super.init()
-        NotificationCenter.default.addObserver(self, selector: #selector(self.playerItemDidReachEnd(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: player.currentItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.playerItemDidReachEnd(_:)), name: .AVPlayerItemDidPlayToEndTime, object: player.currentItem)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -94,8 +93,8 @@ class VideoPlayer: VideoView {
             asset.loadValuesAsynchronously(forKeys: ["duration", "playable", "tracks"]) {
                 let playerItem = AVPlayerItem(asset: asset)
                 DispatchQueue.main.async(execute: {
-                    if self.player.currentItem != nil {
-                        self.player.currentItem?.removeObserver(self, forKeyPath: self.kStatus)
+                    if let item = self.player.currentItem {
+                        item.removeObserver(self, forKeyPath: self.kStatus)
                     }
                     self.player.replaceCurrentItem(with: playerItem)
                     playerItem.addObserver(self, forKeyPath: self.kStatus, options: [.new], context: nil)
@@ -107,13 +106,14 @@ class VideoPlayer: VideoView {
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == kStatus && player.currentItem?.status == .readyToPlay {
-            if let readyToPlayClosure = onReadyToPlay {
-                readyToPlayClosure()
-            }
-            if autoplay {
-                play()
-            }
+        guard keyPath == kStatus, player.currentItem?.status == .readyToPlay else {
+            return
+        }
+        if let readyToPlayClosure = onReadyToPlay {
+            readyToPlayClosure()
+        }
+        if autoplay {
+            play()
         }
     }
 }
