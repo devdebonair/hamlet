@@ -50,7 +50,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             make.top.equalTo(view).offset(20)
         }
         
-        Subreddit.fetchHotListing(subreddit: "porninfifteenseconds") { (listings) in
+        Subreddit.fetchHotListing(subreddit: "animegifs") { (listings) in
             self.listings = listings
             self.tableView.reloadData()
         }
@@ -136,6 +136,8 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             switch listing.domain {
             case Listing.Domain.imgur.rawValue:
                 cell.setVideoUrl(url: Imgur.replaceGIFV(url: listing.url))
+            case Listing.Domain.reddit.rawValue:
+                cell.setVideoUrl(url: preview.variantMP4?.source.url)
             case Listing.Domain.gfycat.rawValue:
                 Gfycat.fetch(url: listing.url, completion: { (gfycat) in
                     if let gfycat = gfycat {
@@ -143,7 +145,11 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
                     }
                 })
             default:
-                cell.setVideoUrl(url: nil)
+                if let url = preview.variantMP4?.source.url {
+                    cell.setVideoUrl(url: url)
+                } else {
+                    cell.setVideoUrl(url: nil)
+                }
             }
         }
         
@@ -168,6 +174,16 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? PhotoTableViewCell {
             cell.imagePhoto.kf.cancelDownloadTask()
+        }
+        
+        if let cell = cell as? AsyncVideoTableViewCell, cell.videoPlayer.isPlaying() {
+            cell.videoPlayer.pause()
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if let cell = cell as? AsyncVideoTableViewCell {
+            cell.videoPlayer.play()
         }
     }
 

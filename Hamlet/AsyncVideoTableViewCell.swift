@@ -21,8 +21,9 @@ class AsyncVideoTableViewCell: UITableViewCell {
     lazy var videoPlayer: ASVideoNode = {
         let player = ASVideoNode()
         player.gravity = AVLayerVideoGravityResizeAspectFill
-        player.shouldAutoplay = true
+        player.shouldAutoplay = false
         player.shouldAutorepeat = true
+
         return player
     }()
     
@@ -39,7 +40,7 @@ class AsyncVideoTableViewCell: UITableViewCell {
         
         mainNode.view.snp.makeConstraints({ (make) in
             make.edges.equalTo(self.contentView)
-            make.height.equalTo(0).priority(750)
+            make.height.equalTo(340).priority(750)
         })
         
         videoPlayer.view.snp.makeConstraints({ (make) in
