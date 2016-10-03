@@ -9,15 +9,36 @@
 import Mapper
 
 struct Preview {
-    let source: Image
-    let resolutions: [Image]
+    let variantSource: Variant
+    let variantGIF: Variant?
+    let variantMP4: Variant?
 }
 
 extension Preview: Convertible {
     static func fromMap(_ value: Any) throws -> Preview {
-        guard let preview = value as? NSDictionary, let images = preview["images"] as? NSArray, let actualImages = images[0] as? NSDictionary, let sourceData = actualImages["source"] as? NSDictionary, let resolutionsData = actualImages["resolutions"] as? NSArray, let source = Image.from(sourceData), let resolutions = Image.from(resolutionsData) else {
+        guard let preview = value as? NSDictionary, let images = preview["images"] as? NSArray, let actualImages = images[0] as? NSDictionary, let source = getVariant(json: actualImages) else {
             throw MapperError.convertibleError(value: value, type: Preview.self)
         }
-        return Preview(source: source, resolutions: resolutions)
+        
+        var gif: Variant? = nil
+        var mp4: Variant? = nil
+        
+        if let variants = actualImages["variants"] as? NSDictionary {
+            if let gifData = variants["gif"] as? NSDictionary {
+                gif = getVariant(json: gifData)
+            }
+            if let mp4Data = variants["mp4"] as? NSDictionary {
+                mp4 = getVariant(json: mp4Data)
+            }
+        }
+        
+        return Preview(variantSource: source, variantGIF: gif, variantMP4: mp4)
+    }
+    
+    private static func getVariant(json: NSDictionary) -> Variant? {
+        guard let sourceData = json["source"] as? NSDictionary, let resolutionsData = json["resolutions"] as? NSArray, let source = Image.from(sourceData), let resolutions = Image.from(resolutionsData) else {
+            return nil
+        }
+        return Variant(source: source, resolutions: resolutions)
     }
 }

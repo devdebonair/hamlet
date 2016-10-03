@@ -50,7 +50,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             make.top.equalTo(view).offset(20)
         }
         
-        Subreddit.fetchHotListing(subreddit: "helgalovekaty") { (listings) in
+        Subreddit.fetchHotListing(subreddit: "porninfifteenseconds") { (listings) in
             self.listings = listings
             self.tableView.reloadData()
         }
@@ -80,7 +80,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         let container = UIView()
         container.backgroundColor = UIColor.white.withAlphaComponent(0.99)
         
-        if listing.previewImage != nil {
+        if listing.previewMedia != nil {
             container.addBorder(edges: .bottom, colour: UIColor.lightGray.withAlphaComponent(0.5), thickness: 0.4)
         }
         
@@ -115,19 +115,21 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         cell.preservesSuperviewLayoutMargins = false
         cell.selectionStyle = .none
         
-        if let cell = cell as? PhotoTableViewCell, let preview = listing.previewImage, indexPath.row == CellType.media.rawValue {
+        if let cell = cell as? PhotoTableViewCell, let preview = listing.previewMedia, indexPath.row == CellType.media.rawValue {
             if listing.domain == Listing.Domain.imgur.rawValue {
                 cell.imagePhoto.kf.setImage(with: listing.url)
             } else {
-                cell.imagePhoto.kf.setImage(with: preview.source.url)
+                cell.imagePhoto.kf.setImage(with: preview.variantSource.source.url)
             }
-            let height = aspectHeight(tableView.frame.size, CGSize(width: preview.source.width, height: preview.source.height))
+            let mediaSize = CGSize(width: preview.variantSource.source.width, height: preview.variantSource.source.height)
+            let height = aspectHeight(tableView.frame.size, mediaSize)
             cell.setPhotoHeight(height)
             cell.separatorInset = .zero
         }
         
-        if let cell = cell as? AsyncVideoTableViewCell, let preview = listing.previewImage, listing.isVideo {
-            let height = aspectHeight(tableView.frame.size, CGSize(width: preview.source.width, height: preview.source.height))
+        if let cell = cell as? AsyncVideoTableViewCell, let preview = listing.previewMedia, listing.isVideo {
+            let mediaSize = CGSize(width: preview.variantSource.source.width, height: preview.variantSource.source.height)
+            let height = aspectHeight(tableView.frame.size, mediaSize)
             cell.setMediaHeight(height: height)
             cell.separatorInset = .zero
             

@@ -44,7 +44,7 @@ struct Listing: Mappable {
     let name: String
     let isVisited: Bool
     let kind: String
-    let previewImage: Preview?
+    let previewMedia: Preview?
     let subreddit: String
     
     var descriptionEscaped: String {
@@ -79,7 +79,7 @@ struct Listing: Mappable {
         description = map.optionalFrom("data.selftext") ?? ""
         name = map.optionalFrom("data.name") ?? ""
         isVisited = map.optionalFrom("data.visited") ?? false
-        previewImage = map.optionalFrom("data.preview")
+        previewMedia = map.optionalFrom("data.preview")
         subreddit = map.optionalFrom("data.subreddit") ?? ""
     }
 }
