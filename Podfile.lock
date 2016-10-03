@@ -1,11 +1,25 @@
 PODS:
   - Alamofire (4.0.1)
+  - AsyncDisplayKit (1.9.90):
+    - AsyncDisplayKit/PINRemoteImage (= 1.9.90)
+  - AsyncDisplayKit/ASDealloc2MainObject (1.9.90)
+  - AsyncDisplayKit/Core (1.9.90):
+    - AsyncDisplayKit/ASDealloc2MainObject
+  - AsyncDisplayKit/PINRemoteImage (1.9.90):
+    - AsyncDisplayKit/Core
+    - PINRemoteImage/iOS (>= 3.0.0-beta.3)
   - Kingfisher (3.1.1)
   - ModelMapper (5.0.0-beta.2)
+  - PINCache (3.0.1-beta)
+  - PINRemoteImage/Core (3.0.0-beta.3):
+    - PINCache (>= 3.0.0-beta)
+  - PINRemoteImage/iOS (3.0.0-beta.3):
+    - PINRemoteImage/Core
   - SnapKit (3.0.1)
 
 DEPENDENCIES:
   - Alamofire (~> 4.0.1)
+  - AsyncDisplayKit
   - Kingfisher (~> 3.1.1)
   - ModelMapper (from `https://github.com/lyft/mapper`, branch `swift-3.0`)
   - SnapKit (~> 3.0.0)
@@ -22,8 +36,11 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Alamofire: 7682d43245de14874acd142ec137b144aa1dd335
+  AsyncDisplayKit: 926ded3ca3fb7026565e0e81f0e132fea4d3a6eb
   Kingfisher: 12b755ae697cc9f0fd3e550db8417fa1233e09ab
   ModelMapper: b306e689e231331896d447a36a54643c5da0bacd
+  PINCache: 6911fe422a633e18b3d3ddf2bd4f0e55e36e2892
+  PINRemoteImage: 308731aa6534500e58fc211b9cc2bb7252df25ba
   SnapKit: f818b8326d45b4e1c777d0ab27b5c0a3624bfdeb
 
 COCOAPODS: 0.39.0

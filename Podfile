@@ -6,6 +6,7 @@ target 'Hamlet' do
 	pod 'ModelMapper', :git => 'https://github.com/lyft/mapper', :branch => 'swift-3.0'
 	pod 'SnapKit', '~> 3.0.0'
     pod 'Kingfisher', '~> 3.1.1'
+    pod 'AsyncDisplayKit'
 end
 
 post_install do |installer|
