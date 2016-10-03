@@ -47,6 +47,10 @@ struct Listing: Mappable {
     let previewImage: Preview?
     let subreddit: String
     
+    var descriptionEscaped: String {
+        return description.replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "#", with: "")
+    }
+    
     var isVideo: Bool {
         guard let url = url else {
             return false
