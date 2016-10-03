@@ -50,7 +50,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             make.top.equalTo(view).offset(20)
         }
         
-        Subreddit.fetchHotListing(subreddit: "hentai_gif") { (listings) in
+        Subreddit.fetchHotListing(subreddit: "helgalovekaty") { (listings) in
             self.listings = listings
             self.tableView.reloadData()
         }
@@ -111,9 +111,9 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
-        cell.selectionStyle = .none
         cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: tableView.bounds.width)
         cell.preservesSuperviewLayoutMargins = false
+        cell.selectionStyle = .none
         
         if let cell = cell as? PhotoTableViewCell, let preview = listing.previewImage, indexPath.row == CellType.media.rawValue {
             if listing.domain == Listing.Domain.imgur.rawValue {
@@ -121,14 +121,12 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             } else {
                 cell.imagePhoto.kf.setImage(with: preview.source.url)
             }
-            
             let height = aspectHeight(tableView.frame.size, CGSize(width: preview.source.width, height: preview.source.height))
             cell.setPhotoHeight(height)
             cell.separatorInset = .zero
         }
         
         if let cell = cell as? AsyncVideoTableViewCell, let preview = listing.previewImage, listing.isVideo {
-            
             let height = aspectHeight(tableView.frame.size, CGSize(width: preview.source.width, height: preview.source.height))
             cell.setMediaHeight(height: height)
             cell.separatorInset = .zero
@@ -152,7 +150,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.description.rawValue {
-            cell.labelContent.text = listing.description.replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "#", with: "")
+            cell.labelContent.text = listing.descriptionEscaped
         }
         
         if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.submission.rawValue {
