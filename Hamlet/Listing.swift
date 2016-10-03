@@ -23,6 +23,7 @@ struct Listing: Mappable {
     enum Domain: String {
         case imgur = "i.imgur.com"
         case gfycat = "gfycat.com"
+        case reddit = "i.redd.it"
     }
     
     let author: String
@@ -55,8 +56,15 @@ struct Listing: Mappable {
         guard let url = url else {
             return false
         }
+        
         let fileExtension = url.pathExtension
-        return (VALID_VIDEO_FORMATS.contains(fileExtension) || domain == Domain.gfycat.rawValue)
+        
+        var hasVideoVariant = false
+        if let previewMedia = previewMedia, let _ = previewMedia.variantMP4 {
+            hasVideoVariant = true
+        }
+        
+        return (VALID_VIDEO_FORMATS.contains(fileExtension) || domain == Domain.gfycat.rawValue || hasVideoVariant)
     }
     
     init(map: Mapper) throws {

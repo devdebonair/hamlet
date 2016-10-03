@@ -9,18 +9,23 @@
 import Mapper
 
 struct Image: Mappable {
-    let url: URL
+    private let _url: URL
     let height: Int
     let width: Int
     
+    var url: URL {
+        let urlString = _url.absoluteString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)?.replacingOccurrences(of: "amp;", with: "")
+        return URL(string: urlString!)!
+    }
+    
     init(url: URL, height: Int, width: Int) {
-        self.url = url
+        self._url = url
         self.height = height
         self.width = width
     }
     
     init(map: Mapper) throws {
-        try url = map.from("url")
+        try _url = map.from("url")
         try height = map.from("height")
         try width = map.from("width")
     }
