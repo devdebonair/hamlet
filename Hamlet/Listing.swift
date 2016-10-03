@@ -25,30 +25,30 @@ struct Listing: Mappable {
         case gfycat = "gfycat.com"
     }
     
-    let author: String?
-    let authorFlair: String?
-    let createdDate: Double?
-    let downs: Int?
-    let ups: Int?
-    let title: String?
+    let author: String
+    let authorFlair: String
+    let createdDate: Double
+    let downs: Int
+    let ups: Int
+    let title: String
     let url: URL?
-    let isSticky: Bool?
-    let score: Int?
-    let isSaved: Bool?
-    let isNSFW: Bool?
-    let numberOfComments: Int?
-    let flair: String?
+    let isSticky: Bool
+    let score: Int
+    let isSaved: Bool
+    let isNSFW: Bool
+    let numberOfComments: Int
+    let flair: String
     let thumbnail: String?
-    let domain: String?
-    let description: String?
-    let name: String?
-    let isVisited: Bool?
-    let kind: String?
+    let domain: String
+    let description: String
+    let name: String
+    let isVisited: Bool
+    let kind: String
     let previewImage: Preview?
-    let subreddit: String?
+    let subreddit: String
     
     var isVideo: Bool {
-        guard let url = url, let domain = domain else {
+        guard let url = url else {
             return false
         }
         let fileExtension = url.pathExtension
@@ -56,26 +56,26 @@ struct Listing: Mappable {
     }
     
     init(map: Mapper) throws {
-        kind = map.optionalFrom("kind")
-        author = map.optionalFrom("data.author")
-        authorFlair = map.optionalFrom("data.author_flair_text")
-        createdDate = map.optionalFrom("data.created_utc")
-        downs = map.optionalFrom("data.downs")
-        ups = map.optionalFrom("data.ups")
-        title = map.optionalFrom("data.title")
+        kind = map.optionalFrom("kind") ?? ""
+        author = map.optionalFrom("data.author") ?? ""
+        authorFlair = map.optionalFrom("data.author_flair_text") ?? ""
+        createdDate = map.optionalFrom("data.created_utc") ?? 0.0
+        downs = map.optionalFrom("data.downs") ?? 0
+        ups = map.optionalFrom("data.ups") ?? 0
+        title = map.optionalFrom("data.title") ?? ""
         url = map.optionalFrom("data.url")
-        isSticky = map.optionalFrom("data.stickied")
-        score = map.optionalFrom("data.score")
-        isSaved = map.optionalFrom("data.saved")
-        isNSFW = map.optionalFrom("data.over_18")
-        numberOfComments = map.optionalFrom("data.num_comments")
-        flair = map.optionalFrom("data.link_flair_text")
+        isSticky = map.optionalFrom("data.stickied") ?? false
+        score = map.optionalFrom("data.score") ?? 0
+        isSaved = map.optionalFrom("data.saved") ?? false
+        isNSFW = map.optionalFrom("data.over_18") ?? false
+        numberOfComments = map.optionalFrom("data.num_comments") ?? 0
+        flair = map.optionalFrom("data.link_flair_text") ?? ""
         thumbnail = map.optionalFrom("data.thumbnail")
-        domain = map.optionalFrom("data.domain")
-        description = map.optionalFrom("data.selftext")
-        name = map.optionalFrom("data.name")
-        isVisited = map.optionalFrom("data.visited")
+        domain = map.optionalFrom("data.domain") ?? ""
+        description = map.optionalFrom("data.selftext") ?? ""
+        name = map.optionalFrom("data.name") ?? ""
+        isVisited = map.optionalFrom("data.visited") ?? false
         previewImage = map.optionalFrom("data.preview")
-        subreddit = map.optionalFrom("data.subreddit")
+        subreddit = map.optionalFrom("data.subreddit") ?? ""
     }
 }

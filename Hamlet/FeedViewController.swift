@@ -50,7 +50,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             make.top.equalTo(view).offset(20)
         }
         
-        Subreddit.fetchHotListing(subreddit: "rocketleague") { (listings) in
+        Subreddit.fetchHotListing(subreddit: "hentai_gif") { (listings) in
             self.listings = listings
             self.tableView.reloadData()
         }
@@ -116,7 +116,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         cell.preservesSuperviewLayoutMargins = false
         
         if let cell = cell as? PhotoTableViewCell, let preview = listing.previewImage, indexPath.row == CellType.media.rawValue {
-            if let domain = listing.domain, domain == Listing.Domain.imgur.rawValue {
+            if listing.domain == Listing.Domain.imgur.rawValue {
                 cell.imagePhoto.kf.setImage(with: listing.url)
             } else {
                 cell.imagePhoto.kf.setImage(with: preview.source.url)
@@ -127,17 +127,17 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.separatorInset = .zero
         }
         
-        if let cell = cell as? AsyncVideoTableViewCell, let preview = listing.previewImage, listing.isVideo, let domain = listing.domain, let url = listing.url {
+        if let cell = cell as? AsyncVideoTableViewCell, let preview = listing.previewImage, listing.isVideo {
             
             let height = aspectHeight(tableView.frame.size, CGSize(width: preview.source.width, height: preview.source.height))
             cell.setMediaHeight(height: height)
             cell.separatorInset = .zero
             
-            switch domain {
+            switch listing.domain {
             case Listing.Domain.imgur.rawValue:
-                cell.setVideoUrl(url: Imgur.replaceGIFV(url: url))
+                cell.setVideoUrl(url: Imgur.replaceGIFV(url: listing.url))
             case Listing.Domain.gfycat.rawValue:
-                Gfycat.fetch(url: url, completion: { (gfycat) in
+                Gfycat.fetch(url: listing.url, completion: { (gfycat) in
                     if let gfycat = gfycat {
                         cell.setVideoUrl(url: gfycat.urlMP4)
                     }
@@ -151,12 +151,12 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
         }
         
-        if let cell = cell as? LabelTableViewCell, let description = listing.description?.replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "#", with: ""), indexPath.row == CellType.description.rawValue {
-            cell.labelContent.text = description
+        if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.description.rawValue {
+            cell.labelContent.text = listing.description.replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "#", with: "")
         }
         
-        if let cell = cell as? LabelTableViewCell, let author = listing.author, let subreddit = listing.subreddit, indexPath.row == CellType.submission.rawValue {
-            cell.labelContent.text = "Submitted 1 hour ago by \(author) on r/\(subreddit)"
+        if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.submission.rawValue {
+            cell.labelContent.text = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)"
             let rgbValue: CGFloat = 164/255
             cell.labelContent.textColor = UIColor(red: rgbValue, green: rgbValue, blue: rgbValue, alpha: 1.0)
             cell.labelContent.font = UIFont.systemFont(ofSize: 12.0)
