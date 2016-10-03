@@ -21,6 +21,9 @@ struct Gfycat: Mappable {
     private let _height: String?
     let urlMP4: URL?
     let urlGIF: URL?
+    let urlMobileMP4: URL?
+    let posterURL: URL?
+    let mobilePosterUrl: URL?
     
     var width: Int? {
         guard let _width = _width else {
@@ -48,6 +51,9 @@ struct Gfycat: Mappable {
         _height = map.optionalFrom("height")
         urlMP4 = map.optionalFrom("mp4Url")
         urlGIF = map.optionalFrom("gifUrl")
+        urlMobileMP4 = map.optionalFrom("mobileUrl")
+        posterURL = map.optionalFrom("posterUrl")
+        mobilePosterUrl = map.optionalFrom("mobilePosterUrl")
     }
 }
 
