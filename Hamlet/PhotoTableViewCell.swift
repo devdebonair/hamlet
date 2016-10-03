@@ -17,7 +17,7 @@ class PhotoTableViewCell: UITableViewCell {
     var imagePhoto: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.contentMode = .scaleAspectFit
+        iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
         return iv
     }()
