@@ -17,6 +17,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         case action = 1
         case description = 2
         case submission = 3
+        case blank = 4
     }
     
     lazy var tableView: UITableView = {
@@ -32,6 +33,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         tv.register(LabelTableViewCell.self, forCellReuseIdentifier: LabelTableViewCell.IDENTIFIER)
         tv.register(ActionTableViewCell.self, forCellReuseIdentifier: ActionTableViewCell.IDENTIFIER)
         tv.register(AsyncVideoTableViewCell.self, forCellReuseIdentifier: AsyncVideoTableViewCell.IDENTIFIER)
+        tv.register(BlankTableViewCell.self, forCellReuseIdentifier: BlankTableViewCell.IDENTIFIER)
         tv.register(UITableViewCell.self, forCellReuseIdentifier: UITableViewCell.IDENTIFIER)
         return tv
     }()
@@ -50,7 +52,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             make.top.equalTo(view).offset(20)
         }
         
-        Subreddit.fetchHotListing(subreddit: "animegifs") { (listings) in
+        Subreddit.fetchHotListing(subreddit: "re_zero") { (listings) in
             self.listings = listings
             self.tableView.reloadData()
         }
@@ -65,7 +67,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 4
+        return 5
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -106,6 +108,8 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             identifier = LabelTableViewCell.IDENTIFIER
         case CellType.submission.rawValue:
             identifier = LabelTableViewCell.IDENTIFIER
+        case CellType.blank.rawValue:
+            identifier = BlankTableViewCell.IDENTIFIER
         default:
             identifier = UITableViewCell.IDENTIFIER
         }
@@ -162,10 +166,15 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.submission.rawValue {
-            cell.labelContent.text = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)"
+            let text = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)"
+            cell.labelContent.attributedText = NSAttributedString(string: text)
             let rgbValue: CGFloat = 164/255
             cell.labelContent.textColor = UIColor(red: rgbValue, green: rgbValue, blue: rgbValue, alpha: 1.0)
             cell.labelContent.font = UIFont.systemFont(ofSize: 12.0)
+        }
+        
+        if let cell = cell as? BlankTableViewCell {
+            cell.setHeight(height: 20)
         }
         
         return cell
