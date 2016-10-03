@@ -19,41 +19,41 @@ struct Subreddit: Mappable {
     }
     
     let bannerImageUrl: URL?
-    let submitRules: String?
-    let displayName: String?
+    let submitRules: String
+    let displayName: String
     let headerImageUrl: URL?
-    let title: String?
-    let isNSFW: Bool?
+    let title: String
+    let isNSFW: Bool
     let iconImageUrl: URL?
-    let headerTitle: String?
-    let description: String?
-    let numberOfSubscribers: Int?
-    let keyColorHex: String?
-    let name: String?
-    let createdDate: Double?
-    let url: String?
-    let publicDescription: String?
-    let type: String?
-    let kind: String?
+    let headerTitle: String
+    let description: String
+    let numberOfSubscribers: Int
+    let keyColorHex: String
+    let name: String
+    let createdDate: Double
+    let url: URL?
+    let publicDescription: String
+    let type: String
+    let kind: String
     
     init(map: Mapper) throws {
         bannerImageUrl = map.optionalFrom("data.banner_img")
-        submitRules = map.optionalFrom("data.submit_text")
-        displayName = map.optionalFrom("data.display_name")
+        submitRules = map.optionalFrom("data.submit_text") ?? ""
+        displayName = map.optionalFrom("data.display_name") ?? ""
         headerImageUrl = map.optionalFrom("data.display_name")
-        title = map.optionalFrom("data.title")
-        isNSFW = map.optionalFrom("data.over18")
+        title = map.optionalFrom("data.title") ?? ""
+        isNSFW = map.optionalFrom("data.over18") ?? false
         iconImageUrl = map.optionalFrom("data.icon_img")
-        headerTitle = map.optionalFrom("data.header_title")
-        description = map.optionalFrom("data.description")
-        numberOfSubscribers = map.optionalFrom("data.subscribers")
-        keyColorHex = map.optionalFrom("data.key_color")
-        name = map.optionalFrom("data.name")
-        createdDate = map.optionalFrom("data.created_utc")
+        headerTitle = map.optionalFrom("data.header_title") ?? ""
+        description = map.optionalFrom("data.description") ?? ""
+        numberOfSubscribers = map.optionalFrom("data.subscribers") ?? 0
+        keyColorHex = map.optionalFrom("data.key_color") ?? ""
+        name = map.optionalFrom("data.name") ?? ""
+        createdDate = map.optionalFrom("data.created_utc") ?? 0.0
         url = map.optionalFrom("data.url")
-        publicDescription = map.optionalFrom("data.public_description")
-        type = map.optionalFrom("data.subreddit_type")
-        kind = map.optionalFrom("kind")
+        publicDescription = map.optionalFrom("data.public_description") ?? ""
+        type = map.optionalFrom("data.subreddit_type") ?? ""
+        kind = map.optionalFrom("kind") ?? ""
     }
     
 }
