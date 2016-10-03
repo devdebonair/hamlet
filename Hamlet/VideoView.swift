@@ -28,7 +28,7 @@ class VideoView: UIView {
         }
         
         _playerLayer = AVPlayerLayer(player: _player)
-        _playerLayer.videoGravity = AVLayerVideoGravityResizeAspect
+        _playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
         
         super.init(frame: frame)
         
