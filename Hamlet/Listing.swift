@@ -52,6 +52,10 @@ struct Listing: Mappable {
         return description.replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "#", with: "")
     }
     
+    var domainExcludeSubreddit: String {
+        return domain.lowercased().contains("self.\(subreddit.lowercased())") ? "" : domain.replacingOccurrences(of: " ", with: "")
+    }
+    
     var isVideo: Bool {
         guard let url = url else {
             return false

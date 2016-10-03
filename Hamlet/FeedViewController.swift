@@ -166,11 +166,12 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.submission.rawValue {
-            let text = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)"
-            cell.labelContent.attributedText = NSAttributedString(string: text)
             let rgbValue: CGFloat = 164/255
+            let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
+            let submissionText = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)\(domainSubmissionText)"
             cell.labelContent.textColor = UIColor(red: rgbValue, green: rgbValue, blue: rgbValue, alpha: 1.0)
             cell.labelContent.font = UIFont.systemFont(ofSize: 12.0)
+            cell.labelContent.attributedText = NSAttributedString(string: submissionText)
         }
         
         if let cell = cell as? BlankTableViewCell {
