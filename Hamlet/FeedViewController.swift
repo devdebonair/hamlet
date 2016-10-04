@@ -54,7 +54,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             make.top.equalTo(view).offset(20)
         }
         
-        Subreddit.fetchHotListing(subreddit: "re_zero") { (listings) in
+        Subreddit.fetchHotListing(subreddit: "animegifs") { (listings) in
             self.listings = listings
             self.tableView.reloadData()
         }
@@ -105,7 +105,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         case CellType.media.rawValue:
             identifier = listing.isVideo ? AsyncVideoTableViewCell.IDENTIFIER : PhotoTableViewCell.IDENTIFIER
         case CellType.flash.rawValue:
-            identifier = indexPath.section % 2 == 0 ? FlashTableViewCell.IDENTIFIER : BlankTableViewCell.IDENTIFIER
+            identifier = listing.isAlbum ? FlashTableViewCell.IDENTIFIER : BlankTableViewCell.IDENTIFIER
         case CellType.action.rawValue:
             identifier = ActionTableViewCell.IDENTIFIER
         case CellType.description.rawValue:

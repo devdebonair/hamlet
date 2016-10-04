@@ -15,4 +15,15 @@ struct Imgur {
         }
         return url.deletingPathExtension().appendingPathExtension("mp4")
     }
+    
+    static func isAlbum(url: URL?) -> Bool {
+        guard let url = url else { return false }
+        let pathComponents = url.pathComponents
+        let albumPath = pathComponents[pathComponents.count - 2]
+        return albumPath == "a"
+    }
+    
+    static func isAlbum(url: String) -> Bool {
+        return isAlbum(url: URL(string: url))
+    }
 }
