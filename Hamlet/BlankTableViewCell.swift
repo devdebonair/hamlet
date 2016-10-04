@@ -18,6 +18,7 @@ class BlankTableViewCell: UITableViewCell {
     private let blankView: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
+        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
@@ -28,7 +29,7 @@ class BlankTableViewCell: UITableViewCell {
         
         blankView.snp.makeConstraints { (make) in
             make.edges.equalTo(contentView)
-            make.height.equalTo(10)
+            make.height.equalTo(10).priority(750)
         }
     }
     
@@ -42,7 +43,7 @@ class BlankTableViewCell: UITableViewCell {
     
     func setHeight(height: CGFloat) {
         blankView.snp.updateConstraints { (make) in
-            make.height.equalTo(height)
+            make.height.equalTo(height).priority(750)
         }
     }
 

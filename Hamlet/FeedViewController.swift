@@ -69,7 +69,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return 6
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -195,7 +195,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         if let cell = cell as? BlankTableViewCell {
             if indexPath.row == CellType.blank.rawValue {
-                cell.setHeight(height: 20)
+                cell.setHeight(height: 15)
             } else {
                 cell.setHeight(height: 0)
             }
