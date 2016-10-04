@@ -174,8 +174,9 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.accessoryView?.tintColor = cell.labelMessage.textColor
         }
         
-        if indexPath.row == CellType.action.rawValue {
+        if let cell = cell as? ActionTableViewCell {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+            cell.tintColor = UIColor(red: 165/255, green: 165/255, blue: 165/255, alpha: 1.0)
         }
         
         if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.description.rawValue {

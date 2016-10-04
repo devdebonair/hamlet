@@ -15,7 +15,16 @@ class ActionTableViewCell: UITableViewCell {
         return "ActionTableCell"
     }
     
-    let stackViewIcons: UIStackView = {
+    override var tintColor: UIColor! {
+        didSet {
+            imageSave.tintColor = tintColor
+            imageUp.tintColor = tintColor
+            imageDown.tintColor = tintColor
+            labelDiscussion.textColor = tintColor
+        }
+    }
+    
+    lazy var stackViewIcons: UIStackView = {
         let sv = UIStackView()
         sv.axis = .horizontal
         sv.spacing = 20
@@ -24,30 +33,26 @@ class ActionTableViewCell: UITableViewCell {
         return sv
     }()
     
-    let imageSave: UIImageView = {
+    lazy var imageSave: UIImageView = {
         let image = UIImageView(image: #imageLiteral(resourceName: "save"))
-        let rgbValue: CGFloat = 165/255
-        image.tintColor = UIColor(red: rgbValue, green: rgbValue, blue: rgbValue, alpha: 1.0)
+        image.tintColor = self.tintColor
         return image
     }()
-    let imageUp: UIImageView = {
+    lazy var imageUp: UIImageView = {
         let image = UIImageView(image: #imageLiteral(resourceName: "arrow-up"))
-        let rgbValue: CGFloat = 165/255
-        image.tintColor = UIColor(red: rgbValue, green: rgbValue, blue: rgbValue, alpha: 1.0)
+        image.tintColor = self.tintColor
         return image
     }()
-    let imageDown: UIImageView = {
+    lazy var imageDown: UIImageView = {
         let image = UIImageView(image: #imageLiteral(resourceName: "arrow-down"))
-        let rgbValue: CGFloat = 165/255
-        image.tintColor = UIColor(red: rgbValue, green: rgbValue, blue: rgbValue, alpha: 1.0)
+        image.tintColor = self.tintColor
         return image
     }()
     
-    let labelDiscussion: UILabel = {
+    lazy var labelDiscussion: UILabel = {
         let label = UILabel()
         label.text = "View Discussion"
-        let rgbValue: CGFloat = 165/255
-        label.textColor = UIColor(red: rgbValue, green: rgbValue, blue: rgbValue, alpha: 1.0)
+        label.textColor = self.tintColor
         label.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightBold)
         return label
     }()
