@@ -67,18 +67,14 @@ class FlashTableViewCell: UITableViewCell {
         var _progress = progress
         if progress > 1.0, progress < 0.0 { _progress = 0.0 }
         let width = contentView.bounds.width - (contentView.bounds.width * _progress)
-        UIView.animate(withDuration: 1.0, delay: 1.0, options: [], animations: {
-            self.viewProgression.snp.updateConstraints { (make) in
-                make.right.equalTo(self.contentView).inset(width)
-            }
-
-            }, completion: nil)
-    }
-    
-    func animateProgress(progress: CGFloat, duration: TimeInterval = 0.5) {
-        UIView.animate(withDuration: duration) { 
-            self.setProgression(progress: progress)
+        viewProgression.snp.updateConstraints { (make) in
+            make.right.equalTo(self.contentView).inset(width)
         }
     }
 
+    func setHeight(height: CGFloat) {
+        viewProgression.snp.updateConstraints { (make) in
+            make.height.equalTo(height)
+        }
+    }
 }

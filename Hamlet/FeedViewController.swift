@@ -105,7 +105,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         case CellType.media.rawValue:
             identifier = listing.isVideo ? AsyncVideoTableViewCell.IDENTIFIER : PhotoTableViewCell.IDENTIFIER
         case CellType.flash.rawValue:
-            identifier = FlashTableViewCell.IDENTIFIER
+            identifier = indexPath.section % 2 == 0 ? FlashTableViewCell.IDENTIFIER : BlankTableViewCell.IDENTIFIER
         case CellType.action.rawValue:
             identifier = ActionTableViewCell.IDENTIFIER
         case CellType.description.rawValue:
@@ -163,7 +163,6 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         if let cell = cell as? FlashTableViewCell {
             let colorOfProgress = UIColor(red: 0/255, green: 132/255, blue: 180/255, alpha: 1.0)
-            
             cell.colorProgress = colorOfProgress
             cell.labelMessage.textColor = .white
             cell.labelMessage.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightBold)
@@ -195,7 +194,11 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         if let cell = cell as? BlankTableViewCell {
-            cell.setHeight(height: 20)
+            if indexPath.row == CellType.blank.rawValue {
+                cell.setHeight(height: 20)
+            } else {
+                cell.setHeight(height: 0)
+            }
         }
         
         return cell
