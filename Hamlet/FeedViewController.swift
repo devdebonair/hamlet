@@ -132,14 +132,12 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             let mediaSize = CGSize(width: preview.variantSource.source.width, height: preview.variantSource.source.height)
             let height = aspectHeight(tableView.frame.size, mediaSize)
             cell.setPhotoHeight(height)
-            cell.separatorInset = .zero
         }
         
         if let cell = cell as? AsyncVideoTableViewCell, let preview = listing.previewMedia, listing.isVideo {
             let mediaSize = CGSize(width: preview.variantSource.source.width, height: preview.variantSource.source.height)
             let height = aspectHeight(tableView.frame.size, mediaSize)
             cell.setMediaHeight(height: height)
-            cell.separatorInset = .zero
             
             switch listing.domain {
             case Listing.Domain.imgur.rawValue:
@@ -162,7 +160,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         if let cell = cell as? FlashTableViewCell {
-            let colorOfProgress = UIColor(red: 0/255, green: 132/255, blue: 180/255, alpha: 1.0)
+            let colorOfProgress = UIColor(red: 25/255, green: 181/255, blue: 254/255, alpha: 1.0)
             cell.colorProgress = colorOfProgress
             cell.labelMessage.textColor = .white
             cell.labelMessage.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightBold)
