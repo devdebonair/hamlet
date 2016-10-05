@@ -9,10 +9,10 @@
 import Mapper
 
 struct Variant {
-    let source: Image
-    let resolutions: [Image]
+    let source: Media
+    let resolutions: [Media]
     
-    init(source: Image, resolutions: [Image]) {
+    init(source: Media, resolutions: [Media]) {
         self.source = source
         self.resolutions = resolutions
     }
@@ -20,7 +20,7 @@ struct Variant {
 
 extension Variant: Convertible {
     static func fromMap(_ value: Any) throws -> Variant {
-        guard let variant = value as? NSDictionary, let sourceData = variant["source"] as? NSDictionary, let resolutionsData = variant["resolutions"] as? NSArray, let source = Image.from(sourceData), let resolutions = Image.from(resolutionsData) else {
+        guard let variant = value as? NSDictionary, let sourceData = variant["source"] as? NSDictionary, let resolutionsData = variant["resolutions"] as? NSArray, let source = Media.from(sourceData), let resolutions = Media.from(resolutionsData) else {
             throw MapperError.convertibleError(value: value, type: Variant.self)
         }
         return Variant(source: source, resolutions: resolutions)

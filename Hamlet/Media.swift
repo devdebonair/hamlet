@@ -8,7 +8,7 @@
 
 import Mapper
 
-struct Image: Mappable {
+struct Media: Mappable {
     private let _url: URL
     let height: Int
     let width: Int
@@ -31,11 +31,11 @@ struct Image: Mappable {
     }
 }
 
-extension Image: Convertible {
-    static func fromMap(_ value: Any) throws -> Image {
+extension Media: Convertible {
+    static func fromMap(_ value: Any) throws -> Media {
         guard let image = value as? NSDictionary, let urlString = image["url"] as? String, let url = URL(string: urlString), let height = image["height"] as? Int, let width = image["width"] as? Int else {
-            throw MapperError.convertibleError(value: value, type: Image.self)
+            throw MapperError.convertibleError(value: value, type: Media.self)
         }
-        return Image(url: url, height: height, width: width)
+        return Media(url: url, height: height, width: width)
     }
 }

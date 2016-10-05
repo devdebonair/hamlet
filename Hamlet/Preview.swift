@@ -36,7 +36,7 @@ extension Preview: Convertible {
     }
     
     private static func getVariant(json: NSDictionary) -> Variant? {
-        guard let sourceData = json["source"] as? NSDictionary, let resolutionsData = json["resolutions"] as? NSArray, let source = Image.from(sourceData), let resolutions = Image.from(resolutionsData) else {
+        guard let sourceData = json["source"] as? NSDictionary, let resolutionsData = json["resolutions"] as? NSArray, let source = Media.from(sourceData), let resolutions = Media.from(resolutionsData) else {
             return nil
         }
         return Variant(source: source, resolutions: resolutions)
