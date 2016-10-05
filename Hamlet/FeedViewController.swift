@@ -26,8 +26,8 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         tv.delegate = self
         tv.dataSource = self
         tv.tableFooterView = UIView()
-        tv.estimatedRowHeight = 220
-        tv.estimatedSectionHeaderHeight = 50
+        tv.estimatedRowHeight = 300
+        tv.estimatedSectionHeaderHeight = 25
         tv.rowHeight = UITableViewAutomaticDimension
         tv.sectionHeaderHeight = UITableViewAutomaticDimension
         tv.register(PhotoTableViewCell.self, forCellReuseIdentifier: PhotoTableViewCell.IDENTIFIER)
@@ -220,4 +220,3 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
 }
-
