@@ -12,8 +12,21 @@ import Kingfisher
 
 class HomePresenter: FeedControllerDelegate {
     
-    let SUBREDDIT = "pics"
+    let SUBREDDIT = "re_zero"
     
+    let viewController: FeedViewController = {
+        let controller = FeedViewController()
+        return controller
+    }()
+    
+    // Protocols
+    func dataSource() -> [FeedViewModel] { return feedItems }
+    func didLoad() { fetchData(completion: loadTable) }
+    func didReachEnd() { fetchData(completion: loadTable) }
+
+    var cachedListings = [Listing]()
+    
+    // Datasource
     var feedItems = [FeedViewModel]() {
         didSet {
             var imageURLs = [URL]()
@@ -26,28 +39,19 @@ class HomePresenter: FeedControllerDelegate {
         }
     }
     
-    var cachedListings = [Listing]()
-    let viewController: FeedViewController = {
-        let controller = FeedViewController()
-        return controller
-    }()
     
     init() {
         viewController.delegate = self
     }
     
-    func dataSource() -> [FeedViewModel] { return feedItems }
-    func didLoad() { fetchData(completion: loadTable) }
-    func didReachEnd() { fetchData(completion: loadTable) }
-    
-    func fetchData(completion: @escaping ([Listing])->Void) {
+    private func fetchData(completion: @escaping ([Listing])->Void) {
         Subreddit.fetchListing(subreddit: SUBREDDIT, sort: .hot, after: cachedListings.last?.name, limit: 50) { (listings) in
             self.cachedListings = listings
             completion(listings)
         }
     }
     
-    func loadTable(listings: [Listing]) {
+    private func loadTable(listings: [Listing]) {
         let mappedFeedItems = self.loadFeedItems(listings: listings)
         
         self.viewController.tableView.beginUpdates()
@@ -66,7 +70,7 @@ class HomePresenter: FeedControllerDelegate {
         self.viewController.tableView.endUpdates()
     }
     
-    func loadFeedItems(listings: [Listing]) -> [FeedViewModel] {
+    private func loadFeedItems(listings: [Listing]) -> [FeedViewModel] {
         let items = listings.map({ (listing) -> FeedViewModel in
             let flashColor: UIColor? = listing.isAlbum ? UIColor(red: 25/255, green: 181/255, blue: 254/255, alpha: 1.0) : nil
             let flashMessage: String? = listing.isAlbum ? "album".uppercased() : nil
