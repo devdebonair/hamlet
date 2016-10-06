@@ -39,7 +39,7 @@ struct Listing: Mappable {
     let isNSFW: Bool
     let numberOfComments: Int
     let flair: String
-    let thumbnail: String?
+    let thumbnail: URL?
     let domain: String
     let description: String
     let name: String
@@ -67,7 +67,7 @@ struct Listing: Mappable {
         if let previewMedia = previewMedia, let _ = previewMedia.variantMP4 {
             hasVideoVariant = true
         }
-        
+
         return (VALID_VIDEO_FORMATS.contains(fileExtension) || domain == Domain.gfycat.rawValue || hasVideoVariant)
     }
     
