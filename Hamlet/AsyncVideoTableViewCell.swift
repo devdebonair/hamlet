@@ -12,7 +12,7 @@ import AVFoundation
 import AsyncDisplayKit
 import SnapKit
 
-class AsyncVideoTableViewCell: UITableViewCell {
+class AsyncVideoTableViewCell: UITableViewCell, ASVideoNodeDelegate {
     
     override class var IDENTIFIER: String {
         return "Video_Table_Cell"
@@ -23,7 +23,11 @@ class AsyncVideoTableViewCell: UITableViewCell {
         player.gravity = AVLayerVideoGravityResizeAspectFill
         player.shouldAutoplay = false
         player.shouldAutorepeat = true
-
+        player.placeholderShouldPersist()
+        player.placeholderEnabled = true
+        player.placeholderFadeDuration = 0.5
+        player.backgroundColor = .black
+        player.delegate = self
         return player
     }()
     
@@ -74,6 +78,10 @@ class AsyncVideoTableViewCell: UITableViewCell {
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
+    }
+    
+    func didTap(_ videoNode: ASVideoNode) {
+        videoPlayer.player?.seek(to: kCMTimeZero)
     }
 
 }
