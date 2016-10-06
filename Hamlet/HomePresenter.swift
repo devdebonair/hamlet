@@ -29,7 +29,7 @@ class HomePresenter: FeedControllerDelegate {
     func didReachEnd() { fetchData(completion: loadTable) }
     
     func fetchData(completion: @escaping ([Listing])->Void) {
-        Subreddit.fetchListing(subreddit: SUBREDDIT, sort: .new, after: cachedListings.last?.name) { (listings) in
+        Subreddit.fetchListing(subreddit: SUBREDDIT, sort: .new, after: cachedListings.last?.name, limit: 50) { (listings) in
             self.cachedListings = listings
             completion(listings)
         }
@@ -52,7 +52,6 @@ class HomePresenter: FeedControllerDelegate {
         let newContentOffset = CGPoint(x: afterContentOffset.x, y: afterContentOffset.y + afterContentSize.height - beforeContentSize.height)
         self.viewController.tableView.contentOffset = newContentOffset
         self.viewController.tableView.endUpdates()
-        
     }
     
     func loadFeedItems(listings: [Listing]) -> [FeedViewModel] {

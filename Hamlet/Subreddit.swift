@@ -74,10 +74,13 @@ extension Subreddit {
         fetchListing(subreddit: subreddit, sort: .controversial, completion: completion)
     }
     
-    static func fetchListing(subreddit: String, sort: Listing.SortType, after: String? = nil, completion: @escaping (([Listing])->())) {
+    static func fetchListing(subreddit: String, sort: Listing.SortType, after: String? = nil, limit: Int? = nil, completion: @escaping (([Listing])->())) {
         var queries = [String:String]()
         if let after = after {
             queries["after"] = after
+        }
+        if let limit = limit {
+            queries["limit"] = String(limit)
         }
         let url = "https://api.reddit.com/r/\(subreddit)/\(sort.rawValue)"
         let headers = ["User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36"]
