@@ -8,12 +8,24 @@
 
 import Foundation
 import UIKit
+import Kingfisher
 
 class HomePresenter: FeedControllerDelegate {
     
-    let SUBREDDIT = "girlsfinishingthejob"
+    let SUBREDDIT = "pics"
     
-    var feedItems = [FeedViewModel]()
+    var feedItems = [FeedViewModel]() {
+        didSet {
+            var imageURLs = [URL]()
+            feedItems.forEach { (model) in
+                guard let media = model.media, let url = media.url, media.type == .photo  else { return }
+                imageURLs.append(url)
+            }
+            let prefetcher = ImagePrefetcher(urls: imageURLs)
+            prefetcher.start()
+        }
+    }
+    
     var cachedListings = [Listing]()
     let viewController: FeedViewController = {
         let controller = FeedViewController()
@@ -29,7 +41,7 @@ class HomePresenter: FeedControllerDelegate {
     func didReachEnd() { fetchData(completion: loadTable) }
     
     func fetchData(completion: @escaping ([Listing])->Void) {
-        Subreddit.fetchListing(subreddit: SUBREDDIT, sort: .new, after: cachedListings.last?.name, limit: 50) { (listings) in
+        Subreddit.fetchListing(subreddit: SUBREDDIT, sort: .hot, after: cachedListings.last?.name, limit: 50) { (listings) in
             self.cachedListings = listings
             completion(listings)
         }
@@ -95,7 +107,7 @@ class HomePresenter: FeedControllerDelegate {
             
             let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
             let submissionText = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)\(domainSubmissionText)"
-            return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url)
+            return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name)
         })
         return items
     }

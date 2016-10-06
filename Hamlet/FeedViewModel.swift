@@ -26,4 +26,5 @@ struct FeedViewModel {
     let actionColor: UIColor
     let submission: String
     let linkUrl: URL?
+    let primaryKey: String
 }
