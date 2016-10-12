@@ -72,6 +72,9 @@ struct Listing: Mappable {
     }
     
     var isAlbum: Bool {
+        guard let url = url, url.absoluteString.lowercased().contains("imgur") else {
+            return false
+        }
         return Imgur.isAlbum(url: url)
     }
     
