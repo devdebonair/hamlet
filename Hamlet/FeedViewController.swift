@@ -109,6 +109,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         switch indexPath.row {
         case CellType.media.rawValue:
             identifier = feedItem.media?.type == .video ? AsyncVideoTableViewCell.IDENTIFIER : PhotoTableViewCell.IDENTIFIER
+            if feedItem.media == nil { identifier = LabelTableViewCell.IDENTIFIER }
         case CellType.flash.rawValue:
             identifier = feedItem.flashMessage == nil ? BlankTableViewCell.IDENTIFIER : FlashTableViewCell.IDENTIFIER
         case CellType.action.rawValue:
@@ -171,8 +172,11 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.tintColor = feedItem.actionColor
         }
         
-        if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.description.rawValue {
+        if let cell = cell as? LabelTableViewCell, (indexPath.row == CellType.description.rawValue || indexPath.row == CellType.media.rawValue) {
             cell.labelContent.text = feedItem.description
+            if indexPath.row == CellType.description.rawValue && feedItem.media == nil {
+                cell.labelContent.text = ""
+            }
         }
         
         if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.submission.rawValue {
