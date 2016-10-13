@@ -11,8 +11,7 @@ import UIKit
 import Kingfisher
 
 class HomePresenter: FeedControllerDelegate {
-    
-    let SUBREDDIT = "fo4"
+    let SUBREDDIT = "animegifs"
     
     let viewController: FeedViewController = {
         let controller = FeedViewController()
@@ -81,8 +80,9 @@ class HomePresenter: FeedControllerDelegate {
             
             if let preview = listing.previewMedia {
                 let url: URL?
-                
+                var type: Media.MediaType? = nil
                 if listing.isVideo {
+                    type = .video
                     switch listing.domain {
                     case Listing.Domain.imgur.rawValue:
                         url = Imgur.replaceGIFV(url: listing.url)
@@ -95,19 +95,22 @@ class HomePresenter: FeedControllerDelegate {
                             url = mp4Url
                         } else {
                             url = nil
+                            type = nil
                         }
-                        
                     }
                 } else {
+                    type = .photo
                     if listing.domain.lowercased() == Listing.Domain.imgur.rawValue.lowercased() {
                         url = listing.url
+                    } else if let gifSource = preview.variantGIF {
+                        url = gifSource.source.url
                     } else {
                         url = preview.variantSource.source.url
                     }
                 }
                 
                 if let url = url {
-                    media = Media(url: url, height: preview.variantSource.source.height, width: preview.variantSource.source.width, type: nil)
+                    media = Media(url: url, height: preview.variantSource.source.height, width: preview.variantSource.source.width, type: type)
                 }
             }
             
@@ -117,5 +120,4 @@ class HomePresenter: FeedControllerDelegate {
         })
         return items
     }
-
 }

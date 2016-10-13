@@ -242,7 +242,7 @@
 				TargetAttributes = {
 					568119B11D9CC9D100B31FCB = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = PG246JM739;
+						DevelopmentTeam = 8L4W325NFA;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -472,7 +472,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = PG246JM739;
+				DEVELOPMENT_TEAM = 8L4W325NFA;
 				INFOPLIST_FILE = Hamlet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.debonair.Hamlet;
@@ -487,7 +487,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = PG246JM739;
+				DEVELOPMENT_TEAM = 8L4W325NFA;
 				INFOPLIST_FILE = Hamlet/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.debonair.Hamlet;
