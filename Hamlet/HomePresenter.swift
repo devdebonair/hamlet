@@ -11,7 +11,7 @@ import UIKit
 import Kingfisher
 
 class HomePresenter: FeedControllerDelegate {
-    let SUBREDDIT = "animegifs"
+    let SUBREDDIT = "bokunoheroacademia"
     
     let viewController: FeedViewController = {
         let controller = FeedViewController()
@@ -104,8 +104,11 @@ class HomePresenter: FeedControllerDelegate {
                         url = listing.url
                     } else if let gifSource = preview.variantGIF {
                         url = gifSource.source.url
+                    } else if let preview = listing.previewMedia?.variantSource {
+                        url = preview.source.url
                     } else {
-                        url = preview.variantSource.source.url
+                        url = nil
+                        type = nil
                     }
                 }
                 

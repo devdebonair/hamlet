@@ -20,8 +20,12 @@ struct Variant {
 
 extension Variant: Convertible {
     static func fromMap(_ value: Any) throws -> Variant {
-        guard let variant = value as? NSDictionary, let sourceData = variant["source"] as? NSDictionary, let resolutionsData = variant["resolutions"] as? NSArray, let source = Media.from(sourceData), let resolutions = Media.from(resolutionsData) else {
+        guard let variant = value as? NSDictionary, let sourceData = variant["source"] as? NSDictionary, let source = Media.from(sourceData) else {
             throw MapperError.convertibleError(value: value, type: Variant.self)
+        }
+        var resolutions: [Media] = []
+        if let resolutionsData = variant["resolutions"] as? NSArray, let parsedResolutions = Media.from(resolutionsData) {
+            resolutions = parsedResolutions
         }
         return Variant(source: source, resolutions: resolutions)
     }
