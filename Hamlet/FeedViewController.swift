@@ -32,7 +32,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         tv.delegate = self
         tv.dataSource = self
         tv.tableFooterView = UIView()
-        tv.estimatedRowHeight = 300
+        tv.estimatedRowHeight = 200
         tv.estimatedSectionHeaderHeight = 25
         tv.rowHeight = UITableViewAutomaticDimension
         tv.sectionHeaderHeight = UITableViewAutomaticDimension
@@ -142,16 +142,18 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             let height = aspectHeight(tableView.frame.size, mediaSize)
             cell.setMediaHeight(height: height)
             cell.setVideoUrl(url: media.url)
-            cell.videoPlayer.url = feedItem.posterUrl
+            cell.videoPlayer.url = media.poster
         }
         
         if let cell = cell as? FlashTableViewCell, let message = feedItem.flashMessage, let color = feedItem.flashColor {
-            cell.colorProgress = color
-            cell.labelMessage.textColor = .white
-            cell.labelMessage.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightBold)
             cell.message = message.uppercased()
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+            cell.labelMessage.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightBold)
             cell.setProgression(progress: 1.0)
-            cell.contentView.superview?.backgroundColor = color
+            cell.colorProgress = .clear
+            cell.contentView.superview?.backgroundColor = .clear
+            cell.labelMessage.textColor = color
+
             let imageView = UIImageView(image: #imageLiteral(resourceName: "disclose"))
             imageView.frame.size = CGSize(width: 13, height: 13)
             imageView.contentMode = .scaleAspectFit
@@ -199,6 +201,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         if let cell = cell as? AsyncVideoTableViewCell, cell.videoPlayer.isPlaying() {
             cell.videoPlayer.pause()
+            cell.videoPlayer.url = nil
         }
     }
     
