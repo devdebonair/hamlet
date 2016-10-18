@@ -27,5 +27,4 @@ struct FeedViewModel {
     let submission: String
     let linkUrl: URL?
     let primaryKey: String
-    var posterUrl: URL?
 }
