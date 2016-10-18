@@ -22,9 +22,10 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         case media = 0
         case flash = 1
         case action = 2
-        case description = 3
-        case submission = 4
-        case blank = 5
+        case upvotes = 3
+        case description = 4
+        case submission = 5
+        case blank = 6
     }
     
     lazy var tableView: UITableView = {
@@ -75,7 +76,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 6
+        return 7
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -115,6 +116,8 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             identifier = feedItem.flashMessage == nil ? BlankTableViewCell.IDENTIFIER : FlashTableViewCell.IDENTIFIER
         case CellType.action.rawValue:
             identifier = ActionTableViewCell.IDENTIFIER
+        case CellType.upvotes.rawValue:
+            identifier = LabelTableViewCell.IDENTIFIER
         case CellType.description.rawValue:
             identifier = LabelTableViewCell.IDENTIFIER
         case CellType.submission.rawValue:
@@ -166,10 +169,27 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.tintColor = feedItem.actionColor
         }
         
+        if let cell = cell as? LabelTableViewCell, indexPath.row == CellType.upvotes.rawValue {
+            let attachment = NSTextAttachment()
+            attachment.image = #imageLiteral(resourceName: "arrow-up-filled")
+            attachment.bounds.size = CGSize(width: 11, height: 11)
+            let attachmentString = NSAttributedString(attachment: attachment)
+            let string = NSMutableAttributedString(attributedString: attachmentString)
+            string.append(NSAttributedString(string: " \(feedItem.upvotes) upvotes"))
+            cell.labelContent.textColor = .darkText
+            cell.labelContent.attributedText = feedItem.upvotes > 0 ? string : nil
+            cell.labelContent.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightSemibold)
+        }
+        
         if let cell = cell as? LabelTableViewCell, (indexPath.row == CellType.description.rawValue || indexPath.row == CellType.media.rawValue) {
-            cell.labelContent.text = feedItem.description
             if indexPath.row == CellType.description.rawValue && feedItem.media == nil {
-                cell.labelContent.text = ""
+                cell.labelContent.text = nil
+                cell.labelContent.attributedText = nil
+            } else {
+                let authorString = NSAttributedString(string: feedItem.author, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: cell.labelContent.font.pointSize, weight: UIFontWeightSemibold)])
+                let string = NSMutableAttributedString(attributedString: authorString)
+                string.append(NSAttributedString(string: " \(feedItem.description)"))
+                cell.labelContent.attributedText = feedItem.description.isEmpty ? nil : string
             }
         }
         

@@ -46,6 +46,7 @@ class LabelTableViewCell: UITableViewCell {
         labelContent.textColor = .darkText
         labelContent.numberOfLines = 4
         contentText = ""
+        labelContent.attributedText = nil
     }
     
     required init?(coder aDecoder: NSCoder) {

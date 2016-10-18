@@ -27,4 +27,5 @@ struct FeedViewModel {
     let submission: String
     let linkUrl: URL?
     let primaryKey: String
+    let upvotes: Int
 }

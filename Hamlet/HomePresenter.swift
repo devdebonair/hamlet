@@ -133,6 +133,7 @@ class HomePresenter: FeedControllerDelegate {
             let actionColor = UIColor(red: 165/255, green: 165/255, blue: 165/255, alpha: 1.0)
             let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
             let submissionText = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)\(domainSubmissionText)"
+            let upvotes = listing.ups
             
             var media: Media? = nil
             
@@ -167,7 +168,7 @@ class HomePresenter: FeedControllerDelegate {
                 }
             }
             
-            return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name)
+            return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name, upvotes: upvotes)
         })
         return items
     }
