@@ -109,7 +109,8 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         switch indexPath.row {
         case CellType.media.rawValue:
             identifier = feedItem.media?.type == .video ? AsyncVideoTableViewCell.IDENTIFIER : PhotoTableViewCell.IDENTIFIER
-            if feedItem.media == nil { identifier = LabelTableViewCell.IDENTIFIER }
+            if feedItem.media == nil && Imgur.isImgurUrl(url: feedItem.linkUrl) { identifier = PhotoTableViewCell.IDENTIFIER }
+            else if feedItem.media == nil { identifier = LabelTableViewCell.IDENTIFIER }
         case CellType.flash.rawValue:
             identifier = feedItem.flashMessage == nil ? BlankTableViewCell.IDENTIFIER : FlashTableViewCell.IDENTIFIER
         case CellType.action.rawValue:
@@ -137,20 +138,11 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         if let cell = cell as? AsyncVideoTableViewCell, let media = feedItem.media, media.type == .video {
-            if feedItem.domain.lowercased() != Listing.Domain.gfycat.rawValue.lowercased() {
-                let mediaSize = CGSize(width: media.width, height: media.height)
-                let height = aspectHeight(tableView.frame.size, mediaSize)
-                cell.setMediaHeight(height: height)
-                cell.setVideoUrl(url: media.url)
-            }
-            
-            if feedItem.domain.lowercased().contains(Listing.Domain.gfycat.rawValue.lowercased()) {
-                Gfycat.fetch(url: media.url, completion: { (gfycat) in
-                    if let gfycat = gfycat {
-                        cell.setVideoUrl(url: gfycat.urlMP4)
-                    }
-                })
-            }
+            let mediaSize = CGSize(width: media.width, height: media.height)
+            let height = aspectHeight(tableView.frame.size, mediaSize)
+            cell.setMediaHeight(height: height)
+            cell.setVideoUrl(url: media.url)
+            cell.videoPlayer.url = feedItem.posterUrl
         }
         
         if let cell = cell as? FlashTableViewCell, let message = feedItem.flashMessage, let color = feedItem.flashColor {

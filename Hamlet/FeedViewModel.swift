@@ -22,9 +22,10 @@ struct FeedViewModel {
     let author: String
     let subreddit: String
     let domain: String
-    let media: Media?
+    var media: Media?
     let actionColor: UIColor
     let submission: String
     let linkUrl: URL?
     let primaryKey: String
+    var posterUrl: URL?
 }

@@ -12,6 +12,11 @@ import Alamofire
 
 struct Imgur: Mappable {
     
+    private static let HTTP_HEADERS = [
+        "User-Agent": HEADER_USER_AGENT,
+        "Authorization": "Client-ID \(IMGUR_CLIENT_ID)"
+    ]
+    
     let title: String
     let description: String
     let datetime: Int
@@ -40,37 +45,63 @@ struct Imgur: Mappable {
         isNSFW = map.optionalFrom("nsfw") ?? false
     }
     
+    static func isAlbum(url: String) -> Bool { return isAlbum(url: URL(string: url)) }
+    static func isImgurUrl(string: String) -> Bool { return isImgurUrl(url: URL(string: string)) }
+    
+    static func isImgurUrl(url: URL?) -> Bool {
+        guard let url = url, let host = url.host, host.contains("imgur") else { return false }
+        return true
+    }
+    
+    static func getID(url: URL?) -> String? {
+        guard let url = url, isImgurUrl(url: url) else { return nil }
+        return url.deletingPathExtension().lastPathComponent
+    }
+    
     static func replaceGIFV(url: URL?) -> URL? {
-        guard let url = url else { return nil }
+        guard let url = url, isImgurUrl(url: url) else { return nil }
         return url.deletingPathExtension().appendingPathExtension("mp4")
     }
     
+    static func getImage(url: URL?, completion: @escaping (Imgur?)->Void) {
+        guard let id = getID(url: url) else { return completion(nil) }
+        return getImage(id: id, completion: completion)
+    }
+    
     static func isAlbum(url: URL?) -> Bool {
-        guard let url = url else { return false }
+        guard let url = url, isImgurUrl(url: url) else { return false }
         let pathComponents = url.pathComponents
         let albumPath = pathComponents[pathComponents.count - 2]
         let validAlbumPaths = ["a", "gallery"]
         return validAlbumPaths.contains(albumPath)
     }
     
-    static func isAlbum(url: String) -> Bool {
-        return isAlbum(url: URL(string: url))
-    }
-    
     static func getAlbum(id: String, completion: @escaping ([Imgur])->Void) {
         let url = "https://api.imgur.com/3/album/\(id)"
-        let headers = ["User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36"]
-        Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
+        Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: HTTP_HEADERS).responseJSON { (response) in
             completion(parseImages(response: response))
         }
     }
     
     static func getGalleryAlbum(id: String, completion: @escaping ([Imgur])->Void) {
         let url = "http://api.imgur.com/3/gallery/album/\(id)"
-        let headers = ["User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.76 Safari/537.36"]
-        Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: headers).responseJSON { (response) in
+        Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: HTTP_HEADERS).responseJSON { (response) in
             completion(parseImages(response: response))
         }
+    }
+    
+    static func getImage(id: String, completion: @escaping (Imgur?)->Void) {
+        let url = "https://api.imgur.com/3/image/\(id)"
+        Alamofire.request(url, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: HTTP_HEADERS).responseJSON { (response) in
+            completion(parseImage(response: response))
+        }
+    }
+    
+    private static func parseImage(response: DataResponse<Any>) -> Imgur? {
+        guard let json = response.result.value as? NSDictionary, let data = json["data"] as? NSDictionary, let imgurImage = Imgur.from(data) else {
+            return nil
+        }
+        return imgurImage
     }
     
     private static func parseImages(response: DataResponse<Any>) -> [Imgur] {

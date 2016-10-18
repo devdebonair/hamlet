@@ -19,6 +19,7 @@
 		565BD5381DA2C0A800D1376D /* BlankTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565BD5371DA2C0A800D1376D /* BlankTableViewCell.swift */; };
 		565BD53A1DA2E1D700D1376D /* FlashTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565BD5391DA2E1D700D1376D /* FlashTableViewCell.swift */; };
 		5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5674BA711D9F867C00A4A974 /* Subreddit.swift */; };
+		567BADC91DB107FC006B3FCB /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567BADC81DB107FC006B3FCB /* Config.swift */; };
 		568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568119B51D9CC9D100B31FCB /* AppDelegate.swift */; };
 		568119B81D9CC9D100B31FCB /* FeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568119B71D9CC9D100B31FCB /* FeedViewController.swift */; };
 		568119BD1D9CC9D100B31FCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 568119BC1D9CC9D100B31FCB /* Assets.xcassets */; };
@@ -49,6 +50,7 @@
 		565BD5371DA2C0A800D1376D /* BlankTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlankTableViewCell.swift; sourceTree = "<group>"; };
 		565BD5391DA2E1D700D1376D /* FlashTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlashTableViewCell.swift; sourceTree = "<group>"; };
 		5674BA711D9F867C00A4A974 /* Subreddit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Subreddit.swift; sourceTree = "<group>"; };
+		567BADC81DB107FC006B3FCB /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		568119B21D9CC9D100B31FCB /* Hamlet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hamlet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		568119B51D9CC9D100B31FCB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		568119B71D9CC9D100B31FCB /* FeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedViewController.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 				568119BE1D9CC9D100B31FCB /* LaunchScreen.storyboard */,
 				568119C11D9CC9D100B31FCB /* Info.plist */,
 				56CB7E6B1DA0360A008AA2CB /* Math.swift */,
+				567BADC81DB107FC006B3FCB /* Config.swift */,
 			);
 			path = Hamlet;
 			sourceTree = "<group>";
@@ -342,6 +345,7 @@
 				56CB7E681DA024BC008AA2CB /* UITableViewCell+Identifier.swift in Sources */,
 				5636AC391DA19763006EF7B3 /* Gfycat.swift in Sources */,
 				56CB7E6A1DA02812008AA2CB /* LabelTableViewCell.swift in Sources */,
+				567BADC91DB107FC006B3FCB /* Config.swift in Sources */,
 				5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */,
 				56CB7E611D9FFF58008AA2CB /* Preview.swift in Sources */,
 				5636AC321DA17A37006EF7B3 /* VideoView.swift in Sources */,

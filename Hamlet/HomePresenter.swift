@@ -52,37 +52,89 @@ class HomePresenter: FeedControllerDelegate {
     private func loadTable(listings: [Listing]) {
         let mappedFeedItems = self.loadFeedItems(listings: listings)
         
-        self.viewController.tableView.beginUpdates()
+        fetchRemoteMedia(items: mappedFeedItems) { (items) in
+            self.viewController.tableView.beginUpdates()
+            
+            let min = self.feedItems.count
+            let max = self.feedItems.count + items.count
+            let indexSet = IndexSet(integersIn: min..<max)
+            self.viewController.tableView.insertSections(indexSet, with: .none)
+            self.feedItems.append(contentsOf: items)
+            
+            // keep tableview from scrolling to top
+            let beforeContentSize = self.viewController.tableView.contentSize
+            self.viewController.tableView.reloadData()
+            let afterContentSize = self.viewController.tableView.contentSize
+            let afterContentOffset = self.viewController.tableView.contentOffset
+            let newContentOffset = CGPoint(x: afterContentOffset.x, y: afterContentOffset.y + afterContentSize.height - beforeContentSize.height)
+            self.viewController.tableView.contentOffset = newContentOffset
+            
+            self.viewController.tableView.endUpdates()
+        }
         
-        let min = self.feedItems.count
-        let max = self.feedItems.count + mappedFeedItems.count
-        let indexSet = IndexSet(integersIn: min..<max)
-        self.viewController.tableView.insertSections(indexSet, with: .none)
-        self.feedItems.append(contentsOf: mappedFeedItems)
+    }
+    
+    private func fetchRemoteMedia(items: [FeedViewModel], completion: @escaping ([FeedViewModel])->Void) {
+        let queue = DispatchQueue(label: "com.Hamlet.RemoteMediaFetch")
+        let group = DispatchGroup()
         
-        // keep tableview from scrolling to top
-        let beforeContentSize = self.viewController.tableView.contentSize
-        self.viewController.tableView.reloadData()
-        let afterContentSize = self.viewController.tableView.contentSize
-        let afterContentOffset = self.viewController.tableView.contentOffset
-        let newContentOffset = CGPoint(x: afterContentOffset.x, y: afterContentOffset.y + afterContentSize.height - beforeContentSize.height)
-        self.viewController.tableView.contentOffset = newContentOffset
+        var newItems = [FeedViewModel]()
         
-        self.viewController.tableView.endUpdates()
+        for var item in items {
+            if item.media == nil && Imgur.isImgurUrl(url: item.linkUrl) && !Imgur.isAlbum(url: item.linkUrl) {
+                let url = item.linkUrl
+                group.enter()
+                queue.async(group: group) {
+                    Imgur.getImage(url: url, completion: { (image) in
+                        if let image = image {
+                            let media = Media(url: image.link, height: image.height, width: image.width, type: .photo)
+                            item.media = media
+                            newItems.append(item)
+                            group.leave()
+                        }
+                    })
+                }
+            } else if item.domain.lowercased().contains(Listing.Domain.gfycat.rawValue.lowercased()) {
+                let url = item.linkUrl
+                group.enter()
+                queue.async(group: group) {
+                    Gfycat.fetch(url: url, completion: { (gfycat) in
+                        if let gfycat = gfycat, let width = gfycat.width, let height = gfycat.height {
+                            let media = Media(url: gfycat.urlMobileMP4, height: height, width: width, type: .video)
+                            item.media = media
+                            item.posterUrl = gfycat.mobilePosterUrl
+                            newItems.append(item)
+                        }
+                        group.leave()
+                    })
+                }
+            } else {
+                newItems.append(item)
+            }
+        }
+        
+        group.notify(queue: .main) { 
+            completion(newItems)
+        }
     }
     
     private func loadFeedItems(listings: [Listing]) -> [FeedViewModel] {
         let items = listings.map({ (listing) -> FeedViewModel in
+            
             let flashColor: UIColor? = listing.isAlbum ? UIColor(red: 25/255, green: 181/255, blue: 254/255, alpha: 1.0) : nil
             let flashMessage: String? = listing.isAlbum ? "album".uppercased() : nil
             let actionColor = UIColor(red: 165/255, green: 165/255, blue: 165/255, alpha: 1.0)
+            let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
+            let submissionText = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)\(domainSubmissionText)"
+            
             var media: Media? = nil
             
             if let preview = listing.previewMedia {
-                let url: URL?
-                var type: Media.MediaType? = nil
-                if listing.isVideo {
-                    type = .video
+                
+                var url: URL? = nil
+                let type: Media.MediaType = listing.isVideo ? .video : .photo
+                
+                if type == .video {
                     switch listing.domain {
                     case Listing.Domain.imgur.rawValue:
                         url = Imgur.replaceGIFV(url: listing.url)
@@ -91,24 +143,15 @@ class HomePresenter: FeedControllerDelegate {
                     case Listing.Domain.gfycat.rawValue:
                         url = listing.url
                     default:
-                        if let mp4Url = preview.variantMP4?.source.url {
-                            url = mp4Url
-                        } else {
-                            url = nil
-                            type = nil
-                        }
+                        url = preview.variantMP4?.source.url
                     }
                 } else {
-                    type = .photo
                     if listing.domain.lowercased() == Listing.Domain.imgur.rawValue.lowercased() {
                         url = listing.url
                     } else if let gifSource = preview.variantGIF {
                         url = gifSource.source.url
-                    } else if let preview = listing.previewMedia?.variantSource {
-                        url = preview.source.url
                     } else {
-                        url = nil
-                        type = nil
+                        url = preview.variantSource.source.url
                     }
                 }
                 
@@ -117,9 +160,7 @@ class HomePresenter: FeedControllerDelegate {
                 }
             }
             
-            let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
-            let submissionText = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)\(domainSubmissionText)"
-            return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name)
+            return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name, posterUrl: nil)
         })
         return items
     }

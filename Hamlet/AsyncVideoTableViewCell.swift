@@ -54,6 +54,7 @@ class AsyncVideoTableViewCell: UITableViewCell, ASVideoNodeDelegate {
     
     override func prepareForReuse() {
         videoPlayer.asset = nil
+        videoPlayer.url = nil
     }
     
     func setMediaHeight(height: CGFloat) {
