@@ -25,6 +25,7 @@ struct Media: Mappable {
     let height: Int
     let width: Int
     let type: MediaType
+    let poster: URL?
     
     var url: URL? {
         let urlString = _url?.absoluteString.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)?.replacingOccurrences(of: "amp;", with: "")
@@ -34,12 +35,13 @@ struct Media: Mappable {
         return nil
     }
     
-    init(url: URL?, height: Int, width: Int, type: MediaType? = nil) {
+    init(url: URL?, height: Int, width: Int, type: MediaType? = nil, poster: URL? = nil) {
         self._url = url
         self.height = height
         self.width = width
         let tempType = Media.getMediaType(url: _url)
         self.type = type ?? tempType ?? .photo
+        self.poster = poster
     }
     
     init(map: Mapper) throws {
@@ -48,6 +50,7 @@ struct Media: Mappable {
         try width = map.from("width")
         let suggestedMediaType = Media.getMediaType(url: _url)
         type = map.optionalFrom("type") ?? suggestedMediaType ?? .photo
+        poster = nil
     }
     
 }
