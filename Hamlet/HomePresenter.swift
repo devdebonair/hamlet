@@ -9,9 +9,10 @@
 import Foundation
 import UIKit
 import Kingfisher
+import PINRemoteImage
 
 class HomePresenter: FeedControllerDelegate {
-    let SUBREDDIT = "bokunoheroacademia"
+    let SUBREDDIT = "re_zero"
     
     let viewController: FeedViewController = {
         let controller = FeedViewController()
@@ -29,11 +30,18 @@ class HomePresenter: FeedControllerDelegate {
     var feedItems = [FeedViewModel]() {
         didSet {
             var imageURLs = [URL]()
+            var videoPosterURLs = [URL]()
             feedItems.forEach { (model) in
-                guard let media = model.media, let url = media.url, media.type == .photo  else { return }
-                imageURLs.append(url)
+                guard let media = model.media else { return }
+                if let url = media.url, media.type == .photo {
+                    imageURLs.append(url)
+                } else if let poster = media.poster, media.type == .video {
+                    videoPosterURLs.append(poster)
+                }
             }
             let prefetcher = ImagePrefetcher(urls: imageURLs)
+            let manager = PINRemoteImageManager()
+            manager.prefetchImages(with: videoPosterURLs)
             prefetcher.start()
         }
     }
@@ -100,9 +108,8 @@ class HomePresenter: FeedControllerDelegate {
                 queue.async(group: group) {
                     Gfycat.fetch(url: url, completion: { (gfycat) in
                         if let gfycat = gfycat, let width = gfycat.width, let height = gfycat.height {
-                            let media = Media(url: gfycat.urlMobileMP4, height: height, width: width, type: .video)
+                            let media = Media(url: gfycat.urlMobileMP4, height: height, width: width, type: .video, poster: gfycat.mobilePosterUrl)
                             item.media = media
-                            item.posterUrl = gfycat.mobilePosterUrl
                             newItems.append(item)
                         }
                         group.leave()
@@ -121,7 +128,7 @@ class HomePresenter: FeedControllerDelegate {
     private func loadFeedItems(listings: [Listing]) -> [FeedViewModel] {
         let items = listings.map({ (listing) -> FeedViewModel in
             
-            let flashColor: UIColor? = listing.isAlbum ? UIColor(red: 25/255, green: 181/255, blue: 254/255, alpha: 1.0) : nil
+            let flashColor: UIColor? = listing.isAlbum ? UIColor(red: 50/255, green: 92/255, blue: 134/255, alpha: 1.0) : nil
             let flashMessage: String? = listing.isAlbum ? "album".uppercased() : nil
             let actionColor = UIColor(red: 165/255, green: 165/255, blue: 165/255, alpha: 1.0)
             let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
@@ -160,7 +167,7 @@ class HomePresenter: FeedControllerDelegate {
                 }
             }
             
-            return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name, posterUrl: nil)
+            return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name)
         })
         return items
     }
