@@ -67,9 +67,11 @@ class AsyncVideoTableViewCell: UITableViewCell, ASVideoNodeDelegate {
         guard let url = url else {
             return
         }
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.default).async {
+        DispatchQueue.global(qos: .background).async {
             let asset = AVAsset(url: url)
-            self.videoPlayer.asset = asset
+            DispatchQueue.main.async {
+                self.videoPlayer.asset = asset
+            }
         }
     }
     
