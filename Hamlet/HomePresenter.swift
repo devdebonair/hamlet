@@ -8,11 +8,10 @@
 
 import Foundation
 import UIKit
-import Kingfisher
 import PINRemoteImage
 
 class HomePresenter: FeedControllerDelegate {
-    let SUBREDDIT = "re_zero"
+    let SUBREDDIT = "anime"
     
     let viewController: FeedViewController = {
         let controller = FeedViewController()
@@ -30,19 +29,15 @@ class HomePresenter: FeedControllerDelegate {
     var feedItems = [FeedViewModel]() {
         didSet {
             var imageURLs = [URL]()
-            var videoPosterURLs = [URL]()
             feedItems.forEach { (model) in
                 guard let media = model.media else { return }
                 if let url = media.url, media.type == .photo {
                     imageURLs.append(url)
                 } else if let poster = media.poster, media.type == .video {
-                    videoPosterURLs.append(poster)
+                    imageURLs.append(poster)
                 }
             }
-            let prefetcher = ImagePrefetcher(urls: imageURLs)
-            let manager = PINRemoteImageManager()
-            manager.prefetchImages(with: videoPosterURLs)
-            prefetcher.start()
+            PINRemoteImageManager.shared().prefetchImages(with: imageURLs)
         }
     }
     

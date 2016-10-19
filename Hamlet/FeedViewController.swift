@@ -8,7 +8,7 @@
 
 import UIKit
 import SnapKit
-import Kingfisher
+import PINRemoteImage
 
 protocol FeedControllerDelegate {
     func dataSource() -> [FeedViewModel]
@@ -33,7 +33,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         tv.delegate = self
         tv.dataSource = self
         tv.tableFooterView = UIView()
-        tv.estimatedRowHeight = 200
+        tv.estimatedRowHeight = 250
         tv.estimatedSectionHeaderHeight = 25
         tv.rowHeight = UITableViewAutomaticDimension
         tv.sectionHeaderHeight = UITableViewAutomaticDimension
@@ -136,7 +136,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         if let cell = cell as? PhotoTableViewCell, let media = feedItem.media, indexPath.row == CellType.media.rawValue {
             let mediaSize = CGSize(width: media.width, height: media.height)
             let height = aspectHeight(tableView.frame.size, mediaSize)
-            cell.imagePhoto.kf.setImage(with: media.url)
+            cell.imagePhoto.pin_setImage(from: media.url)
             cell.setPhotoHeight(height)
         }
         
@@ -178,7 +178,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             string.append(NSAttributedString(string: " \(feedItem.upvotes) upvotes"))
             cell.labelContent.textColor = .darkText
             cell.labelContent.attributedText = feedItem.upvotes > 0 ? string : nil
-            cell.labelContent.font = UIFont.systemFont(ofSize: 14, weight: UIFontWeightSemibold)
+            cell.labelContent.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightSemibold)
         }
         
         if let cell = cell as? LabelTableViewCell, (indexPath.row == CellType.description.rawValue || indexPath.row == CellType.media.rawValue) {
@@ -186,6 +186,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
                 cell.labelContent.text = nil
                 cell.labelContent.attributedText = nil
             } else {
+                cell.labelContent.font = UIFont.systemFont(ofSize: 12)
                 let authorString = NSAttributedString(string: feedItem.author, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: cell.labelContent.font.pointSize, weight: UIFontWeightSemibold)])
                 let string = NSMutableAttributedString(attributedString: authorString)
                 string.append(NSAttributedString(string: " \(feedItem.description)"))
@@ -216,7 +217,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? PhotoTableViewCell {
-            cell.imagePhoto.kf.cancelDownloadTask()
+            cell.imagePhoto.pin_cancelImageDownload()
         }
         
         if let cell = cell as? AsyncVideoTableViewCell, cell.videoPlayer.isPlaying() {
