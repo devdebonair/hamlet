@@ -56,25 +56,9 @@ class HomePresenter: FeedControllerDelegate {
         let mappedFeedItems = self.loadFeedItems(listings: listings)
         
         fetchRemoteMedia(items: mappedFeedItems) { (items) in
-            self.viewController.tableView.beginUpdates()
-            
-            let min = self.feedItems.count
-            let max = self.feedItems.count + items.count
-            let indexSet = IndexSet(integersIn: min..<max)
-            self.viewController.tableView.insertSections(indexSet, with: .none)
             self.feedItems.append(contentsOf: items)
-            
-            // keep tableview from scrolling to top
-            let beforeContentSize = self.viewController.tableView.contentSize
             self.viewController.tableView.reloadData()
-            let afterContentSize = self.viewController.tableView.contentSize
-            let afterContentOffset = self.viewController.tableView.contentOffset
-            let newContentOffset = CGPoint(x: afterContentOffset.x, y: afterContentOffset.y + afterContentSize.height - beforeContentSize.height)
-            self.viewController.tableView.contentOffset = newContentOffset
-            
-            self.viewController.tableView.endUpdates()
         }
-        
     }
     
     private func fetchRemoteMedia(items: [FeedViewModel], completion: @escaping ([FeedViewModel])->Void) {
