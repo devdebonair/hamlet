@@ -11,7 +11,7 @@ import UIKit
 import PINRemoteImage
 
 class HomePresenter: FeedControllerDelegate {
-    let SUBREDDIT = "rocketleague"
+    let SUBREDDIT = "animegifs"
     
     let viewController: FeedViewController = {
         let controller = FeedViewController()

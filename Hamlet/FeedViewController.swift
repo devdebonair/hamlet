@@ -16,7 +16,7 @@ protocol FeedControllerDelegate {
     func didReachEnd()
 }
 
-class FeedViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class FeedViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate {
 
     enum CellType: Int {
         case media = 0
@@ -227,8 +227,31 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let cell = cell as? AsyncVideoTableViewCell {
-            cell.videoPlayer.play()
+        if tableView.contentOffset.y < tableView.frame.height {
+            if let cell = cell as? AsyncVideoTableViewCell {
+                cell.videoPlayer.play()
+            }
+        }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        playVisibleVideoCells(willPlay: false)
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        playVisibleVideoCells()
+    }
+    
+    private func playVisibleVideoCells(willPlay: Bool = true) {
+        let cells = tableView.visibleCells
+        for cell in cells {
+            if let cell = cell as? AsyncVideoTableViewCell {
+                if willPlay {
+                    cell.videoPlayer.play()
+                } else {
+                    cell.videoPlayer.pause()
+                }
+            }
         }
     }
 
