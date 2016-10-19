@@ -48,6 +48,8 @@ struct Listing: Mappable {
     let previewMedia: Preview?
     let subreddit: String
     
+    var dateCreated: Date { return Date(timeIntervalSince1970: createdDate) }
+    
     var descriptionEscaped: String {
         return description.replacingOccurrences(of: "\n", with: "").replacingOccurrences(of: "#", with: "")
     }

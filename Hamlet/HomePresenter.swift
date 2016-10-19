@@ -11,7 +11,7 @@ import UIKit
 import PINRemoteImage
 
 class HomePresenter: FeedControllerDelegate {
-    let SUBREDDIT = "anime"
+    let SUBREDDIT = "rocketleague"
     
     let viewController: FeedViewController = {
         let controller = FeedViewController()
@@ -127,7 +127,7 @@ class HomePresenter: FeedControllerDelegate {
             let flashMessage: String? = listing.isAlbum ? "album".uppercased() : nil
             let actionColor = UIColor(red: 165/255, green: 165/255, blue: 165/255, alpha: 1.0)
             let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
-            let submissionText = "Submitted 1 hour ago by \(listing.author) on r/\(listing.subreddit)\(domainSubmissionText)"
+            let submissionText = "Submitted \(listing.dateCreated.timeAgo(numericDates: true)) by \(listing.author) on r/\(listing.subreddit)\(domainSubmissionText)"
             let upvotes = listing.ups
             
             var media: Media? = nil
