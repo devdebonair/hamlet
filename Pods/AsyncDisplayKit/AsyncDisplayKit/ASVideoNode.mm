@@ -403,7 +403,7 @@ static NSString * const kStatus = @"status";
 - (void)clearFetchedData
 {
   [super clearFetchedData];
-  [self __clearFetchedData]
+    [self __clearFetchedData];
 }
 
 - (void)visibleStateDidChange:(BOOL)isVisible
