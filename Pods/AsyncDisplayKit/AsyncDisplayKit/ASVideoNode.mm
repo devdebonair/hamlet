@@ -403,13 +403,7 @@ static NSString * const kStatus = @"status";
 - (void)clearFetchedData
 {
   [super clearFetchedData];
-  
-  {
-    ASDN::MutexLocker l(__instanceLock__);
-
-    self.player = nil;
-    self.currentItem = nil;
-  }
+  [self __clearFetchedData]
 }
 
 - (void)visibleStateDidChange:(BOOL)isVisible
