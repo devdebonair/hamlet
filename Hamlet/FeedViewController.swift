@@ -152,7 +152,6 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             cell.message = message.uppercased()
             cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
             cell.labelMessage.font = UIFont.systemFont(ofSize: 12, weight: UIFontWeightBold)
-            cell.setProgression(progress: 1.0)
             cell.colorProgress = .clear
             cell.contentView.superview?.backgroundColor = .clear
             cell.labelMessage.textColor = color
@@ -162,6 +161,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
             imageView.contentMode = .scaleAspectFit
             cell.accessoryView = imageView
             cell.accessoryView?.tintColor = cell.labelMessage.textColor
+            cell.accessoryView?.backgroundColor = .clear
         }
         
         if let cell = cell as? ActionTableViewCell {
@@ -227,19 +227,20 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if tableView.contentOffset.y < tableView.frame.height {
-            if let cell = cell as? AsyncVideoTableViewCell {
-                cell.videoPlayer.play()
-            }
+        let feedItem = dataSource[indexPath.section]
+        if let cell = cell as? AsyncVideoTableViewCell, let media = feedItem.media, media.type == .video {
+            cell.videoPlayer.play()
         }
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        playVisibleVideoCells(willPlay: false)
-    }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        playVisibleVideoCells()
+        
+        if let cell = cell as? FlashTableViewCell, feedItem.flashMessage != nil, let color = feedItem.flashColor {
+            UIView.animate(withDuration: 1.0, delay: 2.0, options: [], animations: {
+                cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+                cell.contentView.superview?.backgroundColor = color
+                }, completion: { _ in
+                    cell.accessoryView?.tintColor = .white
+                    cell.labelMessage.textColor = .white
+            })
+        }
     }
     
     private func playVisibleVideoCells(willPlay: Bool = true) {
@@ -247,9 +248,13 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         for cell in cells {
             if let cell = cell as? AsyncVideoTableViewCell {
                 if willPlay {
-                    cell.videoPlayer.play()
+                    if !cell.videoPlayer.isPlaying() {
+                        cell.videoPlayer.play()
+                    }
                 } else {
-                    cell.videoPlayer.pause()
+                    if cell.videoPlayer.isPlaying() {
+                        cell.videoPlayer.pause()
+                    }
                 }
             }
         }

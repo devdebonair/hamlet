@@ -53,8 +53,8 @@ class AsyncVideoTableViewCell: UITableViewCell, ASVideoNodeDelegate {
     }
     
     override func prepareForReuse() {
-        videoPlayer.asset = nil
         videoPlayer.url = nil
+        videoPlayer.asset = nil
     }
     
     func setMediaHeight(height: CGFloat) {
@@ -69,6 +69,7 @@ class AsyncVideoTableViewCell: UITableViewCell, ASVideoNodeDelegate {
         }
         DispatchQueue.global(qos: .background).async {
             let asset = AVAsset(url: url)
+            self.videoPlayer.asset = nil
             DispatchQueue.main.async {
                 self.videoPlayer.asset = asset
             }
