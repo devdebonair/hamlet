@@ -33,7 +33,7 @@ class HomePresenter: FeedControllerDelegate {
                 guard let media = model.media else { return }
                 if let url = media.url, media.type == .photo {
                     imageURLs.append(url)
-                } else if let poster = media.poster, media.type == .video {
+                } else if let poster = media.poster {
                     imageURLs.append(poster)
                 }
             }
@@ -120,11 +120,13 @@ class HomePresenter: FeedControllerDelegate {
                 
                 var url: URL? = nil
                 let type: Media.MediaType = listing.isVideo ? .video : .photo
+                var poster: URL? = nil
                 
                 if type == .video {
                     switch listing.domain {
                     case Listing.Domain.imgur.rawValue:
                         url = Imgur.replaceGIFV(url: listing.url)
+                        poster = preview.variantSource.source.url
                     case Listing.Domain.reddit.rawValue:
                         url = preview.variantMP4?.source.url
                     case Listing.Domain.gfycat.rawValue:
@@ -143,7 +145,7 @@ class HomePresenter: FeedControllerDelegate {
                 }
                 
                 if let url = url {
-                    media = Media(url: url, height: preview.variantSource.source.height, width: preview.variantSource.source.width, type: type)
+                    media = Media(url: url, height: preview.variantSource.source.height, width: preview.variantSource.source.width, type: type, poster: poster)
                 }
             }
             
