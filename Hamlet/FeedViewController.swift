@@ -233,7 +233,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
         if let cell = cell as? FlashTableViewCell, feedItem.flashMessage != nil, let color = feedItem.flashColor {
-            UIView.animate(withDuration: 0.5, delay: 2.0, options: [], animations: {
+            UIView.animate(withDuration: 0.25, delay: 2.0, options: [], animations: {
                 cell.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
                 cell.contentView.superview?.backgroundColor = color
                 }, completion: { _ in
