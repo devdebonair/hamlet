@@ -393,6 +393,13 @@ static NSString * const kStatus = @"status";
   }
 }
 
+- (void)__clearFetchedData {
+    ASDN::MutexLocker l(__instanceLock__);
+    
+    self.player = nil;
+    self.currentItem = nil;
+}
+
 - (void)clearFetchedData
 {
   [super clearFetchedData];
@@ -480,7 +487,7 @@ static NSString * const kStatus = @"status";
 
 - (void)_setAndFetchAsset:(AVAsset *)asset url:(NSURL *)assetURL
 {
-  [self clearFetchedData];
+  [self __clearFetchedData];
   _asset = asset;
   _assetURL = assetURL;
   [self setNeedsDataFetch];
