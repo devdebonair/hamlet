@@ -8,15 +8,17 @@
 
 import UIKit
 import SnapKit
+import AsyncDisplayKit
+import PINRemoteImage
+import PINCache
 
 class PhotoTableViewCell: UITableViewCell {
     override class var IDENTIFIER: String {
         return "PhotoTableCell"
     }
     
-    var imagePhoto: UIImageView = {
-        let iv = UIImageView()
-        iv.translatesAutoresizingMaskIntoConstraints = false
+    var imagePhoto: ASNetworkImageNode = {
+        let iv = ASNetworkImageNode()
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
         return iv
@@ -25,9 +27,9 @@ class PhotoTableViewCell: UITableViewCell {
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        contentView.addSubview(imagePhoto)
+        contentView.addSubview(imagePhoto.view)
         
-        imagePhoto.snp.makeConstraints { (make) in
+        imagePhoto.view.snp.makeConstraints { (make) in
             make.edges.equalTo(contentView)
             make.height.equalTo(0).priority(750)
         }
@@ -42,12 +44,12 @@ class PhotoTableViewCell: UITableViewCell {
     }
     
     override func prepareForReuse() {
-        imagePhoto.image = nil
+        imagePhoto.url = nil
         setPhotoHeight(0)
     }
     
     func setPhotoHeight(_ height: CGFloat) {
-        imagePhoto.snp.updateConstraints { (make) in
+        imagePhoto.view.snp.updateConstraints { (make) in
             make.height.equalTo(height).priority(750)
         }
     }

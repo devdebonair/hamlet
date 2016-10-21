@@ -33,7 +33,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         tv.delegate = self
         tv.dataSource = self
         tv.tableFooterView = UIView()
-        tv.estimatedRowHeight = 250
+        tv.estimatedRowHeight = 500
         tv.estimatedSectionHeaderHeight = 25
         tv.rowHeight = UITableViewAutomaticDimension
         tv.sectionHeaderHeight = UITableViewAutomaticDimension
@@ -55,13 +55,15 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        automaticallyAdjustsScrollViewInsets = false
+        
         view.backgroundColor = .white
         
         view.addSubview(tableView)
         
         tableView.snp.makeConstraints { (make) in
-            make.left.right.bottom.equalTo(view)
             make.top.equalTo(view).offset(20)
+            make.left.right.bottom.equalTo(view)
         }
         
         delegate.didLoad()
@@ -136,7 +138,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
         if let cell = cell as? PhotoTableViewCell, let media = feedItem.media, indexPath.row == CellType.media.rawValue {
             let mediaSize = CGSize(width: media.width, height: media.height)
             let height = aspectHeight(tableView.frame.size, mediaSize)
-            cell.imagePhoto.pin_setImage(from: media.url)
+            cell.imagePhoto.url = media.url
             cell.setPhotoHeight(height)
         }
         
@@ -186,7 +188,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
                 cell.labelContent.text = nil
                 cell.labelContent.attributedText = nil
             } else {
-                cell.labelContent.font = UIFont.systemFont(ofSize: 12)
+                cell.labelContent.font = UIFont.systemFont(ofSize: 14)
                 let authorString = NSAttributedString(string: feedItem.author, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: cell.labelContent.font.pointSize, weight: UIFontWeightSemibold)])
                 let string = NSMutableAttributedString(attributedString: authorString)
                 string.append(NSAttributedString(string: " \(feedItem.description)"))
@@ -217,7 +219,7 @@ class FeedViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let cell = cell as? PhotoTableViewCell {
-            cell.imagePhoto.pin_cancelImageDownload()
+            cell.imagePhoto.url = nil
         }
         
         if let cell = cell as? AsyncVideoTableViewCell, cell.videoPlayer.isPlaying() {

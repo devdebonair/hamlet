@@ -11,11 +11,17 @@ import UIKit
 import PINRemoteImage
 
 class HomePresenter: FeedControllerDelegate {
-    let SUBREDDIT = "animegifs"
+    let SUBREDDIT = "pics"
     
     let viewController: FeedViewController = {
         let controller = FeedViewController()
+        controller.navigationItem.title = "Pics"
         return controller
+    }()
+    
+    lazy var navigationController: UINavigationController = {
+        let navigation = UINavigationController(rootViewController: self.viewController)
+        return navigation
     }()
     
     // Protocols
