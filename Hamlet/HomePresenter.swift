@@ -11,11 +11,11 @@ import UIKit
 import PINRemoteImage
 
 class HomePresenter: FeedControllerDelegate {
-    let SUBREDDIT = "pics"
+    var subreddit: String
+    var sort: Listing.SortType
     
     let viewController: FeedViewController = {
         let controller = FeedViewController()
-        controller.navigationItem.title = "Pics"
         return controller
     }()
     
@@ -47,12 +47,15 @@ class HomePresenter: FeedControllerDelegate {
         }
     }
     
-    init() {
+    init(subredditID: String, subredditName: String, sort: Listing.SortType) {
+        self.subreddit = subredditID
+        self.sort = sort
+        viewController.navigationItem.title = subredditName
         viewController.delegate = self
     }
     
     private func fetchData(completion: @escaping ([Listing])->Void) {
-        Subreddit.fetchListing(subreddit: SUBREDDIT, sort: .hot, after: cachedListings.last?.name, limit: 50) { (listings) in
+        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 50) { (listings) in
             self.cachedListings = listings
             completion(listings)
         }
