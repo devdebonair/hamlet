@@ -12,6 +12,8 @@
 		56173B7C1DBB2F42009A0563 /* SubredditListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B7B1DBB2F42009A0563 /* SubredditListViewController.swift */; };
 		56173B7E1DBB3237009A0563 /* SubredditListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B7D1DBB3237009A0563 /* SubredditListViewModel.swift */; };
 		56173B801DBB454A009A0563 /* SubredditListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B7F1DBB454A009A0563 /* SubredditListPresenter.swift */; };
+		56173B821DBB5567009A0563 /* CellNodeVideo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B811DBB5567009A0563 /* CellNodeVideo.swift */; };
+		56173B841DBB5AAD009A0563 /* FeedTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B831DBB5AAD009A0563 /* FeedTestViewController.swift */; };
 		5636AC2E1DA0C630006EF7B3 /* UIView+Border.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC2D1DA0C630006EF7B3 /* UIView+Border.swift */; };
 		5636AC301DA179BD006EF7B3 /* VideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC2F1DA179BD006EF7B3 /* VideoPlayer.swift */; };
 		5636AC321DA17A37006EF7B3 /* VideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC311DA17A37006EF7B3 /* VideoView.swift */; };
@@ -48,6 +50,8 @@
 		56173B7B1DBB2F42009A0563 /* SubredditListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubredditListViewController.swift; sourceTree = "<group>"; };
 		56173B7D1DBB3237009A0563 /* SubredditListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubredditListViewModel.swift; sourceTree = "<group>"; };
 		56173B7F1DBB454A009A0563 /* SubredditListPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubredditListPresenter.swift; sourceTree = "<group>"; };
+		56173B811DBB5567009A0563 /* CellNodeVideo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellNodeVideo.swift; sourceTree = "<group>"; };
+		56173B831DBB5AAD009A0563 /* FeedTestViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedTestViewController.swift; sourceTree = "<group>"; };
 		5636AC2D1DA0C630006EF7B3 /* UIView+Border.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Border.swift"; sourceTree = "<group>"; };
 		5636AC2F1DA179BD006EF7B3 /* VideoPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoPlayer.swift; sourceTree = "<group>"; };
 		5636AC311DA17A37006EF7B3 /* VideoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoView.swift; sourceTree = "<group>"; };
@@ -106,6 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				56173B791DBB2C0D009A0563 /* CellNodeSubredditList.swift */,
+				56173B811DBB5567009A0563 /* CellNodeVideo.swift */,
 			);
 			name = Nodes;
 			sourceTree = "<group>";
@@ -181,6 +186,7 @@
 			children = (
 				568119B71D9CC9D100B31FCB /* FeedViewController.swift */,
 				56173B7B1DBB2F42009A0563 /* SubredditListViewController.swift */,
+				56173B831DBB5AAD009A0563 /* FeedTestViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -366,6 +372,7 @@
 				56A125221DA4F6AA001715BA /* String+Array.swift in Sources */,
 				56173B7C1DBB2F42009A0563 /* SubredditListViewController.swift in Sources */,
 				56A125201DA4B9B4001715BA /* FeedViewModel.swift in Sources */,
+				56173B841DBB5AAD009A0563 /* FeedTestViewController.swift in Sources */,
 				5636AC3B1DA1A860006EF7B3 /* Imgur.swift in Sources */,
 				56B232171DB7E60C007BCEA9 /* Date+TimeAgo.swift in Sources */,
 				56CB7E681DA024BC008AA2CB /* UITableViewCell+Identifier.swift in Sources */,
@@ -378,6 +385,7 @@
 				5636AC321DA17A37006EF7B3 /* VideoView.swift in Sources */,
 				565BD53A1DA2E1D700D1376D /* FlashTableViewCell.swift in Sources */,
 				5636AC2E1DA0C630006EF7B3 /* UIView+Border.swift in Sources */,
+				56173B821DBB5567009A0563 /* CellNodeVideo.swift in Sources */,
 				568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */,
 				569BAB751DA082F2006C6531 /* ActionTableViewCell.swift in Sources */,
 				56CB7E6C1DA0360A008AA2CB /* Math.swift in Sources */,
