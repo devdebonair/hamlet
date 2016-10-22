@@ -16,11 +16,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
-        let controller = HomePresenter().navigationController
+//        let controller = HomePresenter().navigationController
+//        controller.hidesBarsOnSwipe = true
+//        controller.navigationBar.barTintColor = .white
+        let controller = SubredditListPresenter().navigationController
         controller.hidesBarsOnSwipe = true
         controller.navigationBar.barTintColor = .white
         window?.rootViewController = controller
-        
         window?.makeKeyAndVisible()
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
