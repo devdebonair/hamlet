@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import AsyncDisplayKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,19 +17,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
-//        let controller = HomePresenter().navigationController
-//        controller.hidesBarsOnSwipe = true
-//        controller.navigationBar.barTintColor = .white
-        let controller = SubredditListPresenter().navigationController
-        controller.hidesBarsOnSwipe = true
-        controller.navigationBar.barTintColor = .white
-        window?.rootViewController = controller
+        let presenter = SubredditListPresenter()
+        let controller = SubredditListViewController()
+
+        controller.delegate = presenter
+        
+        let navController = UINavigationController(rootViewController: controller)
+        navController.hidesBarsOnSwipe = true
+        navController.navigationBar.alpha = 1.0
+        controller.navigationItem.title = "Subreddits"
+        navController.navigationBar.barTintColor = .white
+        navController.navigationBar.tintColor = .darkText
+        navController.navigationBar.titleTextAttributes = [
+            NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
+        
+        presenter.onDidSelectSubreddit = { id, item in
+            let presenter = HomePresenter(subredditID: id, subredditName: item.name, sort: .hot)
+            let controller = FeedViewController()
+            controller.delegate = presenter
+            navController.pushViewController(controller, animated: true)
+        }
+        
+        
+        window?.rootViewController = navController
         window?.makeKeyAndVisible()
+        
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryAmbient)
         } catch {
             print("Error with audio sessions")
         }
+        
         return true
     }
 
