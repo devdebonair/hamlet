@@ -9,6 +9,7 @@ PODS:
     - AsyncDisplayKit/Core
     - PINRemoteImage/iOS (>= 3.0.0-beta.3)
   - ModelMapper (5.0.0-beta.2)
+  - NVActivityIndicatorView (3.0)
   - PINCache (3.0.1-beta)
   - PINRemoteImage/Core (3.0.0-beta.3):
     - PINCache (>= 3.0.0-beta)
@@ -18,8 +19,9 @@ PODS:
 
 DEPENDENCIES:
   - Alamofire (~> 4.0.1)
-  - AsyncDisplayKit
+  - AsyncDisplayKit (~> 1.9.90)
   - ModelMapper (from `https://github.com/lyft/mapper`, branch `swift-3.0`)
+  - NVActivityIndicatorView (~> 3.0)
   - SnapKit (~> 3.0.0)
 
 EXTERNAL SOURCES:
@@ -36,6 +38,7 @@ SPEC CHECKSUMS:
   Alamofire: 7682d43245de14874acd142ec137b144aa1dd335
   AsyncDisplayKit: 926ded3ca3fb7026565e0e81f0e132fea4d3a6eb
   ModelMapper: b306e689e231331896d447a36a54643c5da0bacd
+  NVActivityIndicatorView: 81953b5e65093ba79edf4fe7268e002039ca5268
   PINCache: 6911fe422a633e18b3d3ddf2bd4f0e55e36e2892
   PINRemoteImage: 308731aa6534500e58fc211b9cc2bb7252df25ba
   SnapKit: f818b8326d45b4e1c777d0ab27b5c0a3624bfdeb

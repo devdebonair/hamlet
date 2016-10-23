@@ -6,6 +6,7 @@ target 'Hamlet' do
 	pod 'ModelMapper', :git => 'https://github.com/lyft/mapper', :branch => 'swift-3.0'
 	pod 'SnapKit', '~> 3.0.0'
     pod 'AsyncDisplayKit', '~> 1.9.90'
+    pod 'NVActivityIndicatorView', '~> 3.0'
 end
 
 post_install do |installer|
