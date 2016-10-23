@@ -22,9 +22,16 @@ class CellNodeSubredditList: ASCellNode {
         
         addSubnode(textNode)
         addSubnode(imageNode)
+        
+        textNode.isLayerBacked = true
+        imageNode.isLayerBacked = true
+        
         textNode.maximumNumberOfLines = 1
         imageNode.cornerRadius = imageHeight / 2
+        imageNode.borderColor = UIColor.lightGray.cgColor
+        imageNode.borderWidth = 1.0
         imageNode.clipsToBounds = true
+        imageNode.contentMode = .scaleAspectFill
         
         if let subreddit = subreddit {
             self.textNode.attributedText = NSAttributedString(string: subreddit, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightRegular)])
