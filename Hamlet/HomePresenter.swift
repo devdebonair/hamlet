@@ -9,26 +9,17 @@
 import Foundation
 import UIKit
 import PINRemoteImage
+import AsyncDisplayKit
 
 class HomePresenter: FeedControllerDelegate {
-    var subreddit: String
-    var sort: Listing.SortType
-    
-    let viewController: FeedViewController = {
-        let controller = FeedViewController()
-        return controller
-    }()
-    
-    lazy var navigationController: UINavigationController = {
-        let navigation = UINavigationController(rootViewController: self.viewController)
-        return navigation
-    }()
     
     // Protocols
     func dataSource() -> [FeedViewModel] { return feedItems }
-    func didLoad() { fetchData(completion: loadTable) }
-    func didReachEnd() { fetchData(completion: loadTable) }
-
+    func didLoad(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
+    func didReachEnd(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
+    
+    var subreddit: String
+    var sort: Listing.SortType
     var cachedListings = [Listing]()
     
     // Datasource
@@ -43,30 +34,23 @@ class HomePresenter: FeedControllerDelegate {
                     imageURLs.append(poster)
                 }
             }
-            PINRemoteImageManager.shared().prefetchImages(with: imageURLs)
         }
     }
     
     init(subredditID: String, subredditName: String, sort: Listing.SortType) {
-        self.subreddit = subredditID
         self.sort = sort
-        viewController.navigationItem.title = subredditName
-        viewController.delegate = self
+        subreddit = subredditID
     }
     
-    private func fetchData(completion: @escaping ([Listing])->Void) {
+    private func fetchData(tableNode: ASTableNode) {
         Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 50) { (listings) in
             self.cachedListings = listings
-            completion(listings)
-        }
-    }
-    
-    private func loadTable(listings: [Listing]) {
-        let mappedFeedItems = self.loadFeedItems(listings: listings)
-        
-        fetchRemoteMedia(items: mappedFeedItems) { (items) in
-            self.feedItems.append(contentsOf: items)
-            self.viewController.tableView.reloadData()
+            let mappedFeedItems = self.loadFeedItems(listings: listings)
+            
+            self.fetchRemoteMedia(items: mappedFeedItems) { (items) in
+                self.feedItems.append(contentsOf: items)
+                tableNode.view.reloadData()
+            }
         }
     }
     

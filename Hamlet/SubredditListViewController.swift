@@ -9,10 +9,10 @@
 import UIKit
 import AsyncDisplayKit
 
-protocol SubredditListDelegate {
+protocol SubredditListDelegate: class {
     func dataSource() -> [SubredditListViewModel]
-    func didLoad()
-    func didSelectItem(row: Int)
+    func didLoad(tableNode: ASTableNode)
+    func didSelectItem(tableNode: ASTableNode, row: Int)
 }
 
 class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
@@ -29,7 +29,7 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     override func loadView() {
         super.loadView()
         node.view.separatorStyle = .none
-        delegate.didLoad()
+        delegate.didLoad(tableNode: node)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -38,13 +38,20 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     
     func numberOfSections(in tableView: UITableView) -> Int { return dataSource.count }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { return 1 }
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { delegate.didSelectItem(row: indexPath.section) }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { delegate.didSelectItem(tableNode: node, row: indexPath.section) }
     
     func tableView(_ tableView: ASTableView, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let item = dataSource[indexPath.section]
         return { _ -> ASCellNode in
-            let cell = CellNodeSubredditList(subreddit: item.name, url: item.imageURL)
+            let cell = CellNodeSubredditList(subreddit: item.name, url: nil)
             return cell
+        }
+    }
+    
+    func tableView(_ tableView: ASTableView, willDisplayNodeForRowAt indexPath: IndexPath) {
+        let cell = tableView.nodeForRow(at: indexPath)
+        if let cell = cell as? CellNodeSubredditList {
+            cell.imageNode.url = dataSource[indexPath.section].imageURL
         }
     }
 }
