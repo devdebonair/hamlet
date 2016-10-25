@@ -38,7 +38,6 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
     
     var delegate: FeedControllerDelegate!
     var dataSource: [FeedViewModel] { return delegate.dataSource() }
-    var assetsCache = [Int:AVAsset]()
     
     init() {
         super.init(node: ASTableNode(style: .plain))
@@ -215,32 +214,17 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
     }
 
     func tableView(_ tableView: ASTableView, willDisplayNodeForRowAt indexPath: IndexPath) {
-//        let feedItem = dataSource[indexPath.section]
-//        let cell = tableView.nodeForRow(at: indexPath)
-//        let weakSelf = self
-//        if let cell = cell as? CellNodeVideo, cell.videoPlayer.asset == nil {
-//            if let asset = assetsCache[indexPath.section] {
-//                cell.videoPlayer.asset = asset
-//            } else {
-//                DispatchQueue.global(qos: .background).async {
-//                    if let media = feedItem.media, let url = media.url {
-//                        let asset = AVAsset(url: url)
-//                        weakSelf.assetsCache[indexPath.section] = asset
-//                        DispatchQueue.main.async {
-//                            cell.videoPlayer.asset = asset
-//                        }
-//                    }
-//                }
-//            }
-//            cell.videoPlayer.url = feedItem.media?.poster
-//        }
+        let cell = tableView.nodeForRow(at: indexPath)
+        if let cell = cell as? CellNodeVideo {
+            cell.loadData()
+        }
+        
     }
     
     func tableView(_ tableView: ASTableView, didEndDisplaying node: ASCellNode, forRowAt indexPath: IndexPath) {
-//        if let node = node as? CellNodeVideo {
-//            node.videoPlayer.asset = nil
-//            node.restartVideo()
-//        }
+        if let node = node as? CellNodeVideo {
+            node.cleanData()
+        }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

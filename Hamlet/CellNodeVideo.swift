@@ -17,6 +17,7 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
     var spinnerNode: ASDisplayNode
     var asset: AVAsset? = nil
     var placeholderURL: URL? = nil
+    var url: URL? = nil
     
     var spinner: NVActivityIndicatorView {
         return spinnerNode.view as! NVActivityIndicatorView
@@ -30,19 +31,10 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
         })
         
         self.size = size
+        self.placeholderURL = placeholderURL
+        self.url = url
         
         super.init()
-        
-        let weakSelf = self
-        if let url = url {
-            DispatchQueue.global(qos: .background).async {
-                let asset = AVAsset(url: url)
-                weakSelf.asset = asset
-                DispatchQueue.main.async {
-                    weakSelf.videoPlayer.asset = weakSelf.asset
-                }
-            }
-        }
         
         addSubnode(videoPlayer)
         addSubnode(spinnerNode)
@@ -92,13 +84,26 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
         videoPlayer.player?.seek(to: kCMTimeZero)
     }
     
-    override func fetchData() {
-        super.fetchData()
-        videoPlayer.asset = asset
-        videoPlayer.url = placeholderURL
+    func loadData() {
+        if let asset = asset {
+            videoPlayer.asset = asset
+            videoPlayer.url = placeholderURL
+        } else {
+            let weakSelf = self
+            if let url = url {
+                DispatchQueue.global(qos: .background).async {
+                    let asset = AVAsset(url: url)
+                    weakSelf.asset = asset
+                    DispatchQueue.main.async {
+                        weakSelf.videoPlayer.asset = weakSelf.asset
+                    }
+                }
+            }
+            videoPlayer.url = placeholderURL
+        }
     }
     
-    override func clearFetchedData() {
+    func cleanData() {
         videoPlayer.asset = nil
         super.clearFetchedData()
     }
