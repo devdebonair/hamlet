@@ -115,6 +115,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 let cell = CellNodeText(attributedString: attributeString, insets: UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15))
                 cell.text.maximumNumberOfLines = 0
                 cell.selectionStyle = .none
+                cell.backgroundColor = .white
                 return cell
                 
             case .photo:
@@ -139,12 +140,14 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 let cell = CellNodeText(attributedString: string)
                 cell.text.maximumNumberOfLines = 8
                 cell.selectionStyle = .none
+                cell.backgroundColor = .white
                 return cell
                 
             case .flash:
                 if let message = feedItem.flashMessage, let color = feedItem.flashColor {
                     let cell = CellNodeFlashMessage(message: message, color: color)
                     cell.selectionStyle = .none
+                    cell.backgroundColor = .white
                     return cell
                 }
                 else { return CellNodeBlank() }
@@ -152,6 +155,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
             case .action:
                 let cell = CellNodeFeedAction(color: .darkText)
                 cell.selectionStyle = .none
+                cell.backgroundColor = .white
                 return cell
                 
             case .upvotes:
@@ -173,6 +177,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 let text = feedItem.upvotes > 0 ? attributedString : nil
                 let cell = CellNodeText(attributedString: text, insets: UIEdgeInsets(top: 10, left: 15, bottom: 5, right: 15))
                 cell.selectionStyle = .none
+                cell.backgroundColor = .white
                 return cell
                 
             case .description:
@@ -190,6 +195,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 
                 let cell = CellNodeText(attributedString: description)
                 cell.selectionStyle = .none
+                cell.backgroundColor = .white
                 return cell
                 
             case .submission:
@@ -197,11 +203,13 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                     NSForegroundColorAttributeName: UIColor(red: 164, green: 164, blue: 164),
                     NSFontAttributeName: UIFont.systemFont(ofSize: 12.0)]))
                 cell.selectionStyle = .none
+                cell.backgroundColor = .white
                 return cell
                 
             case .blank:
                 let cell = CellNodeBlank(height: 15)
                 cell.selectionStyle = .none
+                cell.backgroundColor = .white
                 return cell
                 
             case .separator:

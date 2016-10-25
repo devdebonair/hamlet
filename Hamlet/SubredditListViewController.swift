@@ -50,6 +50,7 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
         let item = dataSource[indexPath.section]
         return { _ -> ASCellNode in
             let cell = CellNodeSubredditList(subreddit: item.name, url: item.imageURL)
+            cell.backgroundColor = .white
             return cell
         }
     }
