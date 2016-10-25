@@ -106,6 +106,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                         NSForegroundColorAttributeName: UIColor.darkText
                     ])
                 let cell = CellNodeText(attributedString: attributeString, insets: UIEdgeInsets(top: 15, left: 15, bottom: 15, right: 15))
+                cell.text.maximumNumberOfLines = 0
                 cell.selectionStyle = .none
                 return cell
                 
@@ -129,6 +130,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                     attributes: [
                         NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightRegular)])
                 let cell = CellNodeText(attributedString: string)
+                cell.text.maximumNumberOfLines = 8
                 cell.selectionStyle = .none
                 return cell
                 
