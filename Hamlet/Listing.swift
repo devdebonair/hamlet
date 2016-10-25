@@ -73,12 +73,7 @@ struct Listing: Mappable {
         return (VALID_VIDEO_FORMATS.contains(fileExtension) || domain == Domain.gfycat.rawValue || hasVideoVariant)
     }
     
-    var isAlbum: Bool {
-        guard let url = url, url.absoluteString.lowercased().contains("imgur") else {
-            return false
-        }
-        return Imgur.isAlbum(url: url)
-    }
+    var isAlbum: Bool { return Imgur.isAlbum(url: url) }
     
     init(map: Mapper) throws {
         kind = map.optionalFrom("kind") ?? ""
