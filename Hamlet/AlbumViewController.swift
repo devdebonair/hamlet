@@ -17,10 +17,11 @@ protocol AlbumViewControllerDelegate: class {
 class AlbumViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
     
     enum CellType: Int {
-        case media = 0
+        case photo = 0
         case description = 1
         case separator = 2
         case blank = 3
+        case video = 4
     }
     
     var delegate: AlbumViewControllerDelegate!
@@ -53,7 +54,16 @@ class AlbumViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTab
     
     func cellTypes(from: AlbumViewModel) -> [CellType] {
         var types = [CellType]()
-        if let _ = from.media { types.append(.media) }
+        
+        if let media = from.media {
+            switch media.type {
+            case .photo:
+                types.append(.photo)
+            case .video:
+                types.append(.video)
+            }
+        }
+        
         if let description = from.description, description.characters.count > 0 { types.append(.description) }
         types.append(.separator)
         types.append(.blank)
@@ -70,17 +80,21 @@ class AlbumViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTab
         return { _ -> ASCellNode in
             switch cellTypes[indexPath.row] {
                 
-            case .media:
-                if let media = albumItem.media {
-                    let mediaSize = CGSize(width: media.width, height: media.height)
-                    var cell: ASCellNode!
-                    cell = media.type == .photo ? CellNodePhoto(url: nil, size: mediaSize) : CellNodeVideo(url: nil, placeholderURL: nil, size: mediaSize)
-                    cell.backgroundColor = .white
+            case .photo:
+                if let media = albumItem.media, media.type == .photo {
+                    let cell = CellNodePhoto(url: media.url, size: CGSize(width: media.width, height: media.height))
                     cell.selectionStyle = .none
+                    cell.backgroundColor = .white
                     return cell
-                } else {
-                    return CellNodeBlank()
-                }
+                } else { return CellNodeBlank() }
+                
+            case .video:
+                if let media = albumItem.media, media.type == .video {
+                    let cell = CellNodeVideo(url: nil, placeholderURL: media.poster, size: CGSize(width: media.width, height: media.height))
+                    cell.selectionStyle = .none
+                    cell.backgroundColor = .white
+                    return cell
+                } else { return CellNodeBlank() }
                 
             case .description:
                 var descriptionString = ""
@@ -112,33 +126,35 @@ class AlbumViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTab
         }
     }
     
+    var assets = [Int:AVAsset]()
+    
     func tableView(_ tableView: ASTableView, willDisplayNodeForRowAt indexPath: IndexPath) {
         let albumItem = dataSource[indexPath.section]
         let cell = tableView.nodeForRow(at: indexPath)
+        let weakSelf = self
         
-        if let cell = cell as? CellNodePhoto {
-            if let media = albumItem.media {
-                cell.photo.url = media.url
-            }
-        }
-        
-        if let cell = cell as? CellNodeVideo {
-            DispatchQueue.global(qos: .background).async {
-                if let media = albumItem.media, let url = media.url {
-                    let asset = AVAsset(url: url)
-                    DispatchQueue.main.async {
-                        cell.videoPlayer.asset = asset
-                        cell.videoPlayer.url = media.poster
+        if let cell = cell as? CellNodeVideo, cell.videoPlayer.asset == nil {
+            if let asset = assets[indexPath.section] {
+                cell.videoPlayer.asset = asset
+            } else {
+                DispatchQueue.global(qos: .background).async {
+                    if let media = albumItem.media, let url = media.url {
+                        let asset = AVAsset(url: url)
+                        weakSelf.assets[indexPath.section] = asset
+                        DispatchQueue.main.async {
+                            cell.videoPlayer.asset = asset
+                        }
                     }
                 }
             }
+            cell.videoPlayer.url = albumItem.media?.poster
         }
     }
     
     func tableView(_ tableView: ASTableView, didEndDisplaying node: ASCellNode, forRowAt indexPath: IndexPath) {
         if let node = node as? CellNodeVideo {
-            node.videoPlayer.pause()
             node.videoPlayer.asset = nil
+            node.restartVideo()
         }
     }
     
