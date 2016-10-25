@@ -32,14 +32,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
         
         presenter.onDidSelectSubreddit = { id, item in
+            
             let presenter = HomePresenter(subredditID: id, subredditName: item.name, sort: .hot)
             let controller = FeedViewController()
             controller.delegate = presenter
             navController.pushViewController(controller, animated: true)
+            
+            presenter.onDidTapFlashMessage = { (listing: Listing) in
+                let albumPresenter = AlbumPresenter(url: listing.url)
+                let albumController = AlbumViewController()
+                albumController.delegate = albumPresenter
+                navController.pushViewController(albumController, animated: true)
+            }
         }
         
+        let testController = navController
         
-        window?.rootViewController = navController
+        window?.rootViewController = testController
         window?.makeKeyAndVisible()
         
         do {

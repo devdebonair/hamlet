@@ -24,11 +24,17 @@
 		5636AC391DA19763006EF7B3 /* Gfycat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC381DA19763006EF7B3 /* Gfycat.swift */; };
 		5636AC3B1DA1A860006EF7B3 /* Imgur.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC3A1DA1A860006EF7B3 /* Imgur.swift */; };
 		5636AC3D1DA1BA69006EF7B3 /* Variant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC3C1DA1BA69006EF7B3 /* Variant.swift */; };
+		564319851DBC9B2C0048D239 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319841DBC9B2C0048D239 /* AlbumViewController.swift */; };
+		564319871DBC9CAB0048D239 /* AlbumViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319861DBC9CAB0048D239 /* AlbumViewModel.swift */; };
 		5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5674BA711D9F867C00A4A974 /* Subreddit.swift */; };
 		567BADC91DB107FC006B3FCB /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567BADC81DB107FC006B3FCB /* Config.swift */; };
 		568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568119B51D9CC9D100B31FCB /* AppDelegate.swift */; };
 		568119BD1D9CC9D100B31FCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 568119BC1D9CC9D100B31FCB /* Assets.xcassets */; };
 		568119C01D9CC9D100B31FCB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 568119BE1D9CC9D100B31FCB /* LaunchScreen.storyboard */; };
+		569E95AE1DBCE200001AABD5 /* UIColor+Literal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569E95AD1DBCE200001AABD5 /* UIColor+Literal.swift */; };
+		569E95B01DBCECFD001AABD5 /* AlbumPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569E95AF1DBCECFD001AABD5 /* AlbumPresenter.swift */; };
+		569E95B21DBD17FA001AABD5 /* CellNodeMultiplexPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569E95B11DBD17FA001AABD5 /* CellNodeMultiplexPhoto.swift */; };
+		569E95B41DBF0358001AABD5 /* String+HTMLDecode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569E95B31DBF0358001AABD5 /* String+HTMLDecode.swift */; };
 		56A1251B1DA4B7E7001715BA /* HomePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A1251A1DA4B7E7001715BA /* HomePresenter.swift */; };
 		56A125201DA4B9B4001715BA /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A1251F1DA4B9B4001715BA /* FeedViewModel.swift */; };
 		56A125221DA4F6AA001715BA /* String+Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A125211DA4F6AA001715BA /* String+Array.swift */; };
@@ -58,6 +64,8 @@
 		5636AC381DA19763006EF7B3 /* Gfycat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gfycat.swift; sourceTree = "<group>"; };
 		5636AC3A1DA1A860006EF7B3 /* Imgur.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Imgur.swift; sourceTree = "<group>"; };
 		5636AC3C1DA1BA69006EF7B3 /* Variant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Variant.swift; sourceTree = "<group>"; };
+		564319841DBC9B2C0048D239 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
+		564319861DBC9CAB0048D239 /* AlbumViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewModel.swift; sourceTree = "<group>"; };
 		5674BA711D9F867C00A4A974 /* Subreddit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Subreddit.swift; sourceTree = "<group>"; };
 		567BADC81DB107FC006B3FCB /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		568119B21D9CC9D100B31FCB /* Hamlet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hamlet.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -65,6 +73,10 @@
 		568119BC1D9CC9D100B31FCB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		568119BF1D9CC9D100B31FCB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		568119C11D9CC9D100B31FCB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		569E95AD1DBCE200001AABD5 /* UIColor+Literal.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+Literal.swift"; sourceTree = "<group>"; };
+		569E95AF1DBCECFD001AABD5 /* AlbumPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumPresenter.swift; sourceTree = "<group>"; };
+		569E95B11DBD17FA001AABD5 /* CellNodeMultiplexPhoto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellNodeMultiplexPhoto.swift; sourceTree = "<group>"; };
+		569E95B31DBF0358001AABD5 /* String+HTMLDecode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+HTMLDecode.swift"; sourceTree = "<group>"; };
 		56A1251A1DA4B7E7001715BA /* HomePresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomePresenter.swift; sourceTree = "<group>"; };
 		56A1251F1DA4B9B4001715BA /* FeedViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
 		56A125211DA4F6AA001715BA /* String+Array.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Array.swift"; sourceTree = "<group>"; };
@@ -101,6 +113,7 @@
 		56173B781DBB2BC8009A0563 /* Nodes */ = {
 			isa = PBXGroup;
 			children = (
+				569E95B11DBD17FA001AABD5 /* CellNodeMultiplexPhoto.swift */,
 				56173B8B1DBBA2E1009A0563 /* CellNodeFlashMessage.swift */,
 				56173B8F1DBBDA63009A0563 /* CellNodeSeparator.swift */,
 				56173B8D1DBBC326009A0563 /* CellNodeBlank.swift */,
@@ -163,6 +176,7 @@
 		56A125191DA4B7C3001715BA /* Presenters */ = {
 			isa = PBXGroup;
 			children = (
+				569E95AF1DBCECFD001AABD5 /* AlbumPresenter.swift */,
 				56173B7F1DBB454A009A0563 /* SubredditListPresenter.swift */,
 				56A1251A1DA4B7E7001715BA /* HomePresenter.swift */,
 			);
@@ -174,6 +188,7 @@
 			children = (
 				56A1251F1DA4B9B4001715BA /* FeedViewModel.swift */,
 				56173B7D1DBB3237009A0563 /* SubredditListViewModel.swift */,
+				564319861DBC9CAB0048D239 /* AlbumViewModel.swift */,
 			);
 			name = ViewModel;
 			sourceTree = "<group>";
@@ -183,6 +198,7 @@
 			children = (
 				56173B7B1DBB2F42009A0563 /* SubredditListViewController.swift */,
 				56173B831DBB5AAD009A0563 /* FeedViewController.swift */,
+				564319841DBC9B2C0048D239 /* AlbumViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -190,10 +206,12 @@
 		56CB7E661DA024A3008AA2CB /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				569E95B31DBF0358001AABD5 /* String+HTMLDecode.swift */,
 				5636AC2D1DA0C630006EF7B3 /* UIView+Border.swift */,
 				56CB7E671DA024BC008AA2CB /* UITableViewCell+Identifier.swift */,
 				56A125211DA4F6AA001715BA /* String+Array.swift */,
 				56B232161DB7E60C007BCEA9 /* Date+TimeAgo.swift */,
+				569E95AD1DBCE200001AABD5 /* UIColor+Literal.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -342,6 +360,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				569E95B21DBD17FA001AABD5 /* CellNodeMultiplexPhoto.swift in Sources */,
 				56173B7E1DBB3237009A0563 /* SubredditListViewModel.swift in Sources */,
 				56D161761D9CEAB90027553A /* Media.swift in Sources */,
 				56D161741D9CE6A80027553A /* Listing.swift in Sources */,
@@ -360,16 +379,21 @@
 				567BADC91DB107FC006B3FCB /* Config.swift in Sources */,
 				5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */,
 				56CB7E611D9FFF58008AA2CB /* Preview.swift in Sources */,
+				569E95B41DBF0358001AABD5 /* String+HTMLDecode.swift in Sources */,
+				564319871DBC9CAB0048D239 /* AlbumViewModel.swift in Sources */,
 				56173B881DBB6A86009A0563 /* CellNodeText.swift in Sources */,
 				56173B901DBBDA64009A0563 /* CellNodeSeparator.swift in Sources */,
 				5636AC2E1DA0C630006EF7B3 /* UIView+Border.swift in Sources */,
 				56173B821DBB5567009A0563 /* CellNodeVideo.swift in Sources */,
 				568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */,
+				569E95B01DBCECFD001AABD5 /* AlbumPresenter.swift in Sources */,
 				56CB7E6C1DA0360A008AA2CB /* Math.swift in Sources */,
 				56173B801DBB454A009A0563 /* SubredditListPresenter.swift in Sources */,
+				569E95AE1DBCE200001AABD5 /* UIColor+Literal.swift in Sources */,
 				5636AC3D1DA1BA69006EF7B3 /* Variant.swift in Sources */,
 				56A1251B1DA4B7E7001715BA /* HomePresenter.swift in Sources */,
 				56173B861DBB6333009A0563 /* CellNodePhoto.swift in Sources */,
+				564319851DBC9B2C0048D239 /* AlbumViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

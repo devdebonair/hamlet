@@ -12,15 +12,22 @@ import PINRemoteImage
 import AsyncDisplayKit
 
 class HomePresenter: FeedControllerDelegate {
-    
+
     // Protocols
     func dataSource() -> [FeedViewModel] { return feedItems }
     func didLoad(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
     func didReachEnd(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
     
+    func didTapFlashMessage(tableNode: ASTableNode, atIndex: Int) {
+        if let onDidTapFlashMessage = onDidTapFlashMessage {
+            onDidTapFlashMessage(cachedListings[atIndex])
+        }
+    }
+    
     var subreddit: String
     var sort: Listing.SortType
     var cachedListings = [Listing]()
+    var onDidTapFlashMessage: ((Listing)->Void)?
     
     // Datasource
     var feedItems = [FeedViewModel]() {
@@ -43,8 +50,8 @@ class HomePresenter: FeedControllerDelegate {
     }
     
     private func fetchData(tableNode: ASTableNode) {
-        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 50) { (listings) in
-            self.cachedListings = listings
+        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 25) { (listings) in
+            self.cachedListings.append(contentsOf: listings)
             let mappedFeedItems = self.loadFeedItems(listings: listings)
             
             self.fetchRemoteMedia(items: mappedFeedItems) { (items) in
@@ -99,8 +106,7 @@ class HomePresenter: FeedControllerDelegate {
     
     private func loadFeedItems(listings: [Listing]) -> [FeedViewModel] {
         let items = listings.map({ (listing) -> FeedViewModel in
-            
-            let flashColor: UIColor? = listing.isAlbum ? UIColor(red: 50/255, green: 92/255, blue: 134/255, alpha: 1.0) : nil
+            let flashColor: UIColor? = listing.isAlbum ? UIColor(red: 50, green: 92, blue: 134) : nil
             let flashMessage: String? = listing.isAlbum ? "album".uppercased() : nil
             let actionColor = UIColor(red: 165/255, green: 165/255, blue: 165/255, alpha: 1.0)
             let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
