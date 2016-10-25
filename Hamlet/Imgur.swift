@@ -91,6 +91,7 @@ struct Imgur: Mappable {
     static func isAlbum(url: URL?) -> Bool {
         guard let url = url, isImgurUrl(url: url) else { return false }
         let pathComponents = url.pathComponents
+        if pathComponents.count < 2 { return false }
         let albumPath = pathComponents[pathComponents.count - 2]
         let validAlbumPaths = ["a", "gallery"]
         return validAlbumPaths.contains(albumPath)
