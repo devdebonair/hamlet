@@ -13,13 +13,14 @@ protocol FeedControllerDelegate: class {
     func dataSource() -> [FeedViewModel]
     func didLoad(tableNode: ASTableNode)
     func didReachEnd(tableNode: ASTableNode)
+    func didTapFlashMessage(tableNode: ASTableNode, atIndex index: Int)
 }
 
 class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
     
     enum CellType: Int {
         case title = 0
-        case media = 1
+        case photo = 1
         case flash = 2
         case action = 3
         case upvotes = 4
@@ -27,6 +28,8 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
         case submission = 6
         case blank = 7
         case separator = 8
+        case mediaDescription = 9
+        case video = 10
     }
     
     var delegate: FeedControllerDelegate!
@@ -57,30 +60,30 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
     }
     
     private func numberOfRows(from: FeedViewModel) -> Int {
-        // action cell is mandatory
-        var count = 0
-        if from.media != nil { count += 1 }
-        if from.flashColor != nil && from.flashMessage != nil { count += 1 }
-        if from.upvotes > 0 { count += 1 }
-        if from.description.characters.count > 0 { count += 1 }
-        if !from.submission.isEmpty { count += 1 }
-        count += 1 // action cell
-        count += 1 // blank cell
-        count += 1 // title cell
-        count += 1 // separator under action
-        return count
+        return orderOfCells(from: from).count
     }
     
     private func orderOfCells(from: FeedViewModel) -> [CellType] {
         var types = [CellType]()
         types.append(.title)
-        if from.media != nil { types.append(.media) } else if from.description.characters.count >= 0 { types.append(.description) }
+        
+        if let media = from.media {
+            switch media.type {
+            case .photo:
+                types.append(.photo)
+            case .video:
+                types.append(.video)
+            }
+        } else if from.description.characters.count > 0 {
+            types.append(.mediaDescription)
+        }
+        
         if from.flashColor != nil || from.flashMessage != nil { types.append(.flash) }
         types.append(.action)
         types.append(.separator)
         if from.upvotes > 0 { types.append(.upvotes) }
         
-        if from.description.characters.count > 0 && !types.contains(.description) { types.append(.description) }
+        if from.description.characters.count > 0 && !types.contains(.mediaDescription) { types.append(.description) }
         
         if !from.submission.isEmpty { types.append(.submission) }
         types.append(.blank)
@@ -97,7 +100,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 
             case .title:
                 let attributeString = NSAttributedString(
-                    string: feedItem.title,
+                    string: feedItem.title.htmlDecodedString,
                     attributes: [
                         NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightBold),
                         NSForegroundColorAttributeName: UIColor.darkText
@@ -106,19 +109,35 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 cell.selectionStyle = .none
                 return cell
                 
-            case .media:
-                if let media = feedItem.media {
-                    let mediaSize = CGSize(width: media.width, height: media.height)
-                    var cell: ASCellNode!
-                    cell = media.type == .photo ? CellNodePhoto(url: nil, size: mediaSize) : CellNodeVideo(url: nil, placeholderURL: nil, size: mediaSize)
+            case .photo:
+                if let media = feedItem.media, media.type == .photo {
+                    let cell = CellNodePhoto(url: media.url, size: CGSize(width: media.width, height: media.height))
                     cell.selectionStyle = .none
                     return cell
-                } else {
-                    return CellNodeBlank()
-                }
+                } else { return CellNodeBlank() }
+                
+            case .video:
+                if let media = feedItem.media, media.type == .video {
+                    let cell = CellNodeVideo(url: nil, placeholderURL: media.poster, size: CGSize(width: media.width, height: media.height))
+                    cell.selectionStyle = .none
+                    return cell
+                } else { return CellNodeBlank() }
+                
+            case .mediaDescription:
+                let string = NSAttributedString(
+                    string: feedItem.description.htmlDecodedString,
+                    attributes: [
+                        NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightRegular)])
+                let cell = CellNodeText(attributedString: string)
+                cell.selectionStyle = .none
+                return cell
                 
             case .flash:
-                if let message = feedItem.flashMessage, let color = feedItem.flashColor { return CellNodeFlashMessage(message: message, color: color) }
+                if let message = feedItem.flashMessage, let color = feedItem.flashColor {
+                    let cell = CellNodeFlashMessage(message: message, color: color)
+                    cell.selectionStyle = .none
+                    return cell
+                }
                 else { return CellNodeBlank() }
                 
             case .action:
@@ -143,21 +162,30 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 attributedString.append(upvoteAttribute)
                 
                 let text = feedItem.upvotes > 0 ? attributedString : nil
-                let cell = CellNodeText(attributedString: text)
+                let cell = CellNodeText(attributedString: text, insets: UIEdgeInsets(top: 10, left: 15, bottom: 5, right: 15))
                 cell.selectionStyle = .none
                 return cell
                 
             case .description:
-                let authorString = NSAttributedString(string: feedItem.author, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightSemibold)])
-                let string = NSMutableAttributedString(attributedString: authorString)
-                string.append(NSAttributedString(string: " \(feedItem.description)", attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightRegular)]))
-                let cell = CellNodeText(attributedString: string)
+                let authorString = NSAttributedString(
+                    string: feedItem.author,
+                    attributes: [
+                        NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightSemibold)])
+                let descriptionString = NSAttributedString(
+                    string: " \(feedItem.description.htmlDecodedString)",
+                    attributes: [
+                        NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightRegular)])
+                
+                let description = NSMutableAttributedString(attributedString: authorString)
+                description.append(descriptionString)
+                
+                let cell = CellNodeText(attributedString: description)
                 cell.selectionStyle = .none
                 return cell
                 
             case .submission:
                 let cell = CellNodeText(attributedString: NSAttributedString(string: feedItem.submission, attributes: [
-                    NSForegroundColorAttributeName: UIColor(red: 164/255, green: 164/255, blue: 164/255, alpha: 1.0),
+                    NSForegroundColorAttributeName: UIColor(red: 164, green: 164, blue: 164),
                     NSFontAttributeName: UIFont.systemFont(ofSize: 12.0)]))
                 cell.selectionStyle = .none
                 return cell
@@ -180,30 +208,31 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
     func tableView(_ tableView: ASTableView, willDisplayNodeForRowAt indexPath: IndexPath) {
         let feedItem = dataSource[indexPath.section]
         let cell = tableView.nodeForRow(at: indexPath)
-        
-        if let cell = cell as? CellNodePhoto {
-            if let media = feedItem.media {
-                cell.photo.url = media.url
-            }
-        }
-        
-        if let cell = cell as? CellNodeVideo {
-            DispatchQueue.global(qos: .background).async {
-                if let media = feedItem.media, let url = media.url {
-                    let asset = AVAsset(url: url)
-                    DispatchQueue.main.async {
-                        cell.videoPlayer.asset = asset
-                        cell.videoPlayer.url = media.poster
+        let weakSelf = self
+        if let cell = cell as? CellNodeVideo, cell.videoPlayer.asset == nil {
+            if let asset = assets[indexPath.section] {
+                cell.videoPlayer.asset = asset
+            } else {
+                DispatchQueue.global(qos: .background).async {
+                    if let media = feedItem.media, let url = media.url {
+                        let asset = AVAsset(url: url)
+                        weakSelf.assets[indexPath.section] = asset
+                        DispatchQueue.main.async {
+                            cell.videoPlayer.asset = asset
+                        }
                     }
                 }
             }
+            cell.videoPlayer.url = feedItem.media?.poster
         }
     }
     
+    var assets = [Int:AVAsset]()
+    
     func tableView(_ tableView: ASTableView, didEndDisplaying node: ASCellNode, forRowAt indexPath: IndexPath) {
         if let node = node as? CellNodeVideo {
-            node.videoPlayer.pause()
             node.videoPlayer.asset = nil
+            node.restartVideo()
         }
     }
     
@@ -211,6 +240,9 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
         let cell = node.view.nodeForRow(at: indexPath)
         if let cell = cell as? CellNodeVideo {
             cell.restartVideo()
+        }
+        if let _ = cell as? CellNodeFlashMessage {
+            delegate.didTapFlashMessage(tableNode: self.node, atIndex: indexPath.section)
         }
     }
 }
