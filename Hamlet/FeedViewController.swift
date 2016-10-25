@@ -46,9 +46,11 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
         node.dataSource = self
     }
     
-    override func loadView() {
-        super.loadView()
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
         node.view.separatorStyle = .none
+        node.view.backgroundColor = UIColor(red: 247, green: 247, blue: 247)
         delegate.didLoad(tableNode: node)
     }
     

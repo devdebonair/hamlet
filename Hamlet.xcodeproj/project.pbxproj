@@ -39,6 +39,7 @@
 		56A125201DA4B9B4001715BA /* FeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A1251F1DA4B9B4001715BA /* FeedViewModel.swift */; };
 		56A125221DA4F6AA001715BA /* String+Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A125211DA4F6AA001715BA /* String+Array.swift */; };
 		56B232171DB7E60C007BCEA9 /* Date+TimeAgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B232161DB7E60C007BCEA9 /* Date+TimeAgo.swift */; };
+		56BD44E91DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BD44E81DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift */; };
 		56CB7E611D9FFF58008AA2CB /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E601D9FFF58008AA2CB /* Preview.swift */; };
 		56CB7E681DA024BC008AA2CB /* UITableViewCell+Identifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E671DA024BC008AA2CB /* UITableViewCell+Identifier.swift */; };
 		56CB7E6C1DA0360A008AA2CB /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E6B1DA0360A008AA2CB /* Math.swift */; };
@@ -81,6 +82,7 @@
 		56A1251F1DA4B9B4001715BA /* FeedViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedViewModel.swift; sourceTree = "<group>"; };
 		56A125211DA4F6AA001715BA /* String+Array.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Array.swift"; sourceTree = "<group>"; };
 		56B232161DB7E60C007BCEA9 /* Date+TimeAgo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+TimeAgo.swift"; sourceTree = "<group>"; };
+		56BD44E81DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ASViewController+UIGestureRecognizerDelegate.swift"; sourceTree = "<group>"; };
 		56CB7E601D9FFF58008AA2CB /* Preview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
 		56CB7E671DA024BC008AA2CB /* UITableViewCell+Identifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+Identifier.swift"; sourceTree = "<group>"; };
 		56CB7E6B1DA0360A008AA2CB /* Math.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
@@ -212,6 +214,7 @@
 				56A125211DA4F6AA001715BA /* String+Array.swift */,
 				56B232161DB7E60C007BCEA9 /* Date+TimeAgo.swift */,
 				569E95AD1DBCE200001AABD5 /* UIColor+Literal.swift */,
+				56BD44E81DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -375,6 +378,7 @@
 				56CB7E681DA024BC008AA2CB /* UITableViewCell+Identifier.swift in Sources */,
 				5636AC391DA19763006EF7B3 /* Gfycat.swift in Sources */,
 				56173B7A1DBB2C0D009A0563 /* CellNodeSubredditList.swift in Sources */,
+				56BD44E91DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift in Sources */,
 				56173B8E1DBBC326009A0563 /* CellNodeBlank.swift in Sources */,
 				567BADC91DB107FC006B3FCB /* Config.swift in Sources */,
 				5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */,
