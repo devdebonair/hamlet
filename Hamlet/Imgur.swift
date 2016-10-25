@@ -12,6 +12,15 @@ import Alamofire
 
 struct Imgur: Mappable {
     
+    enum ImgurThumbnail: String {
+        case small = "s"
+        case bigSquare = "b"
+        case smallThumbnail = "t"
+        case medium = "m"
+        case large = "l"
+        case hughe = "h"
+    }
+    
     private static let HTTP_HEADERS = [
         "User-Agent": HEADER_USER_AGENT,
         "Authorization": "Client-ID \(IMGUR_CLIENT_ID)"
@@ -29,6 +38,10 @@ struct Imgur: Mappable {
     let gifv: URL?
     let mp4: URL?
     let isNSFW: Bool
+    
+    var thumbnailSmall: URL? { return getThumbnail(thumbnail: .smallThumbnail) }
+    var thumbnailMedium: URL? { return getThumbnail(thumbnail: .medium) }
+    var thumbnailLarge: URL? { return getThumbnail(thumbnail: .large) }
         
     init(map: Mapper) throws {
         title = map.optionalFrom("title") ?? ""
@@ -43,6 +56,13 @@ struct Imgur: Mappable {
         gifv = map.optionalFrom("gifv")
         mp4 = map.optionalFrom("mp4")
         isNSFW = map.optionalFrom("nsfw") ?? false
+    }
+    
+    private func getThumbnail(thumbnail: ImgurThumbnail) -> URL? {
+        guard let link = link else { return nil }
+        let ext = link.pathExtension
+        let pathWithoutExt = link.deletingPathExtension().absoluteString
+        return URL(string: "\(pathWithoutExt)\(thumbnail.rawValue).\(ext)")
     }
     
     static func isAlbum(url: String) -> Bool { return isAlbum(url: URL(string: url)) }
