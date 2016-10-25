@@ -14,7 +14,7 @@ class CellNodeText: ASCellNode {
     var text = ASTextNode()
     private var insets: UIEdgeInsets
     
-    init(attributedString: NSAttributedString? = nil, insets: UIEdgeInsets = UIEdgeInsets(top: 10, left: 15, bottom: 0, right: 15)) {
+    init(attributedString: NSAttributedString? = nil, insets: UIEdgeInsets = UIEdgeInsets(top: 5, left: 15, bottom: 5, right: 15)) {
         self.insets = insets
         super.init()
         addSubnode(text)
