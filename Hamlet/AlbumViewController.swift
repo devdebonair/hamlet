@@ -26,6 +26,7 @@ class AlbumViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTab
     
     var delegate: AlbumViewControllerDelegate!
     var dataSource: [AlbumViewModel] { return delegate.dataSource() }
+    var assetsCache = [Int:AVAsset]()
     
     init() {
         super.init(node: ASTableNode(style: .plain))
@@ -126,21 +127,19 @@ class AlbumViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTab
         }
     }
     
-    var assets = [Int:AVAsset]()
-    
     func tableView(_ tableView: ASTableView, willDisplayNodeForRowAt indexPath: IndexPath) {
         let albumItem = dataSource[indexPath.section]
         let cell = tableView.nodeForRow(at: indexPath)
         let weakSelf = self
         
         if let cell = cell as? CellNodeVideo, cell.videoPlayer.asset == nil {
-            if let asset = assets[indexPath.section] {
+            if let asset = assetsCache[indexPath.section] {
                 cell.videoPlayer.asset = asset
             } else {
                 DispatchQueue.global(qos: .background).async {
                     if let media = albumItem.media, let url = media.url {
                         let asset = AVAsset(url: url)
-                        weakSelf.assets[indexPath.section] = asset
+                        weakSelf.assetsCache[indexPath.section] = asset
                         DispatchQueue.main.async {
                             cell.videoPlayer.asset = asset
                         }
