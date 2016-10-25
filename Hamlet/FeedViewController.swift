@@ -126,7 +126,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 
             case .video:
                 if let media = feedItem.media, media.type == .video {
-                    let cell = CellNodeVideo(url: nil, placeholderURL: media.poster, size: CGSize(width: media.width, height: media.height))
+                    let cell = CellNodeVideo(url: media.url, placeholderURL: media.poster, size: CGSize(width: media.width, height: media.height))
                     cell.selectionStyle = .none
                     return cell
                 } else { return CellNodeBlank() }
@@ -215,32 +215,32 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
     }
 
     func tableView(_ tableView: ASTableView, willDisplayNodeForRowAt indexPath: IndexPath) {
-        let feedItem = dataSource[indexPath.section]
-        let cell = tableView.nodeForRow(at: indexPath)
-        let weakSelf = self
-        if let cell = cell as? CellNodeVideo, cell.videoPlayer.asset == nil {
-            if let asset = assetsCache[indexPath.section] {
-                cell.videoPlayer.asset = asset
-            } else {
-                DispatchQueue.global(qos: .background).async {
-                    if let media = feedItem.media, let url = media.url {
-                        let asset = AVAsset(url: url)
-                        weakSelf.assetsCache[indexPath.section] = asset
-                        DispatchQueue.main.async {
-                            cell.videoPlayer.asset = asset
-                        }
-                    }
-                }
-            }
-            cell.videoPlayer.url = feedItem.media?.poster
-        }
+//        let feedItem = dataSource[indexPath.section]
+//        let cell = tableView.nodeForRow(at: indexPath)
+//        let weakSelf = self
+//        if let cell = cell as? CellNodeVideo, cell.videoPlayer.asset == nil {
+//            if let asset = assetsCache[indexPath.section] {
+//                cell.videoPlayer.asset = asset
+//            } else {
+//                DispatchQueue.global(qos: .background).async {
+//                    if let media = feedItem.media, let url = media.url {
+//                        let asset = AVAsset(url: url)
+//                        weakSelf.assetsCache[indexPath.section] = asset
+//                        DispatchQueue.main.async {
+//                            cell.videoPlayer.asset = asset
+//                        }
+//                    }
+//                }
+//            }
+//            cell.videoPlayer.url = feedItem.media?.poster
+//        }
     }
     
     func tableView(_ tableView: ASTableView, didEndDisplaying node: ASCellNode, forRowAt indexPath: IndexPath) {
-        if let node = node as? CellNodeVideo {
-            node.videoPlayer.asset = nil
-            node.restartVideo()
-        }
+//        if let node = node as? CellNodeVideo {
+//            node.videoPlayer.asset = nil
+//            node.restartVideo()
+//        }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

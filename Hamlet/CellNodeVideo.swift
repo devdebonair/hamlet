@@ -15,12 +15,14 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
     var videoPlayer = ASVideoNode()
     var size: CGSize
     var spinnerNode: ASDisplayNode
+    var asset: AVAsset? = nil
+    var placeholderURL: URL? = nil
     
     var spinner: NVActivityIndicatorView {
         return spinnerNode.view as! NVActivityIndicatorView
     }
     
-    init(url: URL?, placeholderURL: URL?, size: CGSize) {
+    init(url: URL? = nil, placeholderURL: URL? = nil, size: CGSize) {
         
         spinnerNode = ASDisplayNode(viewBlock: { () -> UIView in
             let rect = CGRect(origin: .zero, size: CGSize(width: 14, height: 14))
@@ -30,12 +32,21 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
         self.size = size
         
         super.init()
+        
+        let weakSelf = self
+        if let url = url {
+            DispatchQueue.global(qos: .background).async {
+                let asset = AVAsset(url: url)
+                weakSelf.asset = asset
+                DispatchQueue.main.async {
+                    weakSelf.videoPlayer.asset = weakSelf.asset
+                }
+            }
+        }
+        
         addSubnode(videoPlayer)
         addSubnode(spinnerNode)
         
-        if let url = url { videoPlayer.asset = AVAsset(url: url) }
-        videoPlayer.url = placeholderURL
-        videoPlayer.url = url
         videoPlayer.gravity = AVLayerVideoGravityResizeAspectFill
         videoPlayer.shouldAutoplay = true
         videoPlayer.shouldAutorepeat = true
@@ -79,5 +90,16 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
     
     func restartVideo() {
         videoPlayer.player?.seek(to: kCMTimeZero)
+    }
+    
+    override func fetchData() {
+        super.fetchData()
+        videoPlayer.asset = asset
+        videoPlayer.url = placeholderURL
+    }
+    
+    override func clearFetchedData() {
+        videoPlayer.asset = nil
+        super.clearFetchedData()
     }
 }
