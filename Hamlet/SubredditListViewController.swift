@@ -17,6 +17,10 @@ protocol SubredditListDelegate: class {
 
 class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
     
+    override var prefersStatusBarHidden: Bool {
+        return navigationController?.isNavigationBarHidden ?? false
+    }
+    
     var delegate: SubredditListDelegate!
     var dataSource: [SubredditListViewModel] { return delegate.dataSource() }
     

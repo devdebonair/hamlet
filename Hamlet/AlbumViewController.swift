@@ -16,6 +16,10 @@ protocol AlbumViewControllerDelegate: class {
 
 class AlbumViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
     
+    override var prefersStatusBarHidden: Bool {
+        return navigationController?.isNavigationBarHidden ?? false
+    }
+    
     enum CellType: Int {
         case photo = 0
         case description = 1

@@ -18,6 +18,10 @@ protocol FeedControllerDelegate: class {
 
 class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
     
+    override var prefersStatusBarHidden: Bool {
+        return navigationController?.isNavigationBarHidden ?? false
+    }
+    
     enum CellType: Int {
         case title = 0
         case photo = 1
