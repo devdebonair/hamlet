@@ -12,7 +12,7 @@ import AsyncDisplayKit
 protocol FeedControllerDelegate: class {
     func dataSource() -> [FeedViewModel]
     func didLoad(tableNode: ASTableNode)
-    func didReachEnd(tableNode: ASTableNode)
+    func loadNextPage(completion: @escaping ([FeedViewModel])->Void)
     func didTapFlashMessage(tableNode: ASTableNode, atIndex index: Int)
 }
 
@@ -58,9 +58,6 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
         delegate.didLoad(tableNode: node)
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return dataSource.count
@@ -72,6 +69,18 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
     
     private func numberOfRows(from: FeedViewModel) -> Int {
         return orderOfCells(from: from).count
+    }
+    
+    func getNextIndexPaths(from: [FeedViewModel], startSection: Int) -> [IndexPath] {
+        var indexPathsToInsert = [IndexPath]()
+        for i in 0..<from.count {
+            let cellTypesForItem = orderOfCells(from: from[i])
+            for j in 0..<cellTypesForItem.count {
+                let path = IndexPath(row: j, section: startSection + i)
+                indexPathsToInsert.append(path)
+            }
+        }
+        return indexPathsToInsert
     }
     
     private func orderOfCells(from: FeedViewModel) -> [CellType] {
@@ -262,4 +271,23 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
             delegate.didTapFlashMessage(tableNode: self.node, atIndex: indexPath.section)
         }
     }
+    
+    func shouldBatchFetch(for tableView: ASTableView) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: ASTableView, willBeginBatchFetchWith context: ASBatchContext) {
+        let weakSelf = self
+        let beforeFetchCount = dataSource.count
+        delegate.loadNextPage { (items) in
+            let indexes = weakSelf.getNextIndexPaths(from: items, startSection: beforeFetchCount)
+            print(weakSelf.dataSource.count)
+            print(indexes)
+            print(tableView.numberOfSections)
+            tableView.insertRows(at: indexes, with: .fade)
+            context.completeBatchFetching(true)
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }

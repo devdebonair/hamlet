@@ -17,10 +17,21 @@ class HomePresenter: FeedControllerDelegate {
     func dataSource() -> [FeedViewModel] { return feedItems }
     func didLoad(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
     func didReachEnd(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
-    
     func didTapFlashMessage(tableNode: ASTableNode, atIndex: Int) {
         if let onDidTapFlashMessage = onDidTapFlashMessage, let listing = getListing(key: feedItems[atIndex].primaryKey) {
             onDidTapFlashMessage(listing)
+        }
+    }
+    func loadNextPage(completion: @escaping ([FeedViewModel]) -> Void) {
+        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 1) { (listings) in
+            let weakSelf = self
+            weakSelf.cachedListings.append(contentsOf: listings)
+            let mappedFeedItems = weakSelf.loadFeedItems(listings: listings)
+            
+            weakSelf.fetchRemoteMedia(items: mappedFeedItems) { (items) in
+                weakSelf.feedItems.append(contentsOf: items)
+                completion(items)
+            }
         }
     }
     
@@ -28,8 +39,6 @@ class HomePresenter: FeedControllerDelegate {
     var sort: Listing.SortType
     var cachedListings = [Listing]()
     var onDidTapFlashMessage: ((Listing)->Void)?
-    
-    // Datasource
     var feedItems = [FeedViewModel]()
     
     init(subredditID: String, subredditName: String, sort: Listing.SortType) {
