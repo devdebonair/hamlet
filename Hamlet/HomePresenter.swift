@@ -19,8 +19,8 @@ class HomePresenter: FeedControllerDelegate {
     func didReachEnd(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
     
     func didTapFlashMessage(tableNode: ASTableNode, atIndex: Int) {
-        if let onDidTapFlashMessage = onDidTapFlashMessage {
-            onDidTapFlashMessage(cachedListings[atIndex])
+        if let onDidTapFlashMessage = onDidTapFlashMessage, let listing = getListing(key: feedItems[atIndex].primaryKey) {
+            onDidTapFlashMessage(listing)
         }
     }
     
@@ -48,6 +48,15 @@ class HomePresenter: FeedControllerDelegate {
                 tableNode.view.reloadData()
             }
         }
+    }
+    
+    private func getListing(key: String) -> Listing? {
+        for listing in cachedListings {
+            if listing.name == key {
+                return listing
+            }
+        }
+        return nil
     }
     
     private func fetchRemoteMedia(items: [FeedViewModel], completion: @escaping ([FeedViewModel])->Void) {
@@ -84,7 +93,9 @@ class HomePresenter: FeedControllerDelegate {
                     })
                 }
             } else {
+                group.enter()
                 newItems.append(item)
+                group.leave()
             }
         }
         
