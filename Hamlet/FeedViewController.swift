@@ -67,22 +67,10 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
     }
     
     private func numberOfRows(from: FeedViewModel) -> Int {
-        return orderOfCells(from: from).count
+        return getNodeTypeOrder(from: from).count
     }
     
-    func getNextIndexPaths(from: [FeedViewModel], startSection: Int) -> [IndexPath] {
-        var indexPathsToInsert = [IndexPath]()
-        for i in 0..<from.count {
-            let cellTypesForItem = orderOfCells(from: from[i])
-            for j in 0..<cellTypesForItem.count {
-                let path = IndexPath(row: j, section: startSection + i)
-                indexPathsToInsert.append(path)
-            }
-        }
-        return indexPathsToInsert
-    }
-    
-    private func orderOfCells(from: FeedViewModel) -> [CellType] {
+    private func getNodeTypeOrder(from: FeedViewModel) -> [CellType] {
         var types = [CellType]()
         types.append(.title)
         
@@ -111,7 +99,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
     
     func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let feedItem = dataSource[indexPath.section]
-        let typeOrder = orderOfCells(from: feedItem)
+        let typeOrder = getNodeTypeOrder(from: feedItem)
         
         return { _ -> ASCellNode in
             switch typeOrder[indexPath.row] {
