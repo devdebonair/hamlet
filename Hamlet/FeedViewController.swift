@@ -110,8 +110,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
         return types
     }
     
-    func tableView(_ tableView: ASTableView, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
-        
+    func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let feedItem = dataSource[indexPath.section]
         let typeOrder = orderOfCells(from: feedItem)
         
