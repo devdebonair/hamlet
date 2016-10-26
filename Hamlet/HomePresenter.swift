@@ -30,19 +30,7 @@ class HomePresenter: FeedControllerDelegate {
     var onDidTapFlashMessage: ((Listing)->Void)?
     
     // Datasource
-    var feedItems = [FeedViewModel]() {
-        didSet {
-            var imageURLs = [URL]()
-            feedItems.forEach { (model) in
-                guard let media = model.media else { return }
-                if let url = media.url, media.type == .photo {
-                    imageURLs.append(url)
-                } else if let poster = media.poster {
-                    imageURLs.append(poster)
-                }
-            }
-        }
-    }
+    var feedItems = [FeedViewModel]()
     
     init(subredditID: String, subredditName: String, sort: Listing.SortType) {
         self.sort = sort
@@ -50,12 +38,13 @@ class HomePresenter: FeedControllerDelegate {
     }
     
     private func fetchData(tableNode: ASTableNode) {
+        let weakSelf = self
         Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 25) { (listings) in
-            self.cachedListings.append(contentsOf: listings)
-            let mappedFeedItems = self.loadFeedItems(listings: listings)
+            weakSelf.cachedListings.append(contentsOf: listings)
+            let mappedFeedItems = weakSelf.loadFeedItems(listings: listings)
             
-            self.fetchRemoteMedia(items: mappedFeedItems) { (items) in
-                self.feedItems.append(contentsOf: items)
+            weakSelf.fetchRemoteMedia(items: mappedFeedItems) { (items) in
+                weakSelf.feedItems.append(contentsOf: items)
                 tableNode.view.reloadData()
             }
         }

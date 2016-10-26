@@ -30,11 +30,15 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
         node.dataSource = self
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        navigationController?.interactivePopGestureRecognizer?.delegate = nil
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         node.view.separatorStyle = .none
-        node.view.backgroundColor = UIColor(red: 247, green: 247, blue: 247)
+        node.view.backgroundColor = .white
         delegate.didLoad(tableNode: node)
     }
     

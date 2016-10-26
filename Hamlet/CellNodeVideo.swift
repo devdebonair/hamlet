@@ -33,9 +33,7 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
         addSubnode(videoPlayer)
         addSubnode(spinnerNode)
         
-        if let url = url { videoPlayer.asset = AVAsset(url: url) }
         videoPlayer.url = placeholderURL
-        videoPlayer.url = url
         videoPlayer.gravity = AVLayerVideoGravityResizeAspectFill
         videoPlayer.shouldAutoplay = true
         videoPlayer.shouldAutorepeat = true

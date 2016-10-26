@@ -46,11 +46,15 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
         node.dataSource = self
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        navigationController?.interactivePopGestureRecognizer?.delegate = nil
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
         node.view.separatorStyle = .none
-        node.view.backgroundColor = UIColor(red: 247, green: 247, blue: 247)
+        node.view.backgroundColor = .white
         delegate.didLoad(tableNode: node)
     }
     
@@ -147,7 +151,6 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 if let message = feedItem.flashMessage, let color = feedItem.flashColor {
                     let cell = CellNodeFlashMessage(message: message, color: color)
                     cell.selectionStyle = .none
-                    cell.backgroundColor = .white
                     return cell
                 }
                 else { return CellNodeBlank() }
@@ -174,7 +177,7 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 attributedString.append(imageAttribute)
                 attributedString.append(upvoteAttribute)
                 
-                let text = feedItem.upvotes > 0 ? attributedString : nil
+                let text: NSMutableAttributedString? = feedItem.upvotes > 0 ? attributedString : nil
                 let cell = CellNodeText(attributedString: text, insets: UIEdgeInsets(top: 10, left: 15, bottom: 5, right: 15))
                 cell.selectionStyle = .none
                 cell.backgroundColor = .white
@@ -240,13 +243,12 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                     }
                 }
             }
-            cell.videoPlayer.url = feedItem.media?.poster
         }
     }
     
     func tableView(_ tableView: ASTableView, didEndDisplaying node: ASCellNode, forRowAt indexPath: IndexPath) {
         if let node = node as? CellNodeVideo {
-            node.videoPlayer.asset = nil
+            node.videoPlayer.pause()
             node.restartVideo()
         }
     }
