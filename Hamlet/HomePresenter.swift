@@ -23,7 +23,7 @@ class HomePresenter: FeedControllerDelegate {
         }
     }
     func loadNextPage(completion: @escaping ([FeedViewModel]) -> Void) {
-        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 1) { (listings) in
+        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 25) { (listings) in
             let weakSelf = self
             weakSelf.cachedListings.append(contentsOf: listings)
             let mappedFeedItems = weakSelf.loadFeedItems(listings: listings)

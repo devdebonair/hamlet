@@ -255,15 +255,15 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
         }
     }
     
-    func tableView(_ tableView: ASTableView, didEndDisplaying node: ASCellNode, forRowAt indexPath: IndexPath) {
+    func tableNode(_ tableNode: ASTableNode, didEndDisplayingRowWith node: ASCellNode) {
         if let node = node as? CellNodeVideo {
             node.videoPlayer.pause()
             node.restartVideo()
         }
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let cell = node.view.nodeForRow(at: indexPath)
+    func tableNode(_ tableNode: ASTableNode, didSelectRowAt indexPath: IndexPath) {
+        let cell = tableNode.nodeForRow(at: indexPath)
         if let cell = cell as? CellNodeVideo {
             cell.restartVideo()
         }
@@ -276,15 +276,14 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
         return true
     }
     
-    func tableView(_ tableView: ASTableView, willBeginBatchFetchWith context: ASBatchContext) {
-        let weakSelf = self
-        let beforeFetchCount = dataSource.count
+    
+    func tableNode(_ tableNode: ASTableNode, willBeginBatchFetchWith context: ASBatchContext) {
+        let beforeFetchCount = numberOfSections(in: tableNode.view)
         delegate.loadNextPage { (items) in
-            let indexes = weakSelf.getNextIndexPaths(from: items, startSection: beforeFetchCount)
-            print(weakSelf.dataSource.count)
-            print(indexes)
-            print(tableView.numberOfSections)
-            tableView.insertRows(at: indexes, with: .fade)
+            let lower = beforeFetchCount
+            let upper = beforeFetchCount + items.count
+            let set = IndexSet(integersIn: lower..<upper)
+            tableNode.insertSections(set, with: .fade)
             context.completeBatchFetching(true)
         }
     }
