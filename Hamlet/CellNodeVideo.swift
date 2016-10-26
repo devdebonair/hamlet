@@ -37,7 +37,6 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
         videoPlayer.gravity = AVLayerVideoGravityResizeAspectFill
         videoPlayer.shouldAutoplay = true
         videoPlayer.shouldAutorepeat = true
-        videoPlayer.placeholderShouldPersist()
         videoPlayer.placeholderEnabled = true
         videoPlayer.placeholderFadeDuration = 2.0
         videoPlayer.backgroundColor = .black
@@ -51,12 +50,12 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         let height = aspectHeight(constrainedSize.max, size)
         
-        videoPlayer.preferredFrameSize = CGSize(width: constrainedSize.max.width, height: height)
-        spinnerNode.preferredFrameSize = CGSize(width: 24, height: 24)
-        spinnerNode.layoutPosition = CGPoint(x: videoPlayer.preferredFrameSize.width - 40, y: 20)
+        videoPlayer.style.preferredSize = CGSize(width: constrainedSize.max.width, height: height)
+        spinnerNode.style.preferredSize = CGSize(width: 24, height: 24)
+        spinnerNode.style.layoutPosition = CGPoint(x: videoPlayer.preferredFrameSize.width - 40, y: 20)
 
-        let videoLayout = ASStaticLayoutSpec(children: [videoPlayer])
-        let spinnerLayout = ASStaticLayoutSpec(children: [spinnerNode])
+        let videoLayout = ASAbsoluteLayoutSpec(children: [videoPlayer])
+        let spinnerLayout = ASAbsoluteLayoutSpec(children: [spinnerNode])
         
         return ASOverlayLayoutSpec(child: videoLayout, overlay: spinnerLayout)
     }

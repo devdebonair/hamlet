@@ -31,8 +31,8 @@ class CellNodeMultiplexPhoto: ASCellNode, ASMultiplexImageNodeDelegate, ASMultip
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         let height = aspectHeight(constrainedSize.max, size)
-        photo.preferredFrameSize = CGSize(width: constrainedSize.max.width, height: height)
-        return ASStaticLayoutSpec(children: [photo])
+        photo.style.preferredSize = CGSize(width: constrainedSize.max.width, height: height)
+        return ASAbsoluteLayoutSpec(children: [photo])
     }
     
     func multiplexImageNode(_ imageNode: ASMultiplexImageNode, urlForImageIdentifier imageIdentifier: ASImageIdentifier) -> URL? {

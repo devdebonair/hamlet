@@ -29,8 +29,8 @@ class CellNodeFlashMessage: ASCellNode {
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        imageNode.preferredFrameSize = CGSize(width: 15, height: 15)
-        text.flexGrow = true
+        imageNode.style.preferredSize = CGSize(width: 15, height: 15)
+        text.style.flexGrow = 1.0
         
         let layout = ASStackLayoutSpec(
             direction: .horizontal,

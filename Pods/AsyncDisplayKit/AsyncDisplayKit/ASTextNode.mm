@@ -12,6 +12,7 @@
 #import "ASTextNode+Beta.h"
 
 #include <mutex>
+#import <tgmath.h>
 
 #import "_ASDisplayLayer.h"
 #import "ASDisplayNode+Subclasses.h"
@@ -26,6 +27,18 @@
 #import "ASInternalHelpers.h"
 #import "ASLayout.h"
 
+#import "CoreGraphics+ASConvenience.h"
+#import "ASObjectDescriptionHelpers.h"
+
+/**
+ * If set, we will record all values set to attributedText into an array
+ * and once we get 2000, we'll write them all out into a plist file.
+ *
+ * This is useful for gathering realistic text data sets from apps for performance
+ * testing.
+ */
+#define AS_TEXTNODE_RECORD_ATTRIBUTED_STRINGS 0
+
 static const NSTimeInterval ASTextNodeHighlightFadeOutDuration = 0.15;
 static const NSTimeInterval ASTextNodeHighlightFadeInDuration = 0.1;
 static const CGFloat ASTextNodeHighlightLightOpacity = 0.11;
@@ -37,7 +50,7 @@ struct ASTextNodeDrawParameter {
   UIColor *backgroundColor;
 };
 
-@interface ASTextNode () <UIGestureRecognizerDelegate, NSLayoutManagerDelegate>
+@interface ASTextNode () <UIGestureRecognizerDelegate>
 
 @end
 
@@ -47,6 +60,8 @@ struct ASTextNodeDrawParameter {
   UIColor *_cachedShadowUIColor;
   CGFloat _shadowOpacity;
   CGFloat _shadowRadius;
+  
+  UIEdgeInsets _textContainerInset;
 
   NSArray *_exclusionPaths;
 
@@ -123,18 +138,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   return self;
 }
 
-- (instancetype)initWithLayerBlock:(ASDisplayNodeLayerBlock)viewBlock didLoadBlock:(ASDisplayNodeDidLoadBlock)didLoadBlock
-{
-  ASDisplayNodeAssertNotSupported();
-  return nil;
-}
-
-- (instancetype)initWithViewBlock:(ASDisplayNodeViewBlock)viewBlock didLoadBlock:(ASDisplayNodeDidLoadBlock)didLoadBlock
-{
-  ASDisplayNodeAssertNotSupported();
-  return nil;
-}
-
 - (void)dealloc
 {
   if (_shadowColor != NULL) {
@@ -150,15 +153,35 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   }
 }
 
-- (NSString *)description
+#pragma mark - Description
+
+- (NSString *)_plainStringForDescription
 {
-  ASDN::MutexLocker l(__instanceLock__);
-  
-  NSString *plainString = [[_attributedText string] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-  NSString *truncationString = [_composedTruncationText string];
-  if (plainString.length > 50)
+  NSString *plainString = [[self.attributedText string] stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+  if (plainString.length > 50) {
     plainString = [[plainString substringToIndex:50] stringByAppendingString:@"\u2026"];
-  return [NSString stringWithFormat:@"<%@: %p; text = \"%@\"; truncation string = \"%@\"; frame = %@; renderer = %p>", self.class, self, plainString, truncationString, self.nodeLoaded ? NSStringFromCGRect(self.layer.frame) : nil, _renderer];
+  }
+  return plainString;
+}
+
+- (NSMutableArray<NSDictionary *> *)propertiesForDescription
+{
+  NSMutableArray *result = [super propertiesForDescription];
+  NSString *plainString = [self _plainStringForDescription];
+  if (plainString.length > 0) {
+    [result insertObject:@{ @"text" : ASStringWithQuotesIfMultiword(plainString) } atIndex:0];
+  }
+  return result;
+}
+
+- (NSMutableArray<NSDictionary *> *)propertiesForDebugDescription
+{
+  NSMutableArray *result = [super propertiesForDebugDescription];
+  NSString *plainString = [self _plainStringForDescription];
+  if (plainString.length > 0) {
+    [result insertObject:@{ @"text" : ASStringWithQuotesIfMultiword(plainString) } atIndex:0];
+  }
+  return result;
 }
 
 #pragma mark - ASDisplayNode
@@ -224,7 +247,15 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   ASDN::MutexLocker l(__instanceLock__);
 
   if (_renderer == nil) {
-    CGSize constrainedSize = _constrainedSize.width != -INFINITY ? _constrainedSize : bounds.size;
+    CGSize constrainedSize;
+    if (_constrainedSize.width != -INFINITY) {
+      constrainedSize = _constrainedSize;
+    } else {
+      constrainedSize = bounds.size;
+      constrainedSize.width -= (_textContainerInset.left + _textContainerInset.right);
+      constrainedSize.height -= (_textContainerInset.top + _textContainerInset.bottom);
+    }
+    
     _renderer = [[ASTextKitRenderer alloc] initWithTextKitAttributes:[self _rendererAttributes]
                                                      constrainedSize:constrainedSize];
   }
@@ -243,8 +274,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     .exclusionPaths = _exclusionPaths,
     // use the property getter so a subclass can provide these scale factors on demand if desired
     .pointSizeScaleFactors = self.pointSizeScaleFactors,
-    .layoutManagerCreationBlock = self.layoutManagerCreationBlock,
-    .textStorageCreationBlock = self.textStorageCreationBlock,
     .shadowOffset = _shadowOffset,
     .shadowColor = _cachedShadowUIColor,
     .shadowOpacity = _shadowOpacity,
@@ -278,17 +307,31 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   if (_renderer) {
     // Destruction of the layout managers/containers/text storage is quite
     // expensive, and can take some time, so we dispatch onto a bg queue to
-    // actually dealloc.
-    __block ASTextKitRenderer *renderer = _renderer;
-    
-    ASPerformBlockOnDeallocationQueue(^{
-      renderer = nil;
-    });
+    // actually dealloc.    
+    ASPerformBackgroundDeallocation(_renderer);
     _renderer = nil;
   }
 }
 
 #pragma mark - Layout and Sizing
+
+- (void)setTextContainerInset:(UIEdgeInsets)textContainerInset
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  
+  BOOL needsUpdate = !UIEdgeInsetsEqualToEdgeInsets(textContainerInset, _textContainerInset);
+  if (needsUpdate) {
+    _textContainerInset = textContainerInset;
+    [self invalidateCalculatedLayout];
+    [self setNeedsLayout];
+  }
+}
+
+- (UIEdgeInsets)textContainerInset
+{
+  ASDN::MutexLocker l(__instanceLock__);
+  return _textContainerInset;
+}
 
 - (BOOL)_needInvalidateRendererForBoundsSize:(CGSize)boundsSize
 {
@@ -301,6 +344,10 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   // If the size is not the same as the constraint we provided to the renderer, start out assuming we need
   // a new one.  However, there are common cases where the constrained size doesn't need to be the same as calculated.
   CGSize rendererConstrainedSize = _renderer.constrainedSize;
+  
+  //inset bounds
+  boundsSize.width -= _textContainerInset.left + _textContainerInset.right;
+  boundsSize.height -= _textContainerInset.top + _textContainerInset.bottom;
   
   if (CGSizeEqualToSize(boundsSize, rendererConstrainedSize)) {
     return NO;
@@ -332,19 +379,32 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   if (layout != nil) {
     ASDN::MutexLocker l(__instanceLock__);
-    if (CGSizeEqualToSize(_constrainedSize, layout.size) == NO) {
-      _constrainedSize = layout.size;
-      _renderer.constrainedSize = layout.size;
+    CGSize layoutSize = layout.size;
+    
+    // Apply textContainerInset
+    layoutSize.width -= (_textContainerInset.left + _textContainerInset.right);
+    layoutSize.height -= (_textContainerInset.top + _textContainerInset.bottom);
+    
+    if (CGSizeEqualToSize(_constrainedSize, layoutSize) == NO) {
+      _constrainedSize = layoutSize;
+      _renderer.constrainedSize = layoutSize;
     }
   }
 }
 
 - (CGSize)calculateSizeThatFits:(CGSize)constrainedSize
 {
+  ASDN::MutexLocker l(__instanceLock__);
+  
   ASDisplayNodeAssert(constrainedSize.width >= 0, @"Constrained width for text (%f) is too  narrow", constrainedSize.width);
   ASDisplayNodeAssert(constrainedSize.height >= 0, @"Constrained height for text (%f) is too short", constrainedSize.height);
   
-  ASDN::MutexLocker l(__instanceLock__);
+  // Cache the original constrained size for final size calculateion
+  CGSize originalConstrainedSize = constrainedSize;
+  
+  // Adjust constrainedSize for textContainerInset before assigning it
+  constrainedSize.width -= (_textContainerInset.left + _textContainerInset.right);
+  constrainedSize.height -= (_textContainerInset.top + _textContainerInset.bottom);
   
   _constrainedSize = constrainedSize;
   
@@ -356,15 +416,21 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   CGSize size = [self _renderer].size;
   if (_attributedText.length > 0) {
-    self.ascender = [[self class] ascenderWithAttributedString:_attributedText];
-    self.descender = [[_attributedText attribute:NSFontAttributeName atIndex:_attributedText.length - 1 effectiveRange:NULL] descender];
+    self.style.ascender = [[self class] ascenderWithAttributedString:_attributedText];
+    self.style.descender = [[_attributedText attribute:NSFontAttributeName atIndex:_attributedText.length - 1 effectiveRange:NULL] descender];
     if (_renderer.currentScaleFactor > 0 && _renderer.currentScaleFactor < 1.0) {
       // while not perfect, this is a good estimate of what the ascender of the scaled font will be.
-      self.ascender *= _renderer.currentScaleFactor;
-      self.descender *= _renderer.currentScaleFactor;
+      self.style.ascender *= _renderer.currentScaleFactor;
+      self.style.descender *= _renderer.currentScaleFactor;
     }
   }
-  return size;
+  
+  // Add the constrained size back textContainerInset
+  size.width += (_textContainerInset.left + _textContainerInset.right);
+  size.height += (_textContainerInset.top + _textContainerInset.bottom);
+  
+  return CGSizeMake(std::fmin(size.width, originalConstrainedSize.width),
+                    std::fmin(size.height, originalConstrainedSize.height));
 }
 
 #pragma mark - Modifying User Text
@@ -399,7 +465,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     }
 
     _attributedText = ASCleanseAttributedStringOfCoreTextAttributes(attributedText);
-    
+#if AS_TEXTNODE_RECORD_ATTRIBUTED_STRINGS
+	  [ASTextNode _registerAttributedText:_attributedText];
+#endif
     // Sync the truncation string with attributes from the updated _attributedString
     // Without this, the size calculation of the text with truncation applied will
     // not take into account the attributes of attributedText in the last line
@@ -411,8 +479,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   NSUInteger length = attributedText.length;
   if (length > 0) {
-    self.ascender = [[self class] ascenderWithAttributedString:attributedText];
-    self.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
+    self.style.ascender = [[self class] ascenderWithAttributedString:attributedText];
+    self.style.descender = [[attributedText attribute:NSFontAttributeName atIndex:attributedText.length - 1 effectiveRange:NULL] descender];
   }
 
   // Tell the display node superclasses that the cached layout is incorrect now
@@ -477,6 +545,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   CGContextSaveGState(context);
   
+  CGContextTranslateCTM(context, _textContainerInset.left, _textContainerInset.top);
+  
   ASTextKitRenderer *renderer = [self _rendererWithBounds:drawParameterBounds];
   UIEdgeInsets shadowPadding = [self shadowPaddingWithRenderer:renderer];
   CGPoint boundsOrigin = drawParameterBounds.origin;
@@ -536,7 +606,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
   [renderer enumerateTextIndexesAtPosition:point usingBlock:^(NSUInteger characterIndex, CGRect glyphBoundingRect, BOOL *stop) {
     CGPoint glyphLocation = CGPointMake(CGRectGetMidX(glyphBoundingRect), CGRectGetMidY(glyphBoundingRect));
-    CGFloat currentDistance = sqrtf(powf(point.x - glyphLocation.x, 2.f) + powf(point.y - glyphLocation.y, 2.f));
+    CGFloat currentDistance = std::sqrt(std::pow(point.x - glyphLocation.x, 2.f) + std::pow(point.y - glyphLocation.y, 2.f));
     if (currentDistance >= minimumGlyphDistance) {
       // If the distance computed from the touch to the glyph location is
       // not the minimum among the located link attributes, we can just skip
@@ -744,6 +814,13 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
         for (NSValue *rectValue in highlightRects) {
           UIEdgeInsets shadowPadding = _renderer.shadower.shadowPadding;
           CGRect rendererRect = ASTextNodeAdjustRenderRectForShadowPadding(rectValue.CGRectValue, shadowPadding);
+
+          // The rects returned from renderer don't have `textContainerInset`,
+          // as well as they are using the `constrainedSize` for layout,
+          // so we can simply increase the rect by insets to get the full blown layout.
+          rendererRect.size.width += _textContainerInset.left + _textContainerInset.right;
+          rendererRect.size.height += _textContainerInset.top + _textContainerInset.bottom;
+
           CGRect highlightedRect = [self.layer convertRect:rendererRect toLayer:highlightTargetLayer];
 
           // We set our overlay layer's frame to the bounds of the highlight target layer.
@@ -866,7 +943,7 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
   // FIXME: Replace this implementation with reusable CALayers that have .backgroundColor set.
   // This would completely eliminate the memory and performance cost of the backing store.
   CGSize size = self.calculatedSize;
-  if (CGSizeEqualToSize(size, CGSizeZero)) {
+  if ((size.width * size.height) < CGFLOAT_EPSILON) {
     return nil;
   }
   
@@ -1279,7 +1356,7 @@ static NSAttributedString *DefaultTruncationAttributedString()
   }
 
   // If we've reached this point, both _additionalTruncationMessage and
-  // _truncationAttributedString are present.  Compose them.
+  // _truncationAttributedText are present.  Compose them.
 
   NSMutableAttributedString *newComposedTruncationString = [[NSMutableAttributedString alloc] initWithAttributedString:_truncationAttributedText];
   [newComposedTruncationString replaceCharactersInRange:NSMakeRange(newComposedTruncationString.length, 0) withString:@" "];
@@ -1314,6 +1391,30 @@ static NSAttributedString *DefaultTruncationAttributedString()
   }
   return truncationMutableString;
 }
+
+#if AS_TEXTNODE_RECORD_ATTRIBUTED_STRINGS
++ (void)_registerAttributedText:(NSAttributedString *)str
+{
+  static NSMutableArray *array;
+  static NSLock *lock;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    lock = [NSLock new];
+    array = [NSMutableArray new];
+  });
+  [lock lock];
+  [array addObject:str];
+  if (array.count % 20 == 0) {
+    NSLog(@"Got %d strings", (int)array.count);
+  }
+  if (array.count == 2000) {
+    NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent:@"AttributedStrings.plist"];
+    NSAssert([NSKeyedArchiver archiveRootObject:array toFile:path], nil);
+    NSLog(@"Saved to %@", path);
+  }
+  [lock unlock];
+}
+#endif
 
 @end
 

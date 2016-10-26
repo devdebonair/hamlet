@@ -40,7 +40,7 @@ class CellNodeSubredditList: ASCellNode {
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        imageNode.preferredFrameSize = CGSize(width: imageHeight, height: imageHeight)
+        imageNode.style.preferredSize = CGSize(width: imageHeight, height: imageHeight)
         let layout = ASStackLayoutSpec(
             direction: .horizontal,
             spacing: 20,

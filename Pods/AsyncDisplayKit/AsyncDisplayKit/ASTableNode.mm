@@ -16,13 +16,19 @@
 #import "ASDisplayNode+Subclasses.h"
 #import "ASInternalHelpers.h"
 #import "ASCellNode+Internal.h"
+#import "AsyncDisplayKit+Debug.h"
+#import "ASTableView+Undeprecated.h"
 
 #pragma mark - _ASTablePendingState
 
 @interface _ASTablePendingState : NSObject
 @property (weak, nonatomic) id <ASTableDelegate>   delegate;
 @property (weak, nonatomic) id <ASTableDataSource> dataSource;
-@property (assign, nonatomic) ASLayoutRangeMode rangeMode;
+@property (nonatomic, assign) ASLayoutRangeMode rangeMode;
+@property (nonatomic, assign) BOOL allowsSelection;
+@property (nonatomic, assign) BOOL allowsSelectionDuringEditing;
+@property (nonatomic, assign) BOOL allowsMultipleSelection;
+@property (nonatomic, assign) BOOL allowsMultipleSelectionDuringEditing;
 @end
 
 @implementation _ASTablePendingState
@@ -31,6 +37,10 @@
   self = [super init];
   if (self) {
     _rangeMode = ASLayoutRangeModeCount;
+    _allowsSelection = YES;
+    _allowsSelectionDuringEditing = NO;
+    _allowsMultipleSelection = NO;
+    _allowsMultipleSelectionDuringEditing = NO;
   }
   return self;
 }
@@ -69,7 +79,7 @@
 - (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass
 {
   ASDisplayNodeViewBlock tableViewBlock = ^UIView *{
-    return [[ASTableView alloc] _initWithFrame:frame style:style dataControllerClass:dataControllerClass ownedByNode:YES];
+    return [[ASTableView alloc] _initWithFrame:frame style:style dataControllerClass:dataControllerClass];
   };
 
   if (self = [super initWithViewBlock:tableViewBlock]) {
@@ -102,10 +112,20 @@
     self.pendingState    = nil;
     view.asyncDelegate   = pendingState.delegate;
     view.asyncDataSource = pendingState.dataSource;
+    view.allowsSelection = pendingState.allowsSelection;
+    view.allowsSelectionDuringEditing = pendingState.allowsSelectionDuringEditing;
+    view.allowsMultipleSelection = pendingState.allowsMultipleSelection;
+    view.allowsMultipleSelectionDuringEditing = pendingState.allowsMultipleSelectionDuringEditing;
     if (pendingState.rangeMode != ASLayoutRangeModeCount) {
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
     }
   }
+}
+
+- (void)dealloc
+{
+  self.delegate = nil;
+  self.dataSource = nil;
 }
 
 - (ASTableView *)view
@@ -116,24 +136,48 @@
 - (void)clearContents
 {
   [super clearContents];
-  [self.view clearContents];
+  [self.rangeController clearContents];
 }
 
 - (void)clearFetchedData
 {
   [super clearFetchedData];
-  [self.view clearFetchedData];
+  [self.rangeController clearFetchedData];
+}
+
+- (void)interfaceStateDidChange:(ASInterfaceState)newState fromState:(ASInterfaceState)oldState
+{
+  [super interfaceStateDidChange:newState fromState:oldState];
+  [ASRangeController layoutDebugOverlayIfNeeded];
 }
 
 #if ASRangeControllerLoggingEnabled
-- (void)visibleStateDidChange:(BOOL)isVisible
+- (void)didEnterVisibleState
 {
-  [super visibleStateDidChange:isVisible];
-  NSLog(@"%@ - visible: %d", self, isVisible);
+  [super didEnterVisibleState];
+  NSLog(@"%@ - visible: YES", self);
+}
+
+- (void)didExitVisibleState
+{
+  [super didExitVisibleState];
+  NSLog(@"%@ - visible: NO", self);
 }
 #endif
 
 #pragma mark Setter / Getter
+
+// TODO: Implement this without the view.
+- (ASDataController *)dataController
+{
+  return self.view.dataController;
+}
+
+// TODO: Implement this without the view.
+- (ASRangeController *)rangeController
+{
+  return self.view.rangeController;
+}
 
 - (_ASTablePendingState *)pendingState
 {
@@ -178,7 +222,84 @@
   if ([self pendingState]) {
     return _pendingState.dataSource;
   } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded if pendingState doesn't exist");
     return self.view.asyncDataSource;
+  }
+}
+
+- (void)setAllowsSelection:(BOOL)allowsSelection
+{
+  if ([self pendingState]) {
+    _pendingState.allowsSelection = allowsSelection;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded if pendingState doesn't exist");
+    self.view.allowsSelection = allowsSelection;
+  }
+}
+
+- (BOOL)allowsSelection
+{
+  if ([self pendingState]) {
+    return _pendingState.allowsSelection;
+  } else {
+    return self.view.allowsSelection;
+  }
+}
+
+- (void)setAllowsSelectionDuringEditing:(BOOL)allowsSelectionDuringEditing
+{
+  if ([self pendingState]) {
+    _pendingState.allowsSelectionDuringEditing = allowsSelectionDuringEditing;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded if pendingState doesn't exist");
+    self.view.allowsSelectionDuringEditing = allowsSelectionDuringEditing;
+  }
+}
+
+- (BOOL)allowsSelectionDuringEditing
+{
+  if ([self pendingState]) {
+    return _pendingState.allowsSelectionDuringEditing;
+  } else {
+    return self.view.allowsSelectionDuringEditing;
+  }
+}
+
+- (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
+{
+  if ([self pendingState]) {
+    _pendingState.allowsMultipleSelection = allowsMultipleSelection;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded if pendingState doesn't exist");
+    self.view.allowsMultipleSelection = allowsMultipleSelection;
+  }
+}
+
+- (BOOL)allowsMultipleSelection
+{
+  if ([self pendingState]) {
+    return _pendingState.allowsMultipleSelection;
+  } else {
+    return self.view.allowsMultipleSelection;
+  }
+}
+
+- (void)setAllowsMultipleSelectionDuringEditing:(BOOL)allowsMultipleSelectionDuringEditing
+{
+  if ([self pendingState]) {
+    _pendingState.allowsMultipleSelectionDuringEditing = allowsMultipleSelectionDuringEditing;
+  } else {
+    ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded if pendingState doesn't exist");
+    self.view.allowsMultipleSelectionDuringEditing = allowsMultipleSelectionDuringEditing;
+  }
+}
+
+- (BOOL)allowsMultipleSelectionDuringEditing
+{
+  if ([self pendingState]) {
+    return _pendingState.allowsMultipleSelectionDuringEditing;
+  } else {
+    return self.view.allowsMultipleSelectionDuringEditing;
   }
 }
 
@@ -190,12 +311,154 @@
     _pendingState.rangeMode = rangeMode;
   } else {
     ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded if pendingState doesn't exist");
-    [self.view.rangeController updateCurrentRangeWithMode:rangeMode];
+    [self.rangeController updateCurrentRangeWithMode:rangeMode];
   }
 }
 
 #pragma mark ASEnvironment
 
 ASEnvironmentCollectionTableSetEnvironmentState(_environmentStateLock)
+
+#pragma mark - Range Tuning
+
+- (ASRangeTuningParameters)tuningParametersForRangeType:(ASLayoutRangeType)rangeType
+{
+  return [self.rangeController tuningParametersForRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+}
+
+- (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeType:(ASLayoutRangeType)rangeType
+{
+  [self.rangeController setTuningParameters:tuningParameters forRangeMode:ASLayoutRangeModeFull rangeType:rangeType];
+}
+
+- (ASRangeTuningParameters)tuningParametersForRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
+{
+  return [self.rangeController tuningParametersForRangeMode:rangeMode rangeType:rangeType];
+}
+
+- (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType
+{
+  return [self.rangeController setTuningParameters:tuningParameters forRangeMode:rangeMode rangeType:rangeType];
+}
+
+#pragma mark - Selection
+
+- (void)selectRowAtIndexPath:(nullable NSIndexPath *)indexPath animated:(BOOL)animated scrollPosition:(UITableViewScrollPosition)scrollPosition
+{
+  ASDisplayNodeAssertMainThread();
+  // TODO: Solve this in a way to be able to remove this restriction (https://github.com/facebook/AsyncDisplayKit/pull/2453#discussion_r84515457)
+  ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded before calling selectRowAtIndexPath");
+  [self.view selectRowAtIndexPath:indexPath animated:animated scrollPosition:scrollPosition];
+}
+
+- (void)deselectRowAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated
+{
+  ASDisplayNodeAssertMainThread();
+  // TODO: Solve this in a way to be able to remove this restriction (https://github.com/facebook/AsyncDisplayKit/pull/2453#discussion_r84515457)
+  ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded before calling deselectRowAtIndexPath");
+  [self.view deselectRowAtIndexPath:indexPath animated:animated];
+}
+
+#pragma mark - Querying Data
+
+- (NSInteger)numberOfRowsInSection:(NSInteger)section
+{
+  return [self.dataController numberOfRowsInSection:section];
+}
+
+- (NSInteger)numberOfSections
+{
+  return [self.dataController numberOfSections];
+}
+
+- (NSArray<__kindof ASCellNode *> *)visibleNodes
+{
+  ASDisplayNodeAssertMainThread();
+  return self.isNodeLoaded ? [self.view visibleNodes] : @[];
+}
+
+- (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode
+{
+  return [self.dataController indexPathForNode:cellNode];
+}
+
+- (ASCellNode *)nodeForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  return [self.dataController nodeAtIndexPath:indexPath];
+}
+
+#pragma mark - Editing
+
+- (void)reloadDataWithCompletion:(void (^)())completion
+{
+  [self.view reloadDataWithCompletion:completion];
+}
+
+- (void)reloadData
+{
+  [self reloadDataWithCompletion:nil];
+}
+
+- (void)relayoutItems
+{
+  [self.view relayoutItems];
+}
+
+- (void)performBatchAnimated:(BOOL)animated updates:(void (^)())updates completion:(void (^)(BOOL))completion
+{
+  [self.view beginUpdates];
+  updates();
+  [self.view endUpdatesAnimated:animated completion:completion];
+}
+
+- (void)performBatchUpdates:(void (^)())updates completion:(void (^)(BOOL))completion
+{
+  [self performBatchAnimated:YES updates:updates completion:completion];
+}
+
+- (void)insertSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation
+{
+  [self.view insertSections:sections withRowAnimation:animation];
+}
+
+- (void)deleteSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation
+{
+  [self.view deleteSections:sections withRowAnimation:animation];
+}
+
+- (void)reloadSections:(NSIndexSet *)sections withRowAnimation:(UITableViewRowAnimation)animation
+{
+  [self.view reloadSections:sections withRowAnimation:animation];
+}
+
+- (void)moveSection:(NSInteger)section toSection:(NSInteger)newSection
+{
+  [self.view moveSection:section toSection:newSection];
+}
+
+- (void)insertRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation
+{
+  [self.view insertRowsAtIndexPaths:indexPaths withRowAnimation:animation];
+}
+
+- (void)deleteRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation
+{
+  [self.view deleteRowsAtIndexPaths:indexPaths withRowAnimation:animation];
+}
+
+- (void)reloadRowsAtIndexPaths:(NSArray *)indexPaths withRowAnimation:(UITableViewRowAnimation)animation
+{
+  [self.view reloadRowsAtIndexPaths:indexPaths withRowAnimation:animation];
+}
+
+- (void)moveRowAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath
+{
+  [self.view moveRowAtIndexPath:indexPath toIndexPath:newIndexPath];
+}
+
+- (void)waitUntilAllUpdatesAreCommitted
+{
+  [self.view waitUntilAllUpdatesAreCommitted];
+}
 
 @end

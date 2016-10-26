@@ -1,46 +1,52 @@
 PODS:
   - Alamofire (4.0.1)
-  - AsyncDisplayKit (1.9.90):
-    - AsyncDisplayKit/PINRemoteImage (= 1.9.90)
-  - AsyncDisplayKit/ASDealloc2MainObject (1.9.90)
-  - AsyncDisplayKit/Core (1.9.90):
+  - AsyncDisplayKit (2.0-beta.1):
+    - AsyncDisplayKit/PINRemoteImage (= 2.0-beta.1)
+  - AsyncDisplayKit/ASDealloc2MainObject (2.0-beta.1)
+  - AsyncDisplayKit/Core (2.0-beta.1):
     - AsyncDisplayKit/ASDealloc2MainObject
-  - AsyncDisplayKit/PINRemoteImage (1.9.90):
+  - AsyncDisplayKit/PINRemoteImage (2.0-beta.1):
     - AsyncDisplayKit/Core
-    - PINRemoteImage/iOS (>= 3.0.0-beta.3)
+    - PINRemoteImage/iOS (= 3.0.0-beta.5)
   - ModelMapper (5.0.0-beta.2)
   - NVActivityIndicatorView (3.0)
   - PINCache (3.0.1-beta)
-  - PINRemoteImage/Core (3.0.0-beta.3):
-    - PINCache (>= 3.0.0-beta)
-  - PINRemoteImage/iOS (3.0.0-beta.3):
+  - PINRemoteImage/Core (3.0.0-beta.5):
+    - PINCache (= 3.0.1-beta)
+  - PINRemoteImage/iOS (3.0.0-beta.5):
     - PINRemoteImage/Core
   - SnapKit (3.0.1)
 
 DEPENDENCIES:
   - Alamofire (~> 4.0.1)
-  - AsyncDisplayKit (~> 1.9.90)
+  - AsyncDisplayKit (from `https://github.com/facebook/AsyncDisplayKit`, branch `master`)
   - ModelMapper (from `https://github.com/lyft/mapper`, branch `swift-3.0`)
   - NVActivityIndicatorView (~> 3.0)
   - SnapKit (~> 3.0.0)
 
 EXTERNAL SOURCES:
+  AsyncDisplayKit:
+    :branch: master
+    :git: https://github.com/facebook/AsyncDisplayKit
   ModelMapper:
     :branch: swift-3.0
     :git: https://github.com/lyft/mapper
 
 CHECKOUT OPTIONS:
+  AsyncDisplayKit:
+    :commit: 12534ee6fbd09e999f8c6cf5525cd363e329abf8
+    :git: https://github.com/facebook/AsyncDisplayKit
   ModelMapper:
     :commit: eead7f57eacbcda5257925e3ceb99cd73a611fac
     :git: https://github.com/lyft/mapper
 
 SPEC CHECKSUMS:
   Alamofire: 7682d43245de14874acd142ec137b144aa1dd335
-  AsyncDisplayKit: 926ded3ca3fb7026565e0e81f0e132fea4d3a6eb
+  AsyncDisplayKit: 4ef1ca0fac766193f4ccdea5b01e42b82b675683
   ModelMapper: b306e689e231331896d447a36a54643c5da0bacd
   NVActivityIndicatorView: 81953b5e65093ba79edf4fe7268e002039ca5268
   PINCache: 6911fe422a633e18b3d3ddf2bd4f0e55e36e2892
-  PINRemoteImage: 308731aa6534500e58fc211b9cc2bb7252df25ba
+  PINRemoteImage: 20ca800843e5fb326bc33fa6eb528c3b861d8bd6
   SnapKit: f818b8326d45b4e1c777d0ab27b5c0a3624bfdeb
 
 COCOAPODS: 0.39.0

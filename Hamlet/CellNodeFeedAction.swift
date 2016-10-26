@@ -48,15 +48,15 @@ class CellNodeFeedAction: ASCellNode {
         
         let buttonSize = CGSize(width: 20, height: 20)
         
-        buttonSave.preferredFrameSize = buttonSize
-        buttonUpVote.preferredFrameSize = buttonSize
-        buttonDownVote.preferredFrameSize = buttonSize
+        buttonSave.style.preferredSize = buttonSize
+        buttonUpVote.style.preferredSize = buttonSize
+        buttonDownVote.style.preferredSize = buttonSize
         
-        let buttonSaveStaticLayout = ASStaticLayoutSpec(children: [buttonSave])
-        let buttonUpVoteStaticLayout = ASStaticLayoutSpec(children: [buttonUpVote])
-        let buttonDownVoteStaticLayout = ASStaticLayoutSpec(children: [buttonDownVote])
+        let buttonSaveStaticLayout = ASAbsoluteLayoutSpec(children: [buttonSave])
+        let buttonUpVoteStaticLayout = ASAbsoluteLayoutSpec(children: [buttonUpVote])
+        let buttonDownVoteStaticLayout = ASAbsoluteLayoutSpec(children: [buttonDownVote])
         
-        buttonDiscussion.flexGrow = true
+        buttonDiscussion.style.flexGrow = 1.0
         
         let rightStack = ASStackLayoutSpec(
             direction: .horizontal,
@@ -70,7 +70,7 @@ class CellNodeFeedAction: ASCellNode {
             spacing: 5,
             justifyContent: .start,
             alignItems: .center,
-            children: [buttonDiscussion, ASStaticLayoutSpec(children: [rightStack])])
+            children: [buttonDiscussion, ASAbsoluteLayoutSpec(children: [rightStack])])
         
         return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 18, left: 15, bottom: 18, right: 15), child: buttonStack)
     }

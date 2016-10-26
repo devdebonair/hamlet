@@ -23,7 +23,7 @@ class CellNodeSeparator: ASCellNode {
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        separator.preferredFrameSize = CGSize(width: constrainedSize.max.width, height: 1.0)
+        separator.style.preferredSize = CGSize(width: constrainedSize.max.width, height: 1.0)
         return ASInsetLayoutSpec(insets: insets, child: separator)
     }
 }

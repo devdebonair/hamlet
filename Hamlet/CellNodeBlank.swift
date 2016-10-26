@@ -21,7 +21,7 @@ class CellNodeBlank: ASCellNode {
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        blankNode.preferredFrameSize = CGSize(width: constrainedSize.min.width, height: height)
+        blankNode.style.preferredSize = CGSize(width: constrainedSize.min.width, height: height)
         return ASInsetLayoutSpec(insets: .zero, child: blankNode)
     }
 }

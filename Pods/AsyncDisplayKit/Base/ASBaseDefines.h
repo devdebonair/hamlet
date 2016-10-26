@@ -10,6 +10,8 @@
 
 #pragma once
 
+#import "ASLog.h"
+
 // The C++ compiler mangles C function names. extern "C" { /* your C functions */ } prevents this.
 // You should wrap all C function prototypes declared in headers with ASDISPLAYNODE_EXTERN_C_BEGIN/END, even if
 // they are included only from .m (Objective-C) files. It's common for .m files to start using C++
@@ -69,7 +71,7 @@
 #endif
 
 #ifndef ASDISPLAYNODE_WARN_DEPRECATED
-# define ASDISPLAYNODE_WARN_DEPRECATED 1
+# define ASDISPLAYNODE_WARN_DEPRECATED 0
 #endif
 
 #ifndef ASDISPLAYNODE_DEPRECATED
@@ -77,6 +79,14 @@
 #  define ASDISPLAYNODE_DEPRECATED __attribute__ ((deprecated))
 # else
 #  define ASDISPLAYNODE_DEPRECATED
+# endif
+#endif
+
+#ifndef ASDISPLAYNODE_DEPRECATED_MSG
+# if ASDISPLAYNODE_GNUC (3, 0) && ASDISPLAYNODE_WARN_DEPRECATED
+#   define  ASDISPLAYNODE_DEPRECATED_MSG(msg) __deprecated_msg(msg)
+# else
+#   define  ASDISPLAYNODE_DEPRECATED_MSG(msg)
 # endif
 #endif
 
@@ -143,3 +153,21 @@
 #define ASDISPLAYNODE_REQUIRES_SUPER
 #endif
 #endif
+
+#ifndef AS_UNAVAILABLE
+#if __has_attribute(unavailable)
+#define AS_UNAVAILABLE(message) __attribute__((unavailable(message)))
+#else
+#define AS_UNAVAILABLE(message)
+#endif
+#endif
+
+#ifndef AS_WARN_UNUSED_RESULT
+#if __has_attribute(warn_unused_result)
+#define AS_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#else
+#define AS_WARN_UNUSED_RESULT
+#endif
+#endif
+
+#define ASOVERLOADABLE __attribute__((overloadable))
