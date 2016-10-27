@@ -132,11 +132,17 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 } else { return CellNodeBlank() }
                 
             case .mediaDescription:
+                let paragraphStyle = NSMutableParagraphStyle()
+                paragraphStyle.lineSpacing = 2.0
+                
                 let string = NSAttributedString(
                     string: feedItem.description.htmlDecodedString,
                     attributes: [
-                        NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightRegular)])
-                let cell = CellNodeText(attributedString: string)
+                        NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightRegular),
+                        NSParagraphStyleAttributeName: paragraphStyle
+                    ])
+                
+                let cell = CellNodeText(attributedString: string, insets: UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15))
                 cell.text.maximumNumberOfLines = 8
                 cell.selectionStyle = .none
                 cell.backgroundColor = .white
@@ -182,11 +188,14 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
                 let authorString = NSAttributedString(
                     string: feedItem.author,
                     attributes: [
-                        NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightSemibold)])
+                        NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightSemibold)
+                    ])
+                
                 let descriptionString = NSAttributedString(
                     string: " \(feedItem.description.htmlDecodedString)",
                     attributes: [
-                        NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightRegular)])
+                        NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightRegular)
+                    ])
                 
                 let description = NSMutableAttributedString(attributedString: authorString)
                 description.append(descriptionString)
