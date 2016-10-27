@@ -105,7 +105,7 @@ extension Subreddit {
         searchWhere(sort: .def, completion: completion)
     }
     
-    static func search(query: String, completion: @escaping ([Subreddit])->Void) {
+    static func search(query: String, sort: SortType = .popular, completion: @escaping ([Subreddit])->Void) {
         let parameters = ["q": query]
         let url = "https://api.reddit.com/subreddits/search"
         Alamofire.request(url, method: .get, parameters: parameters, encoding: URLEncoding.methodDependent, headers: nil).responseJSON { response in
