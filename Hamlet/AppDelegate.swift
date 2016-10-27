@@ -31,9 +31,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navController.navigationBar.titleTextAttributes = [
             NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
         
-        presenter.onDidSelectSubreddit = { id, item in
+        presenter.onDidSelectSubreddit = { id in
             
-            let presenter = HomePresenter(subredditID: id, subredditName: item.name, sort: .hot)
+            let presenter = HomePresenter(subredditID: id, sort: .hot)
             let controller = FeedViewController()
             controller.delegate = presenter
             navController.pushViewController(controller, animated: true)

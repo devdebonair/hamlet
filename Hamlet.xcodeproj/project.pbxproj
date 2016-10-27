@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		55CC3F678EE7C4E3B2278B2E /* Pods_Hamlet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652DF315F77A61E37614AEB8 /* Pods_Hamlet.framework */; };
-		56173B7A1DBB2C0D009A0563 /* CellNodeSubredditList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B791DBB2C0D009A0563 /* CellNodeSubredditList.swift */; };
+		56173B7A1DBB2C0D009A0563 /* CellNodeAvatarListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B791DBB2C0D009A0563 /* CellNodeAvatarListItem.swift */; };
 		56173B7C1DBB2F42009A0563 /* SubredditListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B7B1DBB2F42009A0563 /* SubredditListViewController.swift */; };
 		56173B7E1DBB3237009A0563 /* SubredditListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B7D1DBB3237009A0563 /* SubredditListViewModel.swift */; };
 		56173B801DBB454A009A0563 /* SubredditListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B7F1DBB454A009A0563 /* SubredditListPresenter.swift */; };
@@ -49,7 +49,7 @@
 
 /* Begin PBXFileReference section */
 		45162716B5E74825E4396D91 /* Pods-Hamlet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hamlet.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet.release.xcconfig"; sourceTree = "<group>"; };
-		56173B791DBB2C0D009A0563 /* CellNodeSubredditList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellNodeSubredditList.swift; sourceTree = "<group>"; };
+		56173B791DBB2C0D009A0563 /* CellNodeAvatarListItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellNodeAvatarListItem.swift; sourceTree = "<group>"; };
 		56173B7B1DBB2F42009A0563 /* SubredditListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubredditListViewController.swift; sourceTree = "<group>"; };
 		56173B7D1DBB3237009A0563 /* SubredditListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubredditListViewModel.swift; sourceTree = "<group>"; };
 		56173B7F1DBB454A009A0563 /* SubredditListPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubredditListPresenter.swift; sourceTree = "<group>"; };
@@ -119,7 +119,7 @@
 				56173B8B1DBBA2E1009A0563 /* CellNodeFlashMessage.swift */,
 				56173B8F1DBBDA63009A0563 /* CellNodeSeparator.swift */,
 				56173B8D1DBBC326009A0563 /* CellNodeBlank.swift */,
-				56173B791DBB2C0D009A0563 /* CellNodeSubredditList.swift */,
+				56173B791DBB2C0D009A0563 /* CellNodeAvatarListItem.swift */,
 				56173B811DBB5567009A0563 /* CellNodeVideo.swift */,
 				56173B851DBB6333009A0563 /* CellNodePhoto.swift */,
 				56173B871DBB6A86009A0563 /* CellNodeText.swift */,
@@ -377,7 +377,7 @@
 				56173B8C1DBBA2E1009A0563 /* CellNodeFlashMessage.swift in Sources */,
 				56CB7E681DA024BC008AA2CB /* UITableViewCell+Identifier.swift in Sources */,
 				5636AC391DA19763006EF7B3 /* Gfycat.swift in Sources */,
-				56173B7A1DBB2C0D009A0563 /* CellNodeSubredditList.swift in Sources */,
+				56173B7A1DBB2C0D009A0563 /* CellNodeAvatarListItem.swift in Sources */,
 				56BD44E91DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift in Sources */,
 				56173B8E1DBBC326009A0563 /* CellNodeBlank.swift in Sources */,
 				567BADC91DB107FC006B3FCB /* Config.swift in Sources */,

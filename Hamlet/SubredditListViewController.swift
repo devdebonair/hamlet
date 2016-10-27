@@ -53,12 +53,10 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     func tableView(_ tableView: ASTableView, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let item = dataSource[indexPath.section]
         return { _ -> ASCellNode in
-            let cell = CellNodeSubredditList(subreddit: item.name, url: item.imageURL)
+            let cell = CellNodeAvatarListItem(title: item.displayName, subtitle: "r/\(item.name)", url: item.imageURL)
             cell.backgroundColor = .white
             return cell
         }
     }
     
-    func tableView(_ tableView: ASTableView, willDisplayNodeForRowAt indexPath: IndexPath) {
-    }
 }

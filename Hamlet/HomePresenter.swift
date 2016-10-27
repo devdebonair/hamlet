@@ -41,7 +41,7 @@ class HomePresenter: FeedControllerDelegate {
     var onDidTapFlashMessage: ((Listing)->Void)?
     var feedItems = [FeedViewModel]()
     
-    init(subredditID: String, subredditName: String, sort: Listing.SortType) {
+    init(subredditID: String, sort: Listing.SortType) {
         self.sort = sort
         subreddit = subredditID
     }
