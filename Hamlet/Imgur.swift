@@ -18,7 +18,7 @@ struct Imgur: Mappable {
         case smallThumbnail = "t"
         case medium = "m"
         case large = "l"
-        case hughe = "h"
+        case huge = "h"
     }
     
     private static let HTTP_HEADERS = [
@@ -42,6 +42,7 @@ struct Imgur: Mappable {
     var thumbnailSmall: URL? { return getThumbnail(thumbnail: .smallThumbnail) }
     var thumbnailMedium: URL? { return getThumbnail(thumbnail: .medium) }
     var thumbnailLarge: URL? { return getThumbnail(thumbnail: .large) }
+    var thumbnailHuge: URL? { return getThumbnail(thumbnail: .huge) }
         
     init(map: Mapper) throws {
         title = map.optionalFrom("title") ?? ""
