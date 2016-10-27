@@ -32,7 +32,7 @@ class AlbumPresenter: AlbumViewControllerDelegate {
                     } else if let gif = image.gifv {
                         imageURL = gif
                         type = .photo
-                    } else if let link = image.thumbnailLarge {
+                    } else if let link = image.thumbnailHuge {
                         imageURL = link
                         type = .photo
                     }
