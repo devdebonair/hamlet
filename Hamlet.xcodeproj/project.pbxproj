@@ -26,6 +26,7 @@
 		5636AC3D1DA1BA69006EF7B3 /* Variant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC3C1DA1BA69006EF7B3 /* Variant.swift */; };
 		564319851DBC9B2C0048D239 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319841DBC9B2C0048D239 /* AlbumViewController.swift */; };
 		564319871DBC9CAB0048D239 /* AlbumViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319861DBC9CAB0048D239 /* AlbumViewModel.swift */; };
+		5669C6FF1DC2DE2C00AB079B /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5669C6FE1DC2DE2C00AB079B /* Comment.swift */; };
 		5674BA721D9F867C00A4A974 /* Subreddit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5674BA711D9F867C00A4A974 /* Subreddit.swift */; };
 		567BADC91DB107FC006B3FCB /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567BADC81DB107FC006B3FCB /* Config.swift */; };
 		568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568119B51D9CC9D100B31FCB /* AppDelegate.swift */; };
@@ -67,6 +68,7 @@
 		5636AC3C1DA1BA69006EF7B3 /* Variant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Variant.swift; sourceTree = "<group>"; };
 		564319841DBC9B2C0048D239 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		564319861DBC9CAB0048D239 /* AlbumViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewModel.swift; sourceTree = "<group>"; };
+		5669C6FE1DC2DE2C00AB079B /* Comment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		5674BA711D9F867C00A4A974 /* Subreddit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Subreddit.swift; sourceTree = "<group>"; };
 		567BADC81DB107FC006B3FCB /* Config.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		568119B21D9CC9D100B31FCB /* Hamlet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hamlet.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -227,6 +229,7 @@
 				5674BA711D9F867C00A4A974 /* Subreddit.swift */,
 				56CB7E601D9FFF58008AA2CB /* Preview.swift */,
 				5636AC3C1DA1BA69006EF7B3 /* Variant.swift */,
+				5669C6FE1DC2DE2C00AB079B /* Comment.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -370,6 +373,7 @@
 				56A125221DA4F6AA001715BA /* String+Array.swift in Sources */,
 				56173B7C1DBB2F42009A0563 /* SubredditListViewController.swift in Sources */,
 				56A125201DA4B9B4001715BA /* FeedViewModel.swift in Sources */,
+				5669C6FF1DC2DE2C00AB079B /* Comment.swift in Sources */,
 				56173B841DBB5AAD009A0563 /* FeedViewController.swift in Sources */,
 				5636AC3B1DA1A860006EF7B3 /* Imgur.swift in Sources */,
 				56B232171DB7E60C007BCEA9 /* Date+TimeAgo.swift in Sources */,
