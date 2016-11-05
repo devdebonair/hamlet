@@ -45,6 +45,8 @@ struct Comment: Mappable {
     let ups: Int
     let replies: [Comment]
     
+    var dateCreated: Date { return Date(timeIntervalSince1970: created) }
+    
     init(map: Mapper) throws {
         subredditId = map.optionalFrom("data.subreddit_id") ?? ""
         linkId = map.optionalFrom("data.link_id") ?? ""
@@ -60,7 +62,7 @@ struct Comment: Mappable {
         stickied = map.optionalFrom("data.stickied") ?? false
         subreddit = map.optionalFrom("data.subreddit") ?? ""
         name = map.optionalFrom("data.name") ?? ""
-        created = map.optionalFrom("created") ?? 0.0
+        created = map.optionalFrom("data.created") ?? 0.0
         authorFlairText = map.optionalFrom("data.author_flair_text") ?? ""
         ups = map.optionalFrom("data.ups") ?? 0
         replies = map.optionalFrom("data.replies.data.children") ?? [Comment]()

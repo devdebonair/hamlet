@@ -13,6 +13,7 @@ import AsyncDisplayKit
 
 class HomePresenter: FeedControllerDelegate {
 
+
     // Protocols
     func dataSource() -> [FeedViewModel] { return feedItems }
     func didLoad(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
@@ -20,6 +21,11 @@ class HomePresenter: FeedControllerDelegate {
     func didTapFlashMessage(tableNode: ASTableNode, atIndex: Int) {
         if let onDidTapFlashMessage = onDidTapFlashMessage, let listing = getListing(key: feedItems[atIndex].primaryKey) {
             onDidTapFlashMessage(listing)
+        }
+    }
+    func didTapViewDiscussion(tableNode: ASTableNode, atIndex index: Int) {
+        if let onDidTapViewDiscussion = onDidTapViewDiscussion, let listing = getListing(key: feedItems[index].primaryKey) {
+            onDidTapViewDiscussion(listing, feedItems[index])
         }
     }
     func loadNextPage(completion: @escaping ([FeedViewModel]) -> Void) {
@@ -39,6 +45,7 @@ class HomePresenter: FeedControllerDelegate {
     var sort: Listing.SortType
     var cachedListings = [Listing]()
     var onDidTapFlashMessage: ((Listing)->Void)?
+    var onDidTapViewDiscussion: ((Listing, FeedViewModel)->Void)?
     var feedItems = [FeedViewModel]()
     
     init(subredditID: String, sort: Listing.SortType) {

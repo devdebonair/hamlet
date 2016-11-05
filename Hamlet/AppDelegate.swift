@@ -19,7 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         let presenter = SubredditListPresenter()
         let controller = SubredditListViewController()
-
+        
         controller.delegate = presenter
         
         let navController = UINavigationController(rootViewController: controller)
@@ -44,11 +44,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 albumController.delegate = albumPresenter
                 navController.pushViewController(albumController, animated: true)
             }
+            
+            presenter.onDidTapViewDiscussion = { (listing: Listing, model: FeedViewModel) in
+                let discussionPresenter = ListingDiscussionPresenter(listingId: listing.id, subreddit: listing.subreddit, sort: .top, feedViewModel: model)
+                let discussionController = FeedDetailViewController()
+                discussionController.delegate = discussionPresenter
+                navController.pushViewController(discussionController, animated: true)
+                
+            }
         }
         
-        let testController = navController
-        
-        window?.rootViewController = testController
+        window?.rootViewController = navController
         window?.makeKeyAndVisible()
         
         do {

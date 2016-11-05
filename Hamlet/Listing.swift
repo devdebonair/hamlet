@@ -48,6 +48,7 @@ struct Listing: Mappable {
     let kind: String
     let previewMedia: Preview?
     let subreddit: String
+    let id: String
     
     var dateCreated: Date { return Date(timeIntervalSince1970: createdDate) }
     
@@ -77,6 +78,7 @@ struct Listing: Mappable {
     var isAlbum: Bool { return Imgur.isAlbum(url: url) }
     
     init(map: Mapper) throws {
+        id = map.optionalFrom("data.id") ?? ""
         kind = map.optionalFrom("kind") ?? ""
         author = map.optionalFrom("data.author") ?? ""
         authorFlair = map.optionalFrom("data.author_flair_text") ?? ""

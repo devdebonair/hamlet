@@ -9,12 +9,21 @@
 import UIKit
 import AsyncDisplayKit
 
+@objc protocol CellNodeFeedActionDelegate: class {
+//    func didTapUpVote()
+//    func didTapDownVote()
+//    func didTapStar()
+    func didTapViewDiscussion(cellNode: CellNodeFeedAction)
+}
+
 class CellNodeFeedAction: ASCellNode {
 
     let buttonSave = ASButtonNode()
     let buttonUpVote = ASButtonNode()
     let buttonDownVote = ASButtonNode()
     let buttonDiscussion = ASButtonNode()
+    
+    weak var delegate: CellNodeFeedActionDelegate?
     
     init(color: UIColor = .lightGray) {
         super.init()
@@ -34,7 +43,13 @@ class CellNodeFeedAction: ASCellNode {
         buttonDownVote.setImage(#imageLiteral(resourceName: "arrow-down-filled"), for: .selected)
         buttonDownVote.imageNode.contentMode = .scaleAspectFit
         
-        let discussionTitle = NSAttributedString(string: "View Discussion", attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightSemibold), NSForegroundColorAttributeName: color])
+        let discussionTitle = NSAttributedString(
+            string: "View Discussion",
+            attributes: [
+                NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightSemibold),
+                NSForegroundColorAttributeName: color
+            ])
+        
         buttonDiscussion.setAttributedTitle(discussionTitle, for: ASControlState())
         buttonDiscussion.contentHorizontalAlignment = .horizontalAlignmentLeft
         
@@ -42,6 +57,8 @@ class CellNodeFeedAction: ASCellNode {
         addSubnode(buttonUpVote)
         addSubnode(buttonDownVote)
         addSubnode(buttonDiscussion)
+        
+        buttonDiscussion.addTarget(self, action: #selector(handleViewDiscussionTap), forControlEvents: .touchUpInside)
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
@@ -73,5 +90,9 @@ class CellNodeFeedAction: ASCellNode {
             children: [buttonDiscussion, ASAbsoluteLayoutSpec(children: [rightStack])])
         
         return ASInsetLayoutSpec(insets: UIEdgeInsets(top: 18, left: 15, bottom: 18, right: 15), child: buttonStack)
+    }
+    
+    @objc private func handleViewDiscussionTap() {
+        delegate?.didTapViewDiscussion(cellNode: self)
     }
 }
