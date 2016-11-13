@@ -25,7 +25,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let navController = UINavigationController(rootViewController: controller)
         navController.hidesBarsOnSwipe = true
         navController.navigationBar.alpha = 1.0
-        controller.navigationItem.title = "Subreddits"
         navController.navigationBar.barTintColor = .white
         navController.navigationBar.tintColor = .darkText
         navController.navigationBar.titleTextAttributes = [
