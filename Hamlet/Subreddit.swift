@@ -30,7 +30,7 @@ struct Subreddit: Mappable {
     let keyColorHex: String
     let name: String
     let createdDate: Double
-    let url: URL?
+    let url: String
     let publicDescription: String
     let type: String
     let kind: String
@@ -39,7 +39,7 @@ struct Subreddit: Mappable {
         bannerImageUrl = map.optionalFrom("data.banner_img")
         submitRules = map.optionalFrom("data.submit_text") ?? ""
         displayName = map.optionalFrom("data.display_name") ?? ""
-        headerImageUrl = map.optionalFrom("data.display_name")
+        headerImageUrl = map.optionalFrom("data.header_img")
         title = map.optionalFrom("data.title") ?? ""
         isNSFW = map.optionalFrom("data.over18") ?? false
         iconImageUrl = map.optionalFrom("data.icon_img")
@@ -49,7 +49,7 @@ struct Subreddit: Mappable {
         keyColorHex = map.optionalFrom("data.key_color") ?? ""
         name = map.optionalFrom("data.name") ?? ""
         createdDate = map.optionalFrom("data.created_utc") ?? 0.0
-        url = map.optionalFrom("data.url")
+        url = map.optionalFrom("data.url") ?? ""
         publicDescription = map.optionalFrom("data.public_description") ?? ""
         type = map.optionalFrom("data.subreddit_type") ?? ""
         kind = map.optionalFrom("kind") ?? ""
@@ -108,7 +108,8 @@ extension Subreddit {
     static func search(query: String, sort: SortType = .popular, completion: @escaping ([Subreddit])->Void) {
         let parameters = ["q": query]
         let url = "https://api.reddit.com/subreddits/search"
-        Alamofire.request(url, method: .get, parameters: parameters, encoding: URLEncoding.methodDependent, headers: nil).responseJSON { response in
+        let headers = ["User-Agent": HEADER_USER_AGENT]
+        Alamofire.request(url, method: .get, parameters: parameters, headers: headers).responseJSON { (response) in
             completion(responseParser(response: response, target: Subreddit.self))
         }
     }
