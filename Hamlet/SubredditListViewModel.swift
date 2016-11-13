@@ -9,8 +9,8 @@
 import Foundation
 
 struct SubredditListViewModel {
-    let displayName: String
-    let name: String
+    let title: String
+    let subtitle: String
     let imageURL: URL?
-    var primaryKey: String { return name }
+    let primaryKey: String
 }
