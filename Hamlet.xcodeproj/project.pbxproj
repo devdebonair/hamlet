@@ -27,6 +27,7 @@
 		5636AC3D1DA1BA69006EF7B3 /* Variant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5636AC3C1DA1BA69006EF7B3 /* Variant.swift */; };
 		564319851DBC9B2C0048D239 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319841DBC9B2C0048D239 /* AlbumViewController.swift */; };
 		564319871DBC9CAB0048D239 /* AlbumViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319861DBC9CAB0048D239 /* AlbumViewModel.swift */; };
+		5657073B1DD8F51D0076DF27 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5657073A1DD8F51D0076DF27 /* Debounce.swift */; };
 		5669C6FF1DC2DE2C00AB079B /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5669C6FE1DC2DE2C00AB079B /* Comment.swift */; };
 		5669C7011DC3096B00AB079B /* FeedDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5669C7001DC3096B00AB079B /* FeedDetailViewController.swift */; };
 		5669C7031DC30C5600AB079B /* CellNodeArticle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5669C7021DC30C5600AB079B /* CellNodeArticle.swift */; };
@@ -45,6 +46,7 @@
 		56A125221DA4F6AA001715BA /* String+Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56A125211DA4F6AA001715BA /* String+Array.swift */; };
 		56AA2BB61DC317F100E99C3A /* FeedDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AA2BB51DC317F100E99C3A /* FeedDetailViewModel.swift */; };
 		56AA2BB81DC31B5900E99C3A /* ListingDiscussionPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56AA2BB71DC31B5900E99C3A /* ListingDiscussionPresenter.swift */; };
+		56B1F0C61DD8FEDE0040EE3B /* NSNumber+CommaFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B1F0C51DD8FEDE0040EE3B /* NSNumber+CommaFormat.swift */; };
 		56B232171DB7E60C007BCEA9 /* Date+TimeAgo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B232161DB7E60C007BCEA9 /* Date+TimeAgo.swift */; };
 		56BD44E91DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BD44E81DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift */; };
 		56CB7E611D9FFF58008AA2CB /* Preview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E601D9FFF58008AA2CB /* Preview.swift */; };
@@ -75,6 +77,7 @@
 		5636AC3C1DA1BA69006EF7B3 /* Variant.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Variant.swift; sourceTree = "<group>"; };
 		564319841DBC9B2C0048D239 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		564319861DBC9CAB0048D239 /* AlbumViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewModel.swift; sourceTree = "<group>"; };
+		5657073A1DD8F51D0076DF27 /* Debounce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debounce.swift; sourceTree = "<group>"; };
 		5669C6FE1DC2DE2C00AB079B /* Comment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		5669C7001DC3096B00AB079B /* FeedDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedDetailViewController.swift; sourceTree = "<group>"; };
 		5669C7021DC30C5600AB079B /* CellNodeArticle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellNodeArticle.swift; sourceTree = "<group>"; };
@@ -96,6 +99,7 @@
 		56A125211DA4F6AA001715BA /* String+Array.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Array.swift"; sourceTree = "<group>"; };
 		56AA2BB51DC317F100E99C3A /* FeedDetailViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedDetailViewModel.swift; sourceTree = "<group>"; };
 		56AA2BB71DC31B5900E99C3A /* ListingDiscussionPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ListingDiscussionPresenter.swift; sourceTree = "<group>"; };
+		56B1F0C51DD8FEDE0040EE3B /* NSNumber+CommaFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSNumber+CommaFormat.swift"; sourceTree = "<group>"; };
 		56B232161DB7E60C007BCEA9 /* Date+TimeAgo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Date+TimeAgo.swift"; sourceTree = "<group>"; };
 		56BD44E81DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ASViewController+UIGestureRecognizerDelegate.swift"; sourceTree = "<group>"; };
 		56CB7E601D9FFF58008AA2CB /* Preview.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Preview.swift; sourceTree = "<group>"; };
@@ -174,6 +178,7 @@
 		568119B41D9CC9D100B31FCB /* Hamlet */ = {
 			isa = PBXGroup;
 			children = (
+				5657073A1DD8F51D0076DF27 /* Debounce.swift */,
 				5690B4031DC63A4D003C0A11 /* Data Structures */,
 				56173B781DBB2BC8009A0563 /* Nodes */,
 				56A1251C1DA4B974001715BA /* ViewModel */,
@@ -245,6 +250,7 @@
 				56B232161DB7E60C007BCEA9 /* Date+TimeAgo.swift */,
 				569E95AD1DBCE200001AABD5 /* UIColor+Literal.swift */,
 				56BD44E81DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift */,
+				56B1F0C51DD8FEDE0040EE3B /* NSNumber+CommaFormat.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -410,6 +416,7 @@
 				56173B8C1DBBA2E1009A0563 /* CellNodeFlashMessage.swift in Sources */,
 				56CB7E681DA024BC008AA2CB /* UITableViewCell+Identifier.swift in Sources */,
 				5636AC391DA19763006EF7B3 /* Gfycat.swift in Sources */,
+				56B1F0C61DD8FEDE0040EE3B /* NSNumber+CommaFormat.swift in Sources */,
 				56173B7A1DBB2C0D009A0563 /* CellNodeAvatarListItem.swift in Sources */,
 				56BD44E91DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift in Sources */,
 				56173B8E1DBBC326009A0563 /* CellNodeBlank.swift in Sources */,
@@ -418,6 +425,7 @@
 				56CB7E611D9FFF58008AA2CB /* Preview.swift in Sources */,
 				5669C7011DC3096B00AB079B /* FeedDetailViewController.swift in Sources */,
 				569E95B41DBF0358001AABD5 /* String+HTMLDecode.swift in Sources */,
+				5657073B1DD8F51D0076DF27 /* Debounce.swift in Sources */,
 				564319871DBC9CAB0048D239 /* AlbumViewModel.swift in Sources */,
 				56173B881DBB6A86009A0563 /* CellNodeText.swift in Sources */,
 				56173B901DBBDA64009A0563 /* CellNodeSeparator.swift in Sources */,
