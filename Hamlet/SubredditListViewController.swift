@@ -13,6 +13,8 @@ protocol SubredditListDelegate: class {
     func dataSource() -> [SubredditListViewModel]
     func didLoad(tableNode: ASTableNode)
     func didSelectItem(tableNode: ASTableNode, row: Int)
+    func didSearch(tableNode: ASTableNode, text: String)
+    func didCancelSearch(tableNode: ASTableNode)
 }
 
 class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
@@ -24,19 +26,34 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     var delegate: SubredditListDelegate!
     var dataSource: [SubredditListViewModel] { return delegate.dataSource() }
     
+    
     init() {
         super.init(node: ASTableNode(style: .plain))
         node.delegate = self
         node.dataSource = self
+        definesPresentationContext = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         navigationController?.interactivePopGestureRecognizer?.delegate = nil
     }
     
+    let searchController = UISearchController(searchResultsController: nil)
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
+
+        searchController.searchBar.sizeToFit()
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search Subreddits"
+        searchController.searchBar.searchBarStyle = .minimal
+        searchController.hidesNavigationBarDuringPresentation = false
+        
+        searchController.searchBar.delegate = self
+        
+        navigationItem.titleView = searchController.searchBar
+        
         node.view.separatorStyle = .none
         node.view.backgroundColor = .white
         delegate.didLoad(tableNode: node)
@@ -53,10 +70,21 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     func tableView(_ tableView: ASTableView, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let item = dataSource[indexPath.section]
         return { _ -> ASCellNode in
-            let cell = CellNodeAvatarListItem(title: item.displayName, subtitle: "r/\(item.name)".lowercased(), url: item.imageURL)
+            let cell = CellNodeAvatarListItem(title: item.title, subtitle: item.subtitle.lowercased(), url: item.imageURL)
             cell.backgroundColor = .white
             return cell
         }
     }
     
+}
+
+extension SubredditListViewController: UISearchResultsUpdating, UISearchControllerDelegate, UISearchBarDelegate {
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let text = searchController.searchBar.text, text.characters.count > 0 else { return delegate.didCancelSearch(tableNode: self.node) }
+        delegate.didSearch(tableNode: self.node, text: text)
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        delegate.didCancelSearch(tableNode: self.node)
+    }
 }
