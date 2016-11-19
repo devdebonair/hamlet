@@ -26,6 +26,7 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     var delegate: SubredditListDelegate!
     var dataSource: [SubredditListViewModel] { return delegate.dataSource() }
     
+    let searchController = UISearchController(searchResultsController: nil)
     
     init() {
         super.init(node: ASTableNode(style: .plain))
@@ -34,11 +35,10 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
         definesPresentationContext = true
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        navigationController?.interactivePopGestureRecognizer?.delegate = nil
+    override func viewWillAppear(_ animated: Bool) {
+        navigationItem.titleView = searchController.searchBar
     }
     
-    let searchController = UISearchController(searchResultsController: nil)
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
@@ -78,13 +78,26 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     
 }
 
-extension SubredditListViewController: UISearchResultsUpdating, UISearchControllerDelegate, UISearchBarDelegate {
+extension SubredditListViewController: UISearchResultsUpdating, UISearchBarDelegate {
     func updateSearchResults(for searchController: UISearchController) {
-        guard let text = searchController.searchBar.text, text.characters.count > 0 else { return delegate.didCancelSearch(tableNode: self.node) }
-        delegate.didSearch(tableNode: self.node, text: text)
+        guard let text = searchController.searchBar.text, text.characters.count > 0 else {
+            return delegate.didCancelSearch(tableNode: self.node)
+        }
+        
+        // implement autosuggestions
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         delegate.didCancelSearch(tableNode: self.node)
+        searchBar.setShowsCancelButton(false, animated: true)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let text = searchController.searchBar.text, text.characters.count > 0, !text.isEmpty else {
+            return delegate.didCancelSearch(tableNode: self.node)
+        }
+        delegate.didSearch(tableNode: self.node, text: text)
+        searchBar.resignFirstResponder()
+        searchBar.setShowsCancelButton(false, animated: true)
     }
 }

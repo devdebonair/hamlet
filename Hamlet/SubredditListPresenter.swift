@@ -72,7 +72,7 @@ class SubredditListPresenter: SubredditListDelegate {
     
     func didSelectItem(tableNode: ASTableNode, row: Int) {
         if let onDidSelectSubreddit = onDidSelectSubreddit {
-            let item = list[row]
+            let item = dataSource()[row]
             onDidSelectSubreddit(item.primaryKey)
         }
     }

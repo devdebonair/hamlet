@@ -11,62 +11,39 @@ import UIKit
 import PINRemoteImage
 import AsyncDisplayKit
 
-class HomePresenter: FeedControllerDelegate {
+class FeedPresenter {
 
-
-    // Protocols
-    func dataSource() -> [FeedViewModel] { return feedItems }
-    func didLoad(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
-    func didReachEnd(tableNode: ASTableNode) { fetchData(tableNode: tableNode) }
-    func didTapFlashMessage(tableNode: ASTableNode, atIndex: Int) {
-        if let onDidTapFlashMessage = onDidTapFlashMessage, let listing = getListing(key: feedItems[atIndex].primaryKey) {
-            onDidTapFlashMessage(listing)
-        }
-    }
-    func didTapViewDiscussion(tableNode: ASTableNode, atIndex index: Int) {
-        if let onDidTapViewDiscussion = onDidTapViewDiscussion, let listing = getListing(key: feedItems[index].primaryKey) {
-            onDidTapViewDiscussion(listing, feedItems[index])
-        }
-    }
-    func loadNextPage(completion: @escaping ([FeedViewModel]) -> Void) {
-        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 25) { (listings) in
-            let weakSelf = self
-            weakSelf.cachedListings.append(contentsOf: listings)
-            let mappedFeedItems = weakSelf.loadFeedItems(listings: listings)
-            
-            weakSelf.fetchRemoteMedia(items: mappedFeedItems) { (items) in
-                weakSelf.feedItems.append(contentsOf: items)
-                completion(items)
-            }
-        }
-    }
-    
     var subreddit: String
     var sort: Listing.SortType
+
     var cachedListings = [Listing]()
+    var feedItems = [FeedViewModel]()
+    var searchItems = [FeedViewModel]()
+    
     var onDidTapFlashMessage: ((Listing)->Void)?
     var onDidTapViewDiscussion: ((Listing, FeedViewModel)->Void)?
-    var feedItems = [FeedViewModel]()
+    
+    let debounce = Debouncer(interval: 0.2)
     
     init(subredditID: String, sort: Listing.SortType) {
         self.sort = sort
         subreddit = subredditID
     }
     
-    private func fetchData(tableNode: ASTableNode) {
+    func fetchData(completion: @escaping ()->Void) {
         let weakSelf = self
         Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 25) { (listings) in
             weakSelf.cachedListings.append(contentsOf: listings)
-            let mappedFeedItems = weakSelf.loadFeedItems(listings: listings)
+            let mappedFeedItems = weakSelf.getFeedItems(from: listings)
             
             weakSelf.fetchRemoteMedia(items: mappedFeedItems) { (items) in
                 weakSelf.feedItems.append(contentsOf: items)
-                tableNode.view.reloadData()
+                completion()
             }
         }
     }
     
-    private func getListing(key: String) -> Listing? {
+    func getListing(key: String) -> Listing? {
         for listing in cachedListings {
             if listing.name == key {
                 return listing
@@ -75,7 +52,7 @@ class HomePresenter: FeedControllerDelegate {
         return nil
     }
     
-    private func fetchRemoteMedia(items: [FeedViewModel], completion: @escaping ([FeedViewModel])->Void) {
+    func fetchRemoteMedia(items: [FeedViewModel], completion: @escaping ([FeedViewModel])->Void) {
         let queue = DispatchQueue(label: "com.Hamlet.RemoteMediaFetch")
         let group = DispatchGroup()
         
@@ -120,8 +97,8 @@ class HomePresenter: FeedControllerDelegate {
         }
     }
     
-    private func loadFeedItems(listings: [Listing]) -> [FeedViewModel] {
-        let items = listings.map({ (listing) -> FeedViewModel in
+    func getFeedItems(from: [Listing]) -> [FeedViewModel] {
+        let items = from.map({ (listing) -> FeedViewModel in
             let flashColor: UIColor? = listing.isAlbum ? UIColor(red: 50, green: 92, blue: 134) : nil
             let flashMessage: String? = listing.isAlbum ? "album".uppercased() : nil
             let actionColor = UIColor(red: 165/255, green: 165/255, blue: 165/255, alpha: 1.0)
@@ -167,5 +144,66 @@ class HomePresenter: FeedControllerDelegate {
             return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name, upvotes: upvotes)
         })
         return items
+    }
+}
+
+extension FeedPresenter: FeedControllerDelegate {
+    
+    func dataClear() {
+        searchItems = []
+        feedItems = []
+        cachedListings = []
+    }
+
+    func didLoad(tableNode: ASTableNode) {
+        dataFetch(tableNode: tableNode)
+    }
+    
+    func dataSource() -> [FeedViewModel] { return feedItems }
+    
+    func didTapFlashMessage(tableNode: ASTableNode, atIndex: Int) {
+        if let onDidTapFlashMessage = onDidTapFlashMessage, let listing = getListing(key: feedItems[atIndex].primaryKey) {
+            onDidTapFlashMessage(listing)
+        }
+    }
+    
+    func didTapViewDiscussion(tableNode: ASTableNode, atIndex index: Int) {
+        if let onDidTapViewDiscussion = onDidTapViewDiscussion, let listing = getListing(key: feedItems[index].primaryKey) {
+            onDidTapViewDiscussion(listing, feedItems[index])
+        }
+    }
+    
+    func dataFetchNext(completion: @escaping ([FeedViewModel]) -> Void) {
+        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 25) { (listings) in
+            let weakSelf = self
+            weakSelf.cachedListings.append(contentsOf: listings)
+            let mappedFeedItems = weakSelf.getFeedItems(from: listings)
+            
+            weakSelf.fetchRemoteMedia(items: mappedFeedItems) { (items) in
+                weakSelf.feedItems.append(contentsOf: items)
+                completion(items)
+            }
+        }
+    }
+    
+    func dataFetch(tableNode: ASTableNode) {
+        fetchData() {
+            tableNode.reloadData()
+        }
+    }
+    
+    func didSearch(tableNode: ASTableNode, text: String) {
+        let weakSelf = self
+        debounce.callback = {
+            Subreddit.searchListings(subreddit: weakSelf.subreddit, query: text, after: nil, limit: 100, completion: { (listings: [Listing]) in
+                weakSelf.searchItems = weakSelf.getFeedItems(from: listings)
+                tableNode.reloadData()
+            })
+        }
+    }
+    
+    func didCancelSearch(tableNode: ASTableNode) {
+        searchItems = []
+        tableNode.reloadData()
     }
 }

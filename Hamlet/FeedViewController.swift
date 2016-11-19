@@ -11,17 +11,24 @@ import AsyncDisplayKit
 
 protocol FeedControllerDelegate: class {
     func dataSource() -> [FeedViewModel]
+
     func didLoad(tableNode: ASTableNode)
-    func loadNextPage(completion: @escaping ([FeedViewModel])->Void)
+    func didCancelSearch(tableNode: ASTableNode)
+    func didSearch(tableNode: ASTableNode, text: String)
     func didTapFlashMessage(tableNode: ASTableNode, atIndex index: Int)
     func didTapViewDiscussion(tableNode: ASTableNode, atIndex index: Int)
+
+    func dataClear()
+    func dataFetch(tableNode: ASTableNode)
+    func dataFetchNext(completion: @escaping ([FeedViewModel])->Void)
 }
 
-class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
+class FeedViewController: ASViewController<ASTableNode> {
     
     var delegate: FeedControllerDelegate!
     var dataSource: [FeedViewModel] { return delegate.dataSource() }
-    override var prefersStatusBarHidden: Bool { return navigationController?.isNavigationBarHidden ?? false }
+    
+    let searchController = UISearchController(searchResultsController: nil)
     
     init() {
         super.init(node: ASTableNode(style: .plain))
@@ -31,17 +38,44 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.interactivePopGestureRecognizer?.delegate = self
+        
+        definesPresentationContext = false
+        
+        searchController.searchBar.sizeToFit()
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search Posts"
+        searchController.searchBar.searchBarStyle = .minimal
+        searchController.hidesNavigationBarDuringPresentation = false
+        
+        searchController.delegate = self
+        searchController.searchBar.delegate = self
+        
+        navigationItem.titleView = searchController.searchBar
+        
         node.view.separatorStyle = .none
         node.view.backgroundColor = .white
+        
         delegate.didLoad(tableNode: node)
     }
+    
+    func refresh() {
+        clear()
+        reload()
+    }
+    
+    func reload() {
+        delegate.dataFetch(tableNode: node)
+    }
+    
+    func clear() {
+        delegate.dataClear()
+    }
+    
+    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+}
 
-    override func viewWillDisappear(_ animated: Bool) { navigationController?.interactivePopGestureRecognizer?.delegate = nil }
-    func numberOfSections(in tableView: UITableView) -> Int { return dataSource.count }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { return numberOfRows(from: dataSource[section]) }
-    private func numberOfRows(from: FeedViewModel) -> Int { return from.getNodeTypeOrder().count }
-    func shouldBatchFetch(for tableView: ASTableView) -> Bool { return true }
+extension FeedViewController: ASTableDelegate, ASTableDataSource {
     
     func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let feedItem = dataSource[indexPath.section]
@@ -85,9 +119,25 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
         }
     }
     
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return dataSource.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return numberOfRows(from: dataSource[section])
+    }
+    
+    private func numberOfRows(from: FeedViewModel) -> Int {
+        return from.getNodeTypeOrder().count
+    }
+    
+    func shouldBatchFetch(for tableView: ASTableView) -> Bool {
+        return true
+    }
+    
     func tableNode(_ tableNode: ASTableNode, willBeginBatchFetchWith context: ASBatchContext) {
         let beforeFetchCount = numberOfSections(in: tableNode.view)
-        delegate.loadNextPage { (items) in
+        delegate.dataFetchNext { (items) in
             let lower = beforeFetchCount
             let upper = beforeFetchCount + items.count
             let set = IndexSet(integersIn: lower..<upper)
@@ -95,15 +145,24 @@ class FeedViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTabl
             context.completeBatchFetching(true)
         }
     }
-    
-    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }
 
-extension  FeedViewController: CellNodeFeedActionDelegate {
+extension FeedViewController: CellNodeFeedActionDelegate {
     func didTapViewDiscussion(cellNode: CellNodeFeedAction) {
         let indexPath = node.indexPath(for: cellNode)
         if let indexPath = indexPath {
             delegate.didTapViewDiscussion(tableNode: node, atIndex: indexPath.section)
         }
+    }
+}
+
+extension FeedViewController: UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let text = searchController.searchBar.text, text.characters.count > 0 else { return delegate.didCancelSearch(tableNode: self.node) }
+        delegate.didSearch(tableNode: self.node, text: text)
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        delegate.didCancelSearch(tableNode: self.node)
     }
 }

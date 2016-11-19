@@ -16,44 +16,67 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        
         window = UIWindow(frame: UIScreen.main.bounds)
-        let presenter = SubredditListPresenter()
-        let controller = SubredditListViewController()
         
-        controller.delegate = presenter
+        let listPresenter = SubredditListPresenter()
+        let listController = SubredditListViewController()
+        listController.delegate = listPresenter
         
-        let navController = UINavigationController(rootViewController: controller)
-        navController.hidesBarsOnSwipe = true
-        navController.navigationBar.alpha = 1.0
-        navController.navigationBar.barTintColor = .white
-        navController.navigationBar.tintColor = .darkText
-        navController.navigationBar.titleTextAttributes = [
+        let listNavigation = UINavigationController(rootViewController: listController)
+        listNavigation.navigationBar.alpha = 1.0
+        listNavigation.navigationBar.barTintColor = .white
+        listNavigation.navigationBar.tintColor = .darkText
+        listNavigation.navigationBar.titleTextAttributes = [
             NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
         
-        presenter.onDidSelectSubreddit = { id in
-            
-            let presenter = HomePresenter(subredditID: id, sort: .hot)
-            let controller = FeedViewController()
-            controller.delegate = presenter
-            navController.pushViewController(controller, animated: true)
-            
-            presenter.onDidTapFlashMessage = { (listing: Listing) in
-                let albumPresenter = AlbumPresenter(url: listing.url)
-                let albumController = AlbumViewController()
-                albumController.delegate = albumPresenter
-                navController.pushViewController(albumController, animated: true)
-            }
-            
-            presenter.onDidTapViewDiscussion = { (listing: Listing, model: FeedViewModel) in
-                let discussionPresenter = ListingDiscussionPresenter(listingId: listing.id, subreddit: listing.subreddit, sort: .top, feedViewModel: model)
-                let discussionController = FeedDetailViewController()
-                discussionController.delegate = discussionPresenter
-                navController.pushViewController(discussionController, animated: true)
-                
-            }
+        let feedPresenter = FeedPresenter(subredditID: "helgalovekaty", sort: .hot)
+        let feedController = FeedViewController()
+        feedController.delegate = feedPresenter
+        feedController.searchController.searchBar.placeholder = "Search Posts in r/helgalovekaty"
+        
+        let feedNavigation = UINavigationController(rootViewController: feedController)
+        feedNavigation.navigationBar.alpha = 1.0
+        feedNavigation.navigationBar.barTintColor = .white
+        feedNavigation.navigationBar.tintColor = .darkText
+        feedNavigation.navigationBar.titleTextAttributes = [
+            NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
+        
+        feedNavigation.view.layer.shadowOpacity = 0.6
+        
+        let mainController = MainPagerViewController(main: feedNavigation, menu: listNavigation)
+        
+        feedPresenter.onDidTapFlashMessage = { (listing: Listing) in
+            let albumPresenter = AlbumPresenter(url: listing.url)
+            let albumController = AlbumViewController()
+            albumController.delegate = albumPresenter
+            feedNavigation.pushViewController(albumController, animated: true)
         }
         
-        window?.rootViewController = navController
+        feedPresenter.onDidTapViewDiscussion = { (listing: Listing, model: FeedViewModel) in
+            let discussionPresenter = ListingDiscussionPresenter(listingId: listing.id, subreddit: listing.subreddit, sort: .top, feedViewModel: model)
+            let discussionController = FeedDetailViewController()
+            discussionController.delegate = discussionPresenter
+            feedNavigation.pushViewController(discussionController, animated: true)
+        }
+        
+        listPresenter.onDidSelectSubreddit = { id in
+            feedPresenter.subreddit = id
+            feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
+            listController.searchController.searchBar.resignFirstResponder()
+            listController.searchController.searchBar.setShowsCancelButton(false, animated: true)
+            mainController.closeMenu(animated: true)
+            feedController.refresh()
+        }
+        
+//        home.onDidTapFlashMessage = { (listing: Listing) in
+//            let albumPresenter = AlbumPresenter(url: listing.url)
+//            let albumController = AlbumViewController()
+//            albumController.delegate = albumPresenter
+//            navController.pushViewController(albumController, animated: true)
+//        }
+
+        window?.rootViewController = mainController
         window?.makeKeyAndVisible()
         
         do {

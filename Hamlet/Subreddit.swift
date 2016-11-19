@@ -89,6 +89,21 @@ extension Subreddit {
         }
     }
     
+    static func searchListings(subreddit: String, query: String, after: String? = nil, limit: Int? = nil, completion: @escaping ([Listing])->Void) {
+        let url = "https://api.reddit.com/r/\(subreddit)/search"
+        let headers = ["User-Agent": HEADER_USER_AGENT]
+        var queries = ["q": query]
+        if let after = after {
+            queries["after"] = after
+        }
+        if let limit = limit {
+            queries["limit"] = String(limit)
+        }
+        Alamofire.request(url, method: .get, parameters: queries, headers: headers).responseJSON { (response) in
+            completion(responseParser(response: response, target: Listing.self))
+        }
+    }
+    
     static func searchPopular(completion: @escaping ([Subreddit])->Void) {
         searchWhere(sort: .popular, completion: completion)
     }
