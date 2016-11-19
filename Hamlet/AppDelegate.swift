@@ -69,13 +69,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             feedController.refresh()
         }
         
-//        home.onDidTapFlashMessage = { (listing: Listing) in
-//            let albumPresenter = AlbumPresenter(url: listing.url)
-//            let albumController = AlbumViewController()
-//            albumController.delegate = albumPresenter
-//            navController.pushViewController(albumController, animated: true)
-//        }
-
         window?.rootViewController = mainController
         window?.makeKeyAndVisible()
         
