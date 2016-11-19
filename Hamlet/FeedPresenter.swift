@@ -8,17 +8,15 @@
 
 import Foundation
 import UIKit
-import PINRemoteImage
 import AsyncDisplayKit
 
 class FeedPresenter {
 
     var subreddit: String
     var sort: Listing.SortType
-
-    var cachedListings = [Listing]()
-    var feedItems = [FeedViewModel]()
-    var searchItems = [FeedViewModel]()
+    
+    let cacheModel = FeedCache()
+    let cacheSearch = FeedCache()
     
     var onDidTapFlashMessage: ((Listing)->Void)?
     var onDidTapViewDiscussion: ((Listing, FeedViewModel)->Void)?
@@ -30,35 +28,27 @@ class FeedPresenter {
         subreddit = subredditID
     }
     
-    func fetchData(completion: @escaping ()->Void) {
-        let weakSelf = self
-        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 25) { (listings) in
-            weakSelf.cachedListings.append(contentsOf: listings)
-            let mappedFeedItems = weakSelf.getFeedItems(from: listings)
-            
-            weakSelf.fetchRemoteMedia(items: mappedFeedItems) { (items) in
-                weakSelf.feedItems.append(contentsOf: items)
-                completion()
+    func fetchData(cache: FeedCache, sort: Listing.SortType, after: String?, completion: @escaping ([FeedModelContainer])->Void) {
+        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: after, limit: 25) { (listings) in
+            var models = [FeedModelContainer]()
+            var keyOrder = [String]()
+            for listing in listings {
+                let model = FeedModelContainer(listing: listing)
+                cache.add(model: model, at: model.feedItem.primaryKey)
+                keyOrder.append(model.feedItem.primaryKey)
+                models.append(model)
             }
+            cache.order.append(contentsOf: keyOrder)
+            completion(models)
         }
     }
     
-    func getListing(key: String) -> Listing? {
-        for listing in cachedListings {
-            if listing.name == key {
-                return listing
-            }
-        }
-        return nil
-    }
-    
-    func fetchRemoteMedia(items: [FeedViewModel], completion: @escaping ([FeedViewModel])->Void) {
+    func fetchRemoteMedia(cache: FeedCache, models: [FeedModelContainer], completion: @escaping ()->Void) {
         let queue = DispatchQueue(label: "com.Hamlet.RemoteMediaFetch")
         let group = DispatchGroup()
         
-        var newItems = [FeedViewModel]()
-        
-        for var item in items {
+        for model in models {
+            let item = model.feedItem
             if item.media == nil && Imgur.isImgurUrl(url: item.linkUrl) && !Imgur.isAlbum(url: item.linkUrl) {
                 let url = item.linkUrl
                 group.enter()
@@ -66,144 +56,188 @@ class FeedPresenter {
                     Imgur.getImage(url: url, completion: { (image) in
                         if let image = image {
                             let media = Media(url: image.link, height: image.height, width: image.width, type: .photo)
-                            item.media = media
-                            newItems.append(item)
+                            cache.add(media: media, at: item.primaryKey)
                             group.leave()
                         }
                     })
                 }
-            } else if item.domain.lowercased().contains(Listing.Domain.gfycat.rawValue.lowercased()) {
+            }
+            
+            if item.domain.lowercased().contains(Listing.Domain.gfycat.rawValue.lowercased()) {
                 let url = item.linkUrl
                 group.enter()
                 queue.async(group: group) {
                     Gfycat.fetch(url: url, completion: { (gfycat) in
                         if let gfycat = gfycat, let width = gfycat.width, let height = gfycat.height {
                             let media = Media(url: gfycat.urlMobileMP4, height: height, width: width, type: .video, poster: gfycat.mobilePosterUrl)
-                            item.media = media
-                            newItems.append(item)
+                            cache.add(media: media, at: item.primaryKey)
                         }
                         group.leave()
                     })
                 }
-            } else {
-                group.enter()
-                newItems.append(item)
-                group.leave()
             }
         }
         
-        group.notify(queue: .main) { 
-            completion(newItems)
+        group.notify(queue: .main) {
+            completion()
         }
-    }
-    
-    func getFeedItems(from: [Listing]) -> [FeedViewModel] {
-        let items = from.map({ (listing) -> FeedViewModel in
-            let flashColor: UIColor? = listing.isAlbum ? UIColor(red: 50, green: 92, blue: 134) : nil
-            let flashMessage: String? = listing.isAlbum ? "album".uppercased() : nil
-            let actionColor = UIColor(red: 165/255, green: 165/255, blue: 165/255, alpha: 1.0)
-            let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
-            let submissionText = "Submitted \(listing.dateCreated.timeAgo(numericDates: true)) by \(listing.author) on r/\(listing.subreddit)\(domainSubmissionText)"
-            let upvotes = listing.ups
-            
-            var media: Media? = nil
-            
-            if let preview = listing.previewMedia {
-                
-                var url: URL? = nil
-                let type: Media.MediaType = listing.isVideo ? .video : .photo
-                var poster: URL? = nil
-                
-                if type == .video {
-                    switch listing.domain {
-                    case Listing.Domain.imgur.rawValue:
-                        url = Imgur.replaceGIFV(url: listing.url)
-                        poster = preview.variantSource.source.url
-                    case Listing.Domain.reddit.rawValue:
-                        url = preview.variantMP4?.source.url
-                    case Listing.Domain.gfycat.rawValue:
-                        url = listing.url
-                    default:
-                        url = preview.variantMP4?.source.url
-                    }
-                } else {
-                    if listing.domain.lowercased() == Listing.Domain.imgur.rawValue.lowercased() {
-                        url = listing.url
-                    } else if let gifSource = preview.variantGIF {
-                        url = gifSource.source.url
-                    } else {
-                        url = preview.variantSource.source.url
-                    }
-                }
-                
-                if let url = url {
-                    media = Media(url: url, height: preview.variantSource.source.height, width: preview.variantSource.source.width, type: type, poster: poster)
-                }
-            }
-            
-            return FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name, upvotes: upvotes)
-        })
-        return items
     }
 }
 
 extension FeedPresenter: FeedControllerDelegate {
     
+    func dataModel(key: String) -> FeedViewModel {
+        return cacheModel.getFeedModel(key: key)!.feedItem
+    }
+    
+    func numberOfModels() -> Int {
+        return cacheModel.countModel
+    }
+    
+    func dataKeyOrder() -> [String] {
+        return cacheModel.order
+    }
+    
     func dataClear() {
-        searchItems = []
-        feedItems = []
-        cachedListings = []
+        cacheModel.clear()
+        cacheSearch.clear()
     }
 
     func didLoad(tableNode: ASTableNode) {
         dataFetch(tableNode: tableNode)
     }
     
-    func dataSource() -> [FeedViewModel] { return feedItems }
-    
-    func didTapFlashMessage(tableNode: ASTableNode, atIndex: Int) {
-        if let onDidTapFlashMessage = onDidTapFlashMessage, let listing = getListing(key: feedItems[atIndex].primaryKey) {
-            onDidTapFlashMessage(listing)
+    func didTapFlashMessage(tableNode: ASTableNode, atKey: String) {
+        if let onDidTapFlashMessage = onDidTapFlashMessage, let model = cacheModel.getFeedModel(key: atKey) {
+            onDidTapFlashMessage(model.listing)
         }
     }
     
-    func didTapViewDiscussion(tableNode: ASTableNode, atIndex index: Int) {
-        if let onDidTapViewDiscussion = onDidTapViewDiscussion, let listing = getListing(key: feedItems[index].primaryKey) {
-            onDidTapViewDiscussion(listing, feedItems[index])
+    func didTapViewDiscussion(tableNode: ASTableNode, atKey key: String) {
+        if let onDidTapViewDiscussion = onDidTapViewDiscussion, let model = cacheModel.getFeedModel(key: key) {
+            onDidTapViewDiscussion(model.listing, model.feedItem)
         }
     }
     
-    func dataFetchNext(completion: @escaping ([FeedViewModel]) -> Void) {
-        Subreddit.fetchListing(subreddit: subreddit, sort: sort, after: cachedListings.last?.name, limit: 25) { (listings) in
-            let weakSelf = self
-            weakSelf.cachedListings.append(contentsOf: listings)
-            let mappedFeedItems = weakSelf.getFeedItems(from: listings)
-            
-            weakSelf.fetchRemoteMedia(items: mappedFeedItems) { (items) in
-                weakSelf.feedItems.append(contentsOf: items)
-                completion(items)
+    func dataFetchNext(completion: @escaping () -> Void) {
+        let weakSelf = self
+        fetchData(cache: cacheModel, sort: sort, after: cacheModel.order[cacheModel.order.count - 1]) { models in
+            weakSelf.fetchRemoteMedia(cache: weakSelf.cacheModel, models: models) {
+                completion()
             }
         }
     }
     
     func dataFetch(tableNode: ASTableNode) {
-        fetchData() {
-            tableNode.reloadData()
+        let weakSelf = self
+        fetchData(cache: cacheModel, sort: sort, after: nil) { models in
+            weakSelf.fetchRemoteMedia(cache: weakSelf.cacheModel, models: models) {
+                tableNode.reloadData()
+            }
         }
     }
     
+    // Need to implement
     func didSearch(tableNode: ASTableNode, text: String) {
-        let weakSelf = self
-        debounce.callback = {
-            Subreddit.searchListings(subreddit: weakSelf.subreddit, query: text, after: nil, limit: 100, completion: { (listings: [Listing]) in
-                weakSelf.searchItems = weakSelf.getFeedItems(from: listings)
-                tableNode.reloadData()
-            })
-        }
+//        let weakSelf = self
+//        debounce.callback = {
+//            Subreddit.searchListings(subreddit: weakSelf.subreddit, query: text, after: nil, limit: 100, completion: { (listings: [Listing]) in
+//                for _ in listings {
+//                    
+//                }
+//                tableNode.reloadData()
+//            })
+//        }
     }
     
     func didCancelSearch(tableNode: ASTableNode) {
-        searchItems = []
+        cacheSearch.clear()
         tableNode.reloadData()
+    }
+}
+
+struct FeedModelContainer {
+    let listing: Listing
+    var feedItem: FeedViewModel
+    
+    init(listing: Listing) {
+        self.listing = listing
+        
+        let flashColor: UIColor? = listing.isAlbum ? UIColor(red: 50, green: 92, blue: 134) : nil
+        let flashMessage: String? = listing.isAlbum ? "album".uppercased() : nil
+        let actionColor = UIColor(red: 165/255, green: 165/255, blue: 165/255, alpha: 1.0)
+        let domainSubmissionText = listing.domainExcludeSubreddit.isEmpty ? "" : "\n\n\(listing.domainExcludeSubreddit.uppercased())"
+        let submissionText = "Submitted \(listing.dateCreated.timeAgo(numericDates: true)) by \(listing.author) on r/\(listing.subreddit)\(domainSubmissionText)"
+        let upvotes = listing.ups
+        
+        var media: Media? = nil
+        
+        if let preview = listing.previewMedia {
+            
+            var url: URL? = nil
+            let type: Media.MediaType = listing.isVideo ? .video : .photo
+            var poster: URL? = nil
+            
+            if type == .video {
+                switch listing.domain {
+                case Listing.Domain.imgur.rawValue:
+                    url = Imgur.replaceGIFV(url: listing.url)
+                    poster = preview.variantSource.source.url
+                case Listing.Domain.reddit.rawValue:
+                    url = preview.variantMP4?.source.url
+                case Listing.Domain.gfycat.rawValue:
+                    url = listing.url
+                default:
+                    url = preview.variantMP4?.source.url
+                }
+            } else {
+                if listing.domain.lowercased() == Listing.Domain.imgur.rawValue.lowercased() {
+                    url = listing.url
+                } else if let gifSource = preview.variantGIF {
+                    url = gifSource.source.url
+                } else {
+                    url = preview.variantSource.source.url
+                }
+            }
+            
+            if let url = url {
+                media = Media(url: url, height: preview.variantSource.source.height, width: preview.variantSource.source.width, type: type, poster: poster)
+            }
+        }
+        
+        self.feedItem = FeedViewModel(title: listing.title, description: listing.descriptionEscaped, flashMessage: flashMessage, flashColor: flashColor, author: listing.author, subreddit: listing.subreddit, domain: listing.domain, media: media, actionColor: actionColor, submission: submissionText, linkUrl: listing.url, primaryKey: listing.name, upvotes: upvotes)
+    }
+}
+
+class FeedCache {
+    var mediaCache = [String:Media]()
+    var modelCache = [String:FeedModelContainer]()
+    var order = [String]()
+    
+    var countModel: Int {
+        return modelCache.count
+    }
+    
+    func clear() {
+        mediaCache = [:]
+        modelCache = [:]
+        order = []
+    }
+    
+    func getFeedModel(key: String) -> FeedModelContainer? {
+        let item = modelCache[key]
+        if var item = item, let media = mediaCache[key] {
+            item.feedItem.media = media
+            return item
+        }
+        return item
+    }
+    
+    func add(media: Media, at: String) {
+        mediaCache[at] = media
+    }
+    
+    func add(model: FeedModelContainer, at: String) {
+        modelCache[at] = model
     }
 }

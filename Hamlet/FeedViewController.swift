@@ -10,23 +10,24 @@ import UIKit
 import AsyncDisplayKit
 
 protocol FeedControllerDelegate: class {
-    func dataSource() -> [FeedViewModel]
-
     func didLoad(tableNode: ASTableNode)
     func didCancelSearch(tableNode: ASTableNode)
     func didSearch(tableNode: ASTableNode, text: String)
-    func didTapFlashMessage(tableNode: ASTableNode, atIndex index: Int)
-    func didTapViewDiscussion(tableNode: ASTableNode, atIndex index: Int)
+    func didTapFlashMessage(tableNode: ASTableNode, atKey key: String)
+    func didTapViewDiscussion(tableNode: ASTableNode, atKey key: String)
 
     func dataClear()
     func dataFetch(tableNode: ASTableNode)
-    func dataFetchNext(completion: @escaping ([FeedViewModel])->Void)
+    func dataFetchNext(completion: @escaping ()->Void)
+    func dataModel(key: String) -> FeedViewModel
+    func dataKeyOrder() -> [String]
+    
+    func numberOfModels() -> Int
 }
 
 class FeedViewController: ASViewController<ASTableNode> {
     
     var delegate: FeedControllerDelegate!
-    var dataSource: [FeedViewModel] { return delegate.dataSource() }
     
     let searchController = UISearchController(searchResultsController: nil)
     
@@ -78,7 +79,7 @@ class FeedViewController: ASViewController<ASTableNode> {
 extension FeedViewController: ASTableDelegate, ASTableDataSource {
     
     func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
-        let feedItem = dataSource[indexPath.section]
+        let feedItem = delegate.dataModel(key: delegate.dataKeyOrder()[indexPath.section])
         return { _ -> ASCellNode in
             let cell = feedItem.getNode(indexPath: indexPath)
             if let cell = cell as? CellNodeFeedAction {
@@ -90,7 +91,7 @@ extension FeedViewController: ASTableDelegate, ASTableDataSource {
     
     func tableNode(_ tableNode: ASTableNode, willDisplayRowWith node: ASCellNode) {
         if let node = node as? CellNodeVideo, let indexPath = tableNode.indexPath(for: node), node.videoPlayer.asset == nil {
-            let feedItem = dataSource[indexPath.section]
+            let feedItem = delegate.dataModel(key: delegate.dataKeyOrder()[indexPath.section])
             DispatchQueue.global(qos: .background).async {
                 if let media = feedItem.media, let url = media.url {
                     let asset = AVAsset(url: url)
@@ -111,20 +112,22 @@ extension FeedViewController: ASTableDelegate, ASTableDataSource {
     
     func tableNode(_ tableNode: ASTableNode, didSelectRowAt indexPath: IndexPath) {
         let cell = tableNode.nodeForRow(at: indexPath)
+        let key = delegate.dataKeyOrder()[indexPath.section]
         if let cell = cell as? CellNodeVideo {
             cell.restartVideo()
         }
         if let _ = cell as? CellNodeFlashMessage {
-            delegate.didTapFlashMessage(tableNode: self.node, atIndex: indexPath.section)
+            delegate.didTapFlashMessage(tableNode: self.node, atKey: key)
         }
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return dataSource.count
+        return delegate.numberOfModels()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return numberOfRows(from: dataSource[section])
+        let item = delegate.dataModel(key: delegate.dataKeyOrder()[section])
+        return numberOfRows(from: item)
     }
     
     private func numberOfRows(from: FeedViewModel) -> Int {
@@ -137,9 +140,10 @@ extension FeedViewController: ASTableDelegate, ASTableDataSource {
     
     func tableNode(_ tableNode: ASTableNode, willBeginBatchFetchWith context: ASBatchContext) {
         let beforeFetchCount = numberOfSections(in: tableNode.view)
-        delegate.dataFetchNext { (items) in
+        let weakSelf = self
+        delegate.dataFetchNext { _ in
             let lower = beforeFetchCount
-            let upper = beforeFetchCount + items.count
+            let upper = beforeFetchCount + (weakSelf.delegate.numberOfModels() - beforeFetchCount) // skeptical
             let set = IndexSet(integersIn: lower..<upper)
             tableNode.insertSections(set, with: .fade)
             context.completeBatchFetching(true)
@@ -151,7 +155,8 @@ extension FeedViewController: CellNodeFeedActionDelegate {
     func didTapViewDiscussion(cellNode: CellNodeFeedAction) {
         let indexPath = node.indexPath(for: cellNode)
         if let indexPath = indexPath {
-            delegate.didTapViewDiscussion(tableNode: node, atIndex: indexPath.section)
+            let key = delegate.dataKeyOrder()[indexPath.section]
+            delegate.didTapViewDiscussion(tableNode: node, atKey: key)
         }
     }
 }
