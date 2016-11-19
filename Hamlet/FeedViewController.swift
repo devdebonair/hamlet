@@ -23,6 +23,8 @@ protocol FeedControllerDelegate: class {
     func dataModel(key: String) -> FeedViewModel
     func dataKeyOrder() -> [String]
     
+    func searchClear()
+    
     func numberOfModels() -> Int
 }
 
@@ -175,7 +177,7 @@ extension FeedViewController: CellNodeFeedActionDelegate {
 extension FeedViewController: UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
     func updateSearchResults(for searchController: UISearchController) {
         guard let text = searchController.searchBar.text, text.characters.count > 0 else {
-            return delegate.didCancelSearch(tableNode: self.node)
+            return delegate.searchClear()
         }
         
         // implement autosuggestions

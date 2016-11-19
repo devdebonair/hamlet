@@ -99,6 +99,10 @@ class FeedPresenter {
 
 extension FeedPresenter: FeedControllerDelegate {
     
+    func searchClear() {
+        cacheSearch.clear()
+    }
+    
     func dataModel(key: String) -> FeedViewModel {
         if !cacheSearch.isEmpty { return cacheSearch.getFeedModel(key: key)!.feedItem }
         return cacheModel.getFeedModel(key: key)!.feedItem
