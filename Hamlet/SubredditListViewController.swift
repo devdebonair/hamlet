@@ -101,3 +101,9 @@ extension SubredditListViewController: UISearchResultsUpdating, UISearchBarDeleg
         searchBar.setShowsCancelButton(false, animated: true)
     }
 }
+
+extension SubredditListViewController {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        searchController.searchBar.endEditing(true)
+    }
+}
