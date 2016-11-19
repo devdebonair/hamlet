@@ -175,13 +175,7 @@ extension FeedViewController: CellNodeFeedActionDelegate {
 }
 
 extension FeedViewController: UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
-    func updateSearchResults(for searchController: UISearchController) {
-        guard let text = searchController.searchBar.text, text.characters.count > 0 else {
-            return delegate.searchClear()
-        }
-        
-        // implement autosuggestions
-    }
+    func updateSearchResults(for searchController: UISearchController) {}
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         delegate.didCancelSearch(tableNode: self.node)
@@ -195,6 +189,12 @@ extension FeedViewController: UISearchResultsUpdating, UISearchBarDelegate, UISe
         delegate.didSearch(tableNode: self.node, text: text)
         searchBar.resignFirstResponder()
         searchBar.setShowsCancelButton(false, animated: true)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        guard searchText.characters.count > 0 else {
+            return delegate.didCancelSearch(tableNode: node)
+        }
     }
 }
 
