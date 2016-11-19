@@ -128,13 +128,13 @@ extension FeedPresenter: FeedControllerDelegate {
     }
     
     func didTapFlashMessage(tableNode: ASTableNode, atKey: String) {
-        if let onDidTapFlashMessage = onDidTapFlashMessage, let model = cacheModel.getFeedModel(key: atKey) {
+        if let onDidTapFlashMessage = onDidTapFlashMessage, let model = cacheSearch.getFeedModel(key: atKey) ?? cacheModel.getFeedModel(key: atKey) {
             onDidTapFlashMessage(model.listing)
         }
     }
     
     func didTapViewDiscussion(tableNode: ASTableNode, atKey key: String) {
-        if let onDidTapViewDiscussion = onDidTapViewDiscussion, let model = cacheModel.getFeedModel(key: key) {
+        if let onDidTapViewDiscussion = onDidTapViewDiscussion, let model = cacheSearch.getFeedModel(key: key) ?? cacheModel.getFeedModel(key: key) {
             onDidTapViewDiscussion(model.listing, model.feedItem)
         }
     }
