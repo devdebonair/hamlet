@@ -92,7 +92,10 @@ extension Subreddit {
     static func searchListings(subreddit: String, query: String, after: String? = nil, limit: Int? = nil, completion: @escaping ([Listing])->Void) {
         let url = "https://api.reddit.com/r/\(subreddit)/search"
         let headers = ["User-Agent": HEADER_USER_AGENT]
-        var queries = ["q": query]
+        var queries: [String:Any] = [
+            "q": query,
+            "restrict_sr": true
+        ]
         if let after = after {
             queries["after"] = after
         }
