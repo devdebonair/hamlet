@@ -30,10 +30,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         listNavigation.navigationBar.titleTextAttributes = [
             NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
         
-        let feedPresenter = FeedPresenter(subredditID: "helgalovekaty", sort: .hot)
+        let feedPresenter = FeedPresenter(subredditID: "all", sort: .hot)
         let feedController = FeedViewController()
         feedController.delegate = feedPresenter
-        feedController.searchController.searchBar.placeholder = "Search Posts in r/helgalovekaty"
+        feedController.searchController.searchBar.placeholder = "Search Posts in r/all"
         
         let feedNavigation = UINavigationController(rootViewController: feedController)
         feedNavigation.navigationBar.alpha = 1.0
