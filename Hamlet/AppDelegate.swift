@@ -23,7 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let listController = SubredditListViewController()
         listController.delegate = listPresenter
         
-        let listNavigation = UINavigationController(rootViewController: listController)
+        
+        let listNavigation = ASNavigationController(rootViewController: listController)
         listNavigation.navigationBar.alpha = 1.0
         listNavigation.navigationBar.barTintColor = .white
         listNavigation.navigationBar.tintColor = .darkText
@@ -35,7 +36,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         feedController.delegate = feedPresenter
         feedController.searchController.searchBar.placeholder = "Search Posts in r/all"
         
-        let feedNavigation = UINavigationController(rootViewController: feedController)
+        let feedNavigation = ASNavigationController(rootViewController: feedController)
         feedNavigation.navigationBar.alpha = 1.0
         feedNavigation.navigationBar.barTintColor = .white
         feedNavigation.navigationBar.tintColor = .darkText
@@ -62,7 +63,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         listPresenter.onDidSelectSubreddit = { id in
             feedPresenter.subreddit = id
+            feedPresenter.dataClear()
             feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
+            feedController.searchController.searchBar.text = ""
             listController.searchController.searchBar.resignFirstResponder()
             listController.searchController.searchBar.setShowsCancelButton(false, animated: true)
             mainController.closeMenu(animated: true)
