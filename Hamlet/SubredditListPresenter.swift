@@ -65,9 +65,7 @@ class SubredditListPresenter: SubredditListDelegate {
     var list = [SubredditListViewModel]()
     
     var onDidSelectSubreddit: ((_ subId: String)->Void)?
-    
-    let debouncer = Debouncer(interval: 0.2)
-    
+        
     init() {}
     
     func didSelectItem(tableNode: ASTableNode, row: Int) {
@@ -79,20 +77,17 @@ class SubredditListPresenter: SubredditListDelegate {
     
     func didSearch(tableNode: ASTableNode, text: String) {
         let weakSelf = self
-        debouncer.callback = {            
-            Subreddit.search(query: text, sort: .popular) { (subreddits) in
-                let viewModels = subreddits.map({ (subreddit: Subreddit) -> SubredditListViewModel in
-                    return SubredditListViewModel(
-                        title: subreddit.url.replacingOccurrences(of: "/r/", with: "").replacingOccurrences(of: "_", with: " ").replacingOccurrences(of: "/", with: "").capitalized,
-                        subtitle: "\(subreddit.numberOfSubscribers.commaFormat) subscribers • \(subreddit.title.htmlDecodedString)",
-                        imageURL: subreddit.headerImageUrl,
-                        primaryKey: subreddit.url.replacingOccurrences(of: "/r/", with: "").replacingOccurrences(of: "/", with: ""))
-                })
-                weakSelf.list = viewModels
-                tableNode.reloadData()
-            }
+        Subreddit.search(query: text, sort: .popular) { (subreddits) in
+            let viewModels = subreddits.map({ (subreddit: Subreddit) -> SubredditListViewModel in
+                return SubredditListViewModel(
+                    title: subreddit.url.replacingOccurrences(of: "/r/", with: "").replacingOccurrences(of: "_", with: " ").replacingOccurrences(of: "/", with: "").capitalized,
+                    subtitle: "\(subreddit.numberOfSubscribers.commaFormat) subscribers • \(subreddit.title.htmlDecodedString)",
+                    imageURL: subreddit.headerImageUrl,
+                    primaryKey: subreddit.url.replacingOccurrences(of: "/r/", with: "").replacingOccurrences(of: "/", with: ""))
+            })
+            weakSelf.list = viewModels
+            tableNode.reloadData()
         }
-        debouncer.call()
     }
     
     func didCancelSearch(tableNode: ASTableNode) {
