@@ -21,11 +21,24 @@ class FeedPresenter {
     var onDidTapFlashMessage: ((Listing)->Void)?
     var onDidTapViewDiscussion: ((Listing, FeedViewModel)->Void)?
     
-    let debounce = Debouncer(interval: 0.2)
-    
     init(subredditID: String, sort: Listing.SortType) {
         self.sort = sort
         subreddit = subredditID
+    }
+    
+    func fetchSearchData(cache: FeedCache, sort: Listing.SortType, query: String, after: String?, completion: @escaping ([FeedModelContainer])->Void) {
+        Subreddit.searchListings(subreddit: subreddit, query: query, after: after, limit: 25, completion: { (listings: [Listing]) in
+            var models = [FeedModelContainer]()
+            var keyOrder = [String]()
+            for listing in listings {
+                let model = FeedModelContainer(listing: listing)
+                cache.add(model: model, at: model.feedItem.primaryKey)
+                keyOrder.append(model.feedItem.primaryKey)
+                models.append(model)
+            }
+            cache.order.append(contentsOf: keyOrder)
+            completion(models)
+        })
     }
     
     func fetchData(cache: FeedCache, sort: Listing.SortType, after: String?, completion: @escaping ([FeedModelContainer])->Void) {
@@ -87,14 +100,17 @@ class FeedPresenter {
 extension FeedPresenter: FeedControllerDelegate {
     
     func dataModel(key: String) -> FeedViewModel {
+        if !cacheSearch.isEmpty { return cacheSearch.getFeedModel(key: key)!.feedItem }
         return cacheModel.getFeedModel(key: key)!.feedItem
     }
     
     func numberOfModels() -> Int {
+        if !cacheSearch.isEmpty { return cacheSearch.countModel }
         return cacheModel.countModel
     }
     
     func dataKeyOrder() -> [String] {
+        if !cacheSearch.isEmpty { return cacheSearch.order }
         return cacheModel.order
     }
     
@@ -128,6 +144,15 @@ extension FeedPresenter: FeedControllerDelegate {
         }
     }
     
+    func dataFetchNextSearch(text: String, completion: @escaping () -> Void) {
+        let weakSelf = self
+        fetchSearchData(cache: cacheSearch, sort: sort, query: text, after: cacheSearch.order[cacheSearch.order.count - 1]) { models in
+            weakSelf.fetchRemoteMedia(cache: weakSelf.cacheSearch, models: models) {
+                completion()
+            }
+        }
+    }
+    
     func dataFetch(tableNode: ASTableNode) {
         let weakSelf = self
         fetchData(cache: cacheModel, sort: sort, after: nil) { models in
@@ -137,17 +162,14 @@ extension FeedPresenter: FeedControllerDelegate {
         }
     }
     
-    // Need to implement
     func didSearch(tableNode: ASTableNode, text: String) {
-//        let weakSelf = self
-//        debounce.callback = {
-//            Subreddit.searchListings(subreddit: weakSelf.subreddit, query: text, after: nil, limit: 100, completion: { (listings: [Listing]) in
-//                for _ in listings {
-//                    
-//                }
-//                tableNode.reloadData()
-//            })
-//        }
+        fetchSearchData(cache: cacheSearch, sort: sort, query: text, after: nil) {[weak self] models in
+            if let weakSelf = self {
+                weakSelf.fetchRemoteMedia(cache: weakSelf.cacheSearch, models: models) {
+                    tableNode.reloadData()
+                }
+            }
+        }
     }
     
     func didCancelSearch(tableNode: ASTableNode) {
@@ -213,6 +235,10 @@ class FeedCache {
     var mediaCache = [String:Media]()
     var modelCache = [String:FeedModelContainer]()
     var order = [String]()
+    
+    var isEmpty: Bool {
+        return modelCache.isEmpty || order.isEmpty
+    }
     
     var countModel: Int {
         return modelCache.count

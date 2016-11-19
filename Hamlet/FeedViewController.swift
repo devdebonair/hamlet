@@ -19,6 +19,7 @@ protocol FeedControllerDelegate: class {
     func dataClear()
     func dataFetch(tableNode: ASTableNode)
     func dataFetchNext(completion: @escaping ()->Void)
+    func dataFetchNextSearch(text: String, completion: @escaping ()->Void)
     func dataModel(key: String) -> FeedViewModel
     func dataKeyOrder() -> [String]
     
@@ -45,7 +46,6 @@ class FeedViewController: ASViewController<ASTableNode> {
         searchController.searchBar.sizeToFit()
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "Search Posts"
         searchController.searchBar.searchBarStyle = .minimal
         searchController.hidesNavigationBarDuringPresentation = false
         
@@ -141,12 +141,23 @@ extension FeedViewController: ASTableDelegate, ASTableDataSource {
     func tableNode(_ tableNode: ASTableNode, willBeginBatchFetchWith context: ASBatchContext) {
         let beforeFetchCount = numberOfSections(in: tableNode.view)
         let weakSelf = self
-        delegate.dataFetchNext { _ in
-            let lower = beforeFetchCount
-            let upper = beforeFetchCount + (weakSelf.delegate.numberOfModels() - beforeFetchCount) // skeptical
-            let set = IndexSet(integersIn: lower..<upper)
-            tableNode.insertSections(set, with: .fade)
-            context.completeBatchFetching(true)
+        
+        if let query = searchController.searchBar.text, !query.isEmpty {
+            delegate.dataFetchNextSearch(text: query) { _ in
+                let lower = beforeFetchCount
+                let upper = beforeFetchCount + (weakSelf.delegate.numberOfModels() - beforeFetchCount)
+                let set = IndexSet(integersIn: lower..<upper)
+                tableNode.insertSections(set, with: .fade)
+                context.completeBatchFetching(true)
+            }
+        } else {
+            delegate.dataFetchNext { _ in
+                let lower = beforeFetchCount
+                let upper = beforeFetchCount + (weakSelf.delegate.numberOfModels() - beforeFetchCount)
+                let set = IndexSet(integersIn: lower..<upper)
+                tableNode.insertSections(set, with: .fade)
+                context.completeBatchFetching(true)
+            }
         }
     }
 }
@@ -163,11 +174,30 @@ extension FeedViewController: CellNodeFeedActionDelegate {
 
 extension FeedViewController: UISearchResultsUpdating, UISearchBarDelegate, UISearchControllerDelegate {
     func updateSearchResults(for searchController: UISearchController) {
-        guard let text = searchController.searchBar.text, text.characters.count > 0 else { return delegate.didCancelSearch(tableNode: self.node) }
-        delegate.didSearch(tableNode: self.node, text: text)
+        guard let text = searchController.searchBar.text, text.characters.count > 0 else {
+            return delegate.didCancelSearch(tableNode: self.node)
+        }
+        
+        // implement autosuggestions
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         delegate.didCancelSearch(tableNode: self.node)
+        searchBar.setShowsCancelButton(false, animated: true)
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let text = searchController.searchBar.text, text.characters.count > 0, !text.isEmpty else {
+            return delegate.didCancelSearch(tableNode: self.node)
+        }
+        delegate.didSearch(tableNode: self.node, text: text)
+        searchBar.resignFirstResponder()
+        searchBar.setShowsCancelButton(false, animated: true)
+    }
+}
+
+extension FeedViewController {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        searchController.searchBar.endEditing(true)
     }
 }
