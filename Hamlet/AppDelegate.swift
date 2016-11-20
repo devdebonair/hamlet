@@ -92,7 +92,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("Error with audio sessions")
         }
         
+        setStatusBarBackgroundColor(color: .white)
+        
         return true
+    }
+    
+    func setStatusBarBackgroundColor(color: UIColor) {
+        
+        guard let statusBar = UIApplication.shared.value(forKeyPath: "statusBarWindow.statusBar") as? UIView else { return }
+        
+        statusBar.backgroundColor = color
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
