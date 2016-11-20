@@ -46,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         feedNavigation.view.layer.shadowOpacity = 0.6
         
-        let mainController = MainPagerViewController(main: feedNavigation, menu: listNavigation)
+        let slideMenuController = SlideMenuViewController(main: feedNavigation, menu: listNavigation)
         
         feedPresenter.onDidTapFlashMessage = { (listing: Listing) in
             let albumPresenter = AlbumPresenter(url: listing.url)
@@ -76,15 +76,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             feedNavigation.setNavigationBarHidden(false, animated: true)
             
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { (timer) in
-                mainController.closeMenu(animated: true)
-                Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { (timer) in
+                slideMenuController.closeLeftPanel() { _ in
                     feedController.clear()
                     feedController.reload()
-                })
+                }
             })
         }
         
-        window?.rootViewController = mainController
+        window?.rootViewController = slideMenuController
         window?.makeKeyAndVisible()
         
         do {

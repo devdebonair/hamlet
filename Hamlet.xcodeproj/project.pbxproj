@@ -28,6 +28,7 @@
 		564319851DBC9B2C0048D239 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319841DBC9B2C0048D239 /* AlbumViewController.swift */; };
 		564319871DBC9CAB0048D239 /* AlbumViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319861DBC9CAB0048D239 /* AlbumViewModel.swift */; };
 		5657073B1DD8F51D0076DF27 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5657073A1DD8F51D0076DF27 /* Debounce.swift */; };
+		5657FA1C1DE233430081CFC6 /* SlideMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5657FA1B1DE233430081CFC6 /* SlideMenuViewController.swift */; };
 		566249D01DDF6F2A0056CABD /* MainPagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566249CF1DDF6F2A0056CABD /* MainPagerViewController.swift */; };
 		566249D41DDF726A0056CABD /* CellNodePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566249D31DDF726A0056CABD /* CellNodePage.swift */; };
 		5669C6FF1DC2DE2C00AB079B /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5669C6FE1DC2DE2C00AB079B /* Comment.swift */; };
@@ -80,6 +81,7 @@
 		564319841DBC9B2C0048D239 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		564319861DBC9CAB0048D239 /* AlbumViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewModel.swift; sourceTree = "<group>"; };
 		5657073A1DD8F51D0076DF27 /* Debounce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debounce.swift; sourceTree = "<group>"; };
+		5657FA1B1DE233430081CFC6 /* SlideMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlideMenuViewController.swift; sourceTree = "<group>"; };
 		566249CF1DDF6F2A0056CABD /* MainPagerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainPagerViewController.swift; sourceTree = "<group>"; };
 		566249D31DDF726A0056CABD /* CellNodePage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellNodePage.swift; sourceTree = "<group>"; };
 		5669C6FE1DC2DE2C00AB079B /* Comment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
@@ -242,6 +244,7 @@
 				56173B831DBB5AAD009A0563 /* FeedViewController.swift */,
 				564319841DBC9B2C0048D239 /* AlbumViewController.swift */,
 				566249CF1DDF6F2A0056CABD /* MainPagerViewController.swift */,
+				5657FA1B1DE233430081CFC6 /* SlideMenuViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -443,6 +446,7 @@
 				568119B61D9CC9D100B31FCB /* AppDelegate.swift in Sources */,
 				569E95B01DBCECFD001AABD5 /* AlbumPresenter.swift in Sources */,
 				56CB7E6C1DA0360A008AA2CB /* Math.swift in Sources */,
+				5657FA1C1DE233430081CFC6 /* SlideMenuViewController.swift in Sources */,
 				56173B801DBB454A009A0563 /* SubredditListPresenter.swift in Sources */,
 				5669C7031DC30C5600AB079B /* CellNodeArticle.swift in Sources */,
 				569E95AE1DBCE200001AABD5 /* UIColor+Literal.swift in Sources */,
