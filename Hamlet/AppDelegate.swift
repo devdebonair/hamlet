@@ -53,6 +53,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let albumController = AlbumViewController()
             albumController.delegate = albumPresenter
             feedNavigation.pushViewController(albumController, animated: true)
+            feedNavigation.setNavigationBarHidden(false, animated: true)
         }
         
         feedPresenter.onDidTapViewDiscussion = { (listing: Listing, model: FeedViewModel) in
@@ -60,6 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let discussionController = FeedDetailViewController()
             discussionController.delegate = discussionPresenter
             feedNavigation.pushViewController(discussionController, animated: true)
+            feedNavigation.setNavigationBarHidden(false, animated: true)
         }
         
         listPresenter.onDidSelectSubreddit = { id in
