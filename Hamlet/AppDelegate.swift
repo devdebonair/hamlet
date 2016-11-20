@@ -64,7 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         listPresenter.onDidSelectSubreddit = { id in
             feedPresenter.subreddit = id
-            `
+            
             feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
             feedController.searchController.searchBar.text = ""
             

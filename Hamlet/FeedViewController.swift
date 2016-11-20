@@ -40,6 +40,24 @@ class FeedViewController: ASViewController<ASTableNode> {
         node.dataSource = self
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        let cells = node.view.visibleNodes()
+        for cell in cells {
+            if let cell = cell as? CellNodeVideo {
+                cell.videoPlayer.play()
+            }
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        let cells = node.view.visibleNodes()
+        for cell in cells {
+            if let cell = cell as? CellNodeVideo {
+                cell.videoPlayer.pause()
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         

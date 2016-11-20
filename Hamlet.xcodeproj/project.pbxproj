@@ -28,7 +28,6 @@
 		564319851DBC9B2C0048D239 /* AlbumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319841DBC9B2C0048D239 /* AlbumViewController.swift */; };
 		564319871DBC9CAB0048D239 /* AlbumViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 564319861DBC9CAB0048D239 /* AlbumViewModel.swift */; };
 		5657073B1DD8F51D0076DF27 /* Debounce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5657073A1DD8F51D0076DF27 /* Debounce.swift */; };
-		5657FA151DE1B83A0081CFC6 /* UIView+Rotate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5657FA141DE1B83A0081CFC6 /* UIView+Rotate.swift */; };
 		566249D01DDF6F2A0056CABD /* MainPagerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566249CF1DDF6F2A0056CABD /* MainPagerViewController.swift */; };
 		566249D41DDF726A0056CABD /* CellNodePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566249D31DDF726A0056CABD /* CellNodePage.swift */; };
 		5669C6FF1DC2DE2C00AB079B /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5669C6FE1DC2DE2C00AB079B /* Comment.swift */; };
@@ -81,7 +80,6 @@
 		564319841DBC9B2C0048D239 /* AlbumViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewController.swift; sourceTree = "<group>"; };
 		564319861DBC9CAB0048D239 /* AlbumViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumViewModel.swift; sourceTree = "<group>"; };
 		5657073A1DD8F51D0076DF27 /* Debounce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debounce.swift; sourceTree = "<group>"; };
-		5657FA141DE1B83A0081CFC6 /* UIView+Rotate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Rotate.swift"; sourceTree = "<group>"; };
 		566249CF1DDF6F2A0056CABD /* MainPagerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainPagerViewController.swift; sourceTree = "<group>"; };
 		566249D31DDF726A0056CABD /* CellNodePage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellNodePage.swift; sourceTree = "<group>"; };
 		5669C6FE1DC2DE2C00AB079B /* Comment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
@@ -259,7 +257,6 @@
 				569E95AD1DBCE200001AABD5 /* UIColor+Literal.swift */,
 				56BD44E81DBFCEE4000067CD /* ASViewController+UIGestureRecognizerDelegate.swift */,
 				56B1F0C51DD8FEDE0040EE3B /* NSNumber+CommaFormat.swift */,
-				5657FA141DE1B83A0081CFC6 /* UIView+Rotate.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -415,7 +412,6 @@
 				56D161761D9CEAB90027553A /* Media.swift in Sources */,
 				56D161741D9CE6A80027553A /* Listing.swift in Sources */,
 				56A125221DA4F6AA001715BA /* String+Array.swift in Sources */,
-				5657FA151DE1B83A0081CFC6 /* UIView+Rotate.swift in Sources */,
 				56173B7C1DBB2F42009A0563 /* SubredditListViewController.swift in Sources */,
 				56A125201DA4B9B4001715BA /* FeedViewModel.swift in Sources */,
 				5669C6FF1DC2DE2C00AB079B /* Comment.swift in Sources */,
