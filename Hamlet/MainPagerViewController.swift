@@ -28,6 +28,18 @@ class MainPagerViewController: ASViewController<ASPagerNode>, ASPagerDataSource,
         node.setDelegate(self)
     }
     
+    func closeMenu(animated: Bool = false) {
+        node.scrollToPage(at: 1, animated: animated)
+    }
+    
+    func openMenu(animated: Bool = false) {
+        node.scrollToPage(at: 0, animated: animated)
+    }
+    
+    func numberOfPages(in pagerNode: ASPagerNode) -> Int {
+        return controllers.count
+    }
+    
     func pagerNode(_ pagerNode: ASPagerNode, nodeBlockAt index: Int) -> ASCellNodeBlock {
         let weakSelf = self
         let controller = controllers[index]
@@ -39,16 +51,6 @@ class MainPagerViewController: ASViewController<ASPagerNode>, ASPagerDataSource,
             return node
         }
     }
-    
-    func closeMenu(animated: Bool = false) {
-        node.scrollToPage(at: 1, animated: animated)
-    }
-    
-    func openMenu(animated: Bool = false) {
-        node.scrollToPage(at: 0, animated: animated)
-    }
-    
-    func numberOfPages(in pagerNode: ASPagerNode) -> Int { return controllers.count }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 }

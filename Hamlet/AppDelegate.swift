@@ -64,10 +64,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         listPresenter.onDidSelectSubreddit = { id in
             feedPresenter.subreddit = id
+            `
             feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
             feedController.searchController.searchBar.text = ""
+            
             listController.searchController.searchBar.resignFirstResponder()
             listController.searchController.searchBar.setShowsCancelButton(false, animated: true)
+            
+            feedNavigation.setNavigationBarHidden(false, animated: true)
             
             Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { (timer) in
                 mainController.closeMenu(animated: true)
