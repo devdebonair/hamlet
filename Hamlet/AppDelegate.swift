@@ -42,6 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         feedNavigation.navigationBar.tintColor = .darkText
         feedNavigation.navigationBar.titleTextAttributes = [
             NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
+        feedNavigation.hidesBarsOnSwipe = true
         
         feedNavigation.view.layer.shadowOpacity = 0.6
         
@@ -63,13 +64,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         listPresenter.onDidSelectSubreddit = { id in
             feedPresenter.subreddit = id
-            feedPresenter.dataClear()
             feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
             feedController.searchController.searchBar.text = ""
             listController.searchController.searchBar.resignFirstResponder()
             listController.searchController.searchBar.setShowsCancelButton(false, animated: true)
-            mainController.closeMenu(animated: true)
-            feedController.refresh()
+            
+            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { (timer) in
+                mainController.closeMenu(animated: true)
+                Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false, block: { (timer) in
+                    feedController.clear()
+                    feedController.reload()
+                })
+            })
         }
         
         window?.rootViewController = mainController

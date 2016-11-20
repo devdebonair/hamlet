@@ -72,7 +72,9 @@ class FeedViewController: ASViewController<ASTableNode> {
     }
     
     func clear() {
+        let preCount = delegate.numberOfModels()
         delegate.dataClear()
+        node.deleteSections(IndexSet(integersIn: 0..<preCount), with: .middle)
     }
     
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }

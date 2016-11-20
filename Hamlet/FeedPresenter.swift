@@ -161,7 +161,7 @@ extension FeedPresenter: FeedControllerDelegate {
         let weakSelf = self
         fetchData(cache: cacheModel, sort: sort, after: nil) { models in
             weakSelf.fetchRemoteMedia(cache: weakSelf.cacheModel, models: models) {
-                tableNode.reloadData()
+                tableNode.insertSections(IndexSet(integersIn: 0..<models.count), with: .middle)
             }
         }
     }
