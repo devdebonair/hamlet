@@ -60,7 +60,9 @@ extension Main: SlideMenuViewControllerDelegate {
         }
     }
     
-    func didEndSliding(state: SlideMenuViewController.SlideMenuState) {}
+    func didEndSliding(state: SlideMenuViewController.SlideMenuState) {
+        UIApplication.shared.isStatusBarHidden = state == .menu
+    }
 }
 
 extension Main: SubredditListPresenterDelegate {
