@@ -58,6 +58,8 @@ extension Main: SlideMenuViewControllerDelegate {
             listController.searchController.searchBar.resignFirstResponder()
         }
     }
+    
+    func didEndSliding(state: SlideMenuViewController.SlideMenuState) {}
 }
 
 extension Main: SubredditListPresenterDelegate {

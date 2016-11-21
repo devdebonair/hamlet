@@ -12,9 +12,19 @@ import UIKit
 
 protocol SlideMenuViewControllerDelegate {
     func didBeginSliding()
+    func didEndSliding(state: SlideMenuViewController.SlideMenuState)
 }
 
 class SlideMenuViewController: ASViewController<ASDisplayNode> {
+    
+    enum SlideMenuState {
+        case menu
+        case main
+    }
+    
+    var state: SlideMenuState {
+        return nodeMain.view.frame.origin == . zero ? .main : .menu
+    }
     
     let main: UIViewController
     let menu: UIViewController
@@ -63,7 +73,7 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
     func openLeftPanel(completion: ((Bool)->Void)? = nil) {
         UIView.animate(withDuration: DURATION, delay: 0.0, options: [.curveEaseIn], animations: {
             self.nodeMain.view.frame.origin.x = self.node.view.frame.width - self.OFFSET
-        }, completion: nil)
+        }, completion: completion)
     }
     
     func closeLeftPanel(completion: ((Bool)->Void)? = nil) {
@@ -87,19 +97,27 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
             nodeMain.view.frame.origin.x = translationPoint.x > 0 ? translationPoint.x : node.view.frame.width - OFFSET + translationPoint.x
         case .ended:
             if velocity.x > threshhold, translationPoint.x > 0 {
-                self.openLeftPanel()
+                self.openLeftPanel() { (success) in
+                    self.delegate.didEndSliding(state: .menu)
+                }
                 break
             } else if velocity.x < -threshhold, translationPoint.x < 0 {
-                self.closeLeftPanel()
+                self.closeLeftPanel() { _ in
+                    self.delegate.didEndSliding(state: .main)
+                }
                 break
             }
             
             if translationPoint.x <= node.view.frame.width / 2 {
-                self.closeLeftPanel()
+                self.closeLeftPanel() { _ in
+                    self.delegate.didEndSliding(state: .main)
+                }
             }
             
             if translationPoint.x >= node.view.frame.width / 2 {
-                self.openLeftPanel()
+                self.openLeftPanel() { (success) in
+                    self.delegate.didEndSliding(state: .menu)
+                }
             }
         default:
             break
@@ -109,4 +127,5 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
 
 extension SlideMenuViewController: SlideMenuViewControllerDelegate {
     func didBeginSliding() {}
+    func didEndSliding(state: SlideMenuViewController.SlideMenuState) {}
 }
