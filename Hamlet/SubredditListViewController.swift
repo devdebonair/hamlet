@@ -16,6 +16,7 @@ protocol SubredditListDelegate: class {
     func didSearch(tableNode: ASTableNode, text: String)
     func didCancelSearch(tableNode: ASTableNode)
     func didTapSearch()
+    func searchClear()
 }
 
 class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
@@ -66,7 +67,10 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     
     func numberOfSections(in tableView: UITableView) -> Int { return dataSource.count }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { return 1 }
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { delegate.didSelectItem(tableNode: node, row: indexPath.section) }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        delegate.didSelectItem(tableNode: node, row: indexPath.section)
+    }
     
     func tableView(_ tableView: ASTableView, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         let item = dataSource[indexPath.section]
@@ -76,7 +80,6 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
             return cell
         }
     }
-    
 }
 
 extension SubredditListViewController: UISearchResultsUpdating, UISearchBarDelegate {
@@ -98,7 +101,7 @@ extension SubredditListViewController: UISearchResultsUpdating, UISearchBarDeleg
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         guard searchText.characters.count > 0 else {
-            return delegate.didCancelSearch(tableNode: node)
+            return delegate.searchClear()
         }
     }
     

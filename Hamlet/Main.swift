@@ -87,6 +87,9 @@ extension Main: SubredditListPresenterDelegate {
             self.slideMenuController.closeLeftPanel() { _ in
                 self.feedController.clear()
                 self.feedController.reload()
+                
+                self.listController.searchController.searchBar.text = ""
+                self.listPresenter.searchClear()
             }
         })
     }

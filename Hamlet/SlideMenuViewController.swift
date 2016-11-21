@@ -91,7 +91,7 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
     func contractMenu(completion: ((Bool)->Void)? = nil) {
         UIView.animate(withDuration: DURATION, delay: 0.0, options: [.curveEaseIn], animations: {
             self.nodeMain.view.frame.origin.x = self.node.view.frame.width - self.OFFSET
-            self.nodeMenu.frame = CGRect(x: 0.0, y: 0.0, width: self.node.frame.width - self.OFFSET, height: self.node.frame.height)
+            self.nodeMenu.frame = CGRect(x: 0.0, y: 0.0, width: self.node.frame.width - self.OFFSET, height: self.nodeMenu.frame.height)
         }, completion: completion)
     }
     

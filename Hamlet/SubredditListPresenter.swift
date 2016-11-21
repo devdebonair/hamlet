@@ -83,6 +83,9 @@ class SubredditListPresenter: SubredditListDelegate {
     func didSelectItem(tableNode: ASTableNode, row: Int) {
         let item = dataSource()[row]
         delegate.didSelectSubreddit(id: item.primaryKey)
+        if !list.isEmpty {
+            didCancelSearch(tableNode: tableNode)
+        }
     }
     
     func didSearch(tableNode: ASTableNode, text: String) {
@@ -101,9 +104,13 @@ class SubredditListPresenter: SubredditListDelegate {
     }
     
     func didCancelSearch(tableNode: ASTableNode) {
-        self.list = []
+        searchClear()
         delegate.didEndSearch()
         tableNode.reloadData()
+    }
+    
+    func searchClear() {
+        list = []
     }
     
     func dataSource() -> [SubredditListViewModel] { return list.isEmpty ? originList : list }
