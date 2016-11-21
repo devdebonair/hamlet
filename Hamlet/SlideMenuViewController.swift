@@ -10,6 +10,10 @@ import Foundation
 import AsyncDisplayKit
 import UIKit
 
+protocol SlideMenuViewControllerDelegate {
+    func didBeginSliding()
+}
+
 class SlideMenuViewController: ASViewController<ASDisplayNode> {
     
     let main: UIViewController
@@ -19,6 +23,8 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
     let viewer = UIView()
     let DURATION = 0.1
     let OFFSET: CGFloat = 40
+    
+    var delegate: SlideMenuViewControllerDelegate!
     
     init(main: ASNavigationController, menu: ASNavigationController) {
         self.main = main
@@ -31,6 +37,8 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
         })
         
         super.init(node: ASDisplayNode())
+        
+        self.delegate = self
         
         node.addSubnode(nodeMenu)
         node.addSubnode(nodeMain)
@@ -73,6 +81,7 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
         
         switch sender.state {
         case .began:
+            delegate.didBeginSliding()
             break
         case .changed:
             nodeMain.view.frame.origin.x = translationPoint.x > 0 ? translationPoint.x : node.view.frame.width - OFFSET + translationPoint.x
@@ -96,5 +105,8 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
             break
         }
     }
-    
+}
+
+extension SlideMenuViewController: SlideMenuViewControllerDelegate {
+    func didBeginSliding() {}
 }

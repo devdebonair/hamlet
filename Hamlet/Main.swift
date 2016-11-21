@@ -11,7 +11,6 @@ import UIKit
 import AsyncDisplayKit
 
 class Main {
-    
     let slideMenuController: SlideMenuViewController
     
     let listNavigation: ASNavigationController
@@ -28,6 +27,7 @@ class Main {
         feedNavigation = ASNavigationController(rootViewController: feedController)
         
         slideMenuController = SlideMenuViewController(main: feedNavigation, menu: listNavigation)
+        slideMenuController.delegate = self
         
         listController.delegate = listPresenter
         listNavigation.navigationBar.alpha = 1.0
@@ -89,6 +89,14 @@ class Main {
                     weakSelf.feedController.reload()
                 }
             })
+        }
+    }
+}
+
+extension Main: SlideMenuViewControllerDelegate {
+    func didBeginSliding() {
+        if listController.searchController.searchBar.isFirstResponder {
+            listController.searchController.searchBar.resignFirstResponder()
         }
     }
 }
