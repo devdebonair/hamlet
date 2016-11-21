@@ -50,18 +50,6 @@ class Main {
         feedNavigation.hidesBarsOnSwipe = true
         feedNavigation.view.layer.shadowOpacity = 0.6
     }
-    
-    func run() {
-        let weakSelf = self
-        
-        feedPresenter.onDidTapFlashMessage = { (listing: Listing) in
-            let albumPresenter = AlbumPresenter(url: listing.url)
-            let albumController = AlbumViewController()
-            albumController.delegate = albumPresenter
-            weakSelf.feedNavigation.pushViewController(albumController, animated: true)
-            weakSelf.feedNavigation.setNavigationBarHidden(false, animated: true)
-        }
-    }
 }
 
 extension Main: SlideMenuViewControllerDelegate {
@@ -103,6 +91,14 @@ extension Main: FeedPresenterDelegate {
         let discussionController = FeedDetailViewController()
         discussionController.delegate = discussionPresenter
         feedNavigation.pushViewController(discussionController, animated: true)
+        feedNavigation.setNavigationBarHidden(false, animated: true)
+    }
+    
+    func didTapFlashMessage(listing: Listing) {
+        let albumPresenter = AlbumPresenter(url: listing.url)
+        let albumController = AlbumViewController()
+        albumController.delegate = albumPresenter
+        feedNavigation.pushViewController(albumController, animated: true)
         feedNavigation.setNavigationBarHidden(false, animated: true)
     }
 }

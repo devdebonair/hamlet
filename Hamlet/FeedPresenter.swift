@@ -12,6 +12,7 @@ import AsyncDisplayKit
 
 protocol FeedPresenterDelegate {
     func didTapViewDiscussion(listing: Listing, model: FeedViewModel)
+    func didTapFlashMessage(listing: Listing)
 }
 
 class FeedPresenter {
@@ -21,8 +22,6 @@ class FeedPresenter {
     
     let cacheModel = FeedCache()
     let cacheSearch = FeedCache()
-    
-    var onDidTapFlashMessage: ((Listing)->Void)?
     
     var delegate: FeedPresenterDelegate!
     
@@ -134,8 +133,8 @@ extension FeedPresenter: FeedControllerDelegate {
     }
     
     func didTapFlashMessage(tableNode: ASTableNode, atKey: String) {
-        if let onDidTapFlashMessage = onDidTapFlashMessage, let model = cacheSearch.getFeedModel(key: atKey) ?? cacheModel.getFeedModel(key: atKey) {
-            onDidTapFlashMessage(model.listing)
+        if let model = cacheSearch.getFeedModel(key: atKey) ?? cacheModel.getFeedModel(key: atKey) {
+            delegate.didTapFlashMessage(listing: model.listing)
         }
     }
     
@@ -280,4 +279,5 @@ class FeedCache {
 
 extension FeedPresenter: FeedPresenterDelegate {
     func didTapViewDiscussion(listing: Listing, model: FeedViewModel) {}
+    func didTapFlashMessage(listing: Listing) {}
 }
