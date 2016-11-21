@@ -10,7 +10,13 @@ import Foundation
 import UIKit
 import AsyncDisplayKit
 
+protocol SubredditListPresenterDelegate {
+    func didSelectSubreddit(id: String)
+}
+
 class SubredditListPresenter: SubredditListDelegate {
+    
+    var delegate: SubredditListPresenterDelegate!
     
     var originList = [
         SubredditListViewModel(title: "Anime", subtitle: "anime", imageURL: URL(string: "http://avatarfiles.alphacoders.com/473/47330.png"), primaryKey: "anime"),
@@ -64,15 +70,13 @@ class SubredditListPresenter: SubredditListDelegate {
     
     var list = [SubredditListViewModel]()
     
-    var onDidSelectSubreddit: ((_ subId: String)->Void)?
-        
-    init() {}
+    init() {
+        delegate = self
+    }
     
     func didSelectItem(tableNode: ASTableNode, row: Int) {
-        if let onDidSelectSubreddit = onDidSelectSubreddit {
-            let item = dataSource()[row]
-            onDidSelectSubreddit(item.primaryKey)
-        }
+        let item = dataSource()[row]
+        delegate.didSelectSubreddit(id: item.primaryKey)
     }
     
     func didSearch(tableNode: ASTableNode, text: String) {
@@ -97,4 +101,8 @@ class SubredditListPresenter: SubredditListDelegate {
     
     func dataSource() -> [SubredditListViewModel] { return list.isEmpty ? originList : list }
     func didLoad(tableNode: ASTableNode) {}
+}
+
+extension SubredditListPresenter: SubredditListPresenterDelegate {
+    func didSelectSubreddit(id: String) {}
 }

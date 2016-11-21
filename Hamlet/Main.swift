@@ -27,6 +27,8 @@ class Main {
         feedNavigation = ASNavigationController(rootViewController: feedController)
         
         slideMenuController = SlideMenuViewController(main: feedNavigation, menu: listNavigation)
+        
+        listPresenter.delegate = self
         slideMenuController.delegate = self
         
         listController.delegate = listPresenter
@@ -66,30 +68,6 @@ class Main {
             weakSelf.feedNavigation.pushViewController(discussionController, animated: true)
             weakSelf.feedNavigation.setNavigationBarHidden(false, animated: true)
         }
-        
-        listPresenter.onDidSelectSubreddit = { id in
-            
-            if weakSelf.feedNavigation.viewControllers.count != 1 {
-                weakSelf.feedNavigation.popToRootViewController(animated: true)
-            }
-            
-            weakSelf.feedPresenter.subreddit = id
-            
-            weakSelf.feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
-            weakSelf.feedController.searchController.searchBar.text = ""
-            
-            weakSelf.listController.searchController.searchBar.resignFirstResponder()
-            weakSelf.listController.searchController.searchBar.setShowsCancelButton(false, animated: true)
-            
-            weakSelf.feedNavigation.setNavigationBarHidden(false, animated: true)
-            
-            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { (timer) in
-                weakSelf.slideMenuController.closeLeftPanel() { _ in
-                    weakSelf.feedController.clear()
-                    weakSelf.feedController.reload()
-                }
-            })
-        }
     }
 }
 
@@ -98,5 +76,30 @@ extension Main: SlideMenuViewControllerDelegate {
         if listController.searchController.searchBar.isFirstResponder {
             listController.searchController.searchBar.resignFirstResponder()
         }
+    }
+}
+
+extension Main: SubredditListPresenterDelegate {
+    func didSelectSubreddit(id: String) {
+        if feedNavigation.viewControllers.count != 1 {
+            feedNavigation.popToRootViewController(animated: true)
+        }
+        
+        feedPresenter.subreddit = id
+        
+        feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
+        feedController.searchController.searchBar.text = ""
+        
+        listController.searchController.searchBar.resignFirstResponder()
+        listController.searchController.searchBar.setShowsCancelButton(false, animated: true)
+        
+        feedNavigation.setNavigationBarHidden(false, animated: true)
+        
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { (timer) in
+            self.slideMenuController.closeLeftPanel() { _ in
+                self.feedController.clear()
+                self.feedController.reload()
+            }
+        })
     }
 }
