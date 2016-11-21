@@ -65,6 +65,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         listPresenter.onDidSelectSubreddit = { id in
+            
+            if feedNavigation.viewControllers.count != 1 {
+                feedNavigation.popToRootViewController(animated: true)
+            }
+            
             feedPresenter.subreddit = id
             
             feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
