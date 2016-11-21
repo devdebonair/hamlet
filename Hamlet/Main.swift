@@ -61,7 +61,7 @@ extension Main: SlideMenuViewControllerDelegate {
     }
     
     func didEndSliding(state: SlideMenuViewController.SlideMenuState) {
-        UIApplication.shared.isStatusBarHidden = state == .menu
+//        UIApplication.shared.isStatusBarHidden = state == .menu
     }
 }
 
@@ -87,6 +87,14 @@ extension Main: SubredditListPresenterDelegate {
                 self.feedController.reload()
             }
         })
+    }
+    
+    func didBeginSearch() {
+        slideMenuController.expandMenu()
+    }
+    
+    func didEndSearch() {
+        slideMenuController.contractMenu()
     }
 }
 

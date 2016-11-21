@@ -81,6 +81,20 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
         }, completion: completion)
     }
     
+    func expandMenu(completion: ((Bool)->Void)? = nil) {
+        UIView.animate(withDuration: DURATION, delay: 0.0, options: [.curveEaseIn], animations: {
+            self.nodeMain.view.frame.origin.x = self.node.frame.width
+            self.nodeMenu.view.frame = CGRect(x: 0.0, y: 0.0, width: self.node.frame.width, height: self.nodeMenu.view.frame.height)
+        }, completion: completion)
+    }
+    
+    func contractMenu(completion: ((Bool)->Void)? = nil) {
+        UIView.animate(withDuration: DURATION, delay: 0.0, options: [.curveEaseIn], animations: {
+            self.nodeMain.view.frame.origin.x = self.node.view.frame.width - self.OFFSET
+            self.nodeMenu.frame = CGRect(x: 0.0, y: 0.0, width: self.node.frame.width - self.OFFSET, height: self.node.frame.height)
+        }, completion: completion)
+    }
+    
     func drag(sender: UIPanGestureRecognizer) {
         let translationPoint = sender.translation(in: node.view)
         let velocity = sender.velocity(in: node.view)

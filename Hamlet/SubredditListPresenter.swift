@@ -12,6 +12,8 @@ import AsyncDisplayKit
 
 protocol SubredditListPresenterDelegate {
     func didSelectSubreddit(id: String)
+    func didBeginSearch()
+    func didEndSearch()
 }
 
 class SubredditListPresenter: SubredditListDelegate {
@@ -74,6 +76,10 @@ class SubredditListPresenter: SubredditListDelegate {
         delegate = self
     }
     
+    func didTapSearch() {
+        delegate.didBeginSearch()
+    }
+    
     func didSelectItem(tableNode: ASTableNode, row: Int) {
         let item = dataSource()[row]
         delegate.didSelectSubreddit(id: item.primaryKey)
@@ -96,6 +102,7 @@ class SubredditListPresenter: SubredditListDelegate {
     
     func didCancelSearch(tableNode: ASTableNode) {
         self.list = []
+        delegate.didEndSearch()
         tableNode.reloadData()
     }
     
@@ -105,4 +112,6 @@ class SubredditListPresenter: SubredditListDelegate {
 
 extension SubredditListPresenter: SubredditListPresenterDelegate {
     func didSelectSubreddit(id: String) {}
+    func didBeginSearch() {}
+    func didEndSearch() {}
 }

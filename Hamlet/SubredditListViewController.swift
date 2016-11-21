@@ -15,6 +15,7 @@ protocol SubredditListDelegate: class {
     func didSelectItem(tableNode: ASTableNode, row: Int)
     func didSearch(tableNode: ASTableNode, text: String)
     func didCancelSearch(tableNode: ASTableNode)
+    func didTapSearch()
 }
 
 class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTableDataSource {
@@ -79,13 +80,7 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
 }
 
 extension SubredditListViewController: UISearchResultsUpdating, UISearchBarDelegate {
-    func updateSearchResults(for searchController: UISearchController) {
-        guard let text = searchController.searchBar.text, text.characters.count > 0 else {
-            return delegate.didCancelSearch(tableNode: self.node)
-        }
-        
-        // implement autosuggestions
-    }
+    func updateSearchResults(for searchController: UISearchController) {}
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         delegate.didCancelSearch(tableNode: self.node)
@@ -99,6 +94,16 @@ extension SubredditListViewController: UISearchResultsUpdating, UISearchBarDeleg
         delegate.didSearch(tableNode: self.node, text: text)
         searchBar.resignFirstResponder()
         searchBar.setShowsCancelButton(false, animated: true)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        guard searchText.characters.count > 0 else {
+            return delegate.didCancelSearch(tableNode: node)
+        }
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        delegate.didTapSearch()
     }
 }
 
