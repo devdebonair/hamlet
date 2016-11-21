@@ -10,6 +10,10 @@ import Foundation
 import UIKit
 import AsyncDisplayKit
 
+protocol FeedPresenterDelegate {
+    func didTapViewDiscussion(listing: Listing, model: FeedViewModel)
+}
+
 class FeedPresenter {
 
     var subreddit: String
@@ -19,11 +23,13 @@ class FeedPresenter {
     let cacheSearch = FeedCache()
     
     var onDidTapFlashMessage: ((Listing)->Void)?
-    var onDidTapViewDiscussion: ((Listing, FeedViewModel)->Void)?
+    
+    var delegate: FeedPresenterDelegate!
     
     init(subredditID: String, sort: Listing.SortType) {
         self.sort = sort
         subreddit = subredditID
+        delegate = self
     }
     
     func fetchSearchData(cache: FeedCache, sort: Listing.SortType, query: String, after: String?, completion: @escaping ([FeedModelContainer])->Void) {
@@ -134,8 +140,8 @@ extension FeedPresenter: FeedControllerDelegate {
     }
     
     func didTapViewDiscussion(tableNode: ASTableNode, atKey key: String) {
-        if let onDidTapViewDiscussion = onDidTapViewDiscussion, let model = cacheSearch.getFeedModel(key: key) ?? cacheModel.getFeedModel(key: key) {
-            onDidTapViewDiscussion(model.listing, model.feedItem)
+        if let model = cacheSearch.getFeedModel(key: key) ?? cacheModel.getFeedModel(key: key) {
+            delegate.didTapViewDiscussion(listing: model.listing, model: model.feedItem)
         }
     }
     
@@ -270,4 +276,8 @@ class FeedCache {
     func add(model: FeedModelContainer, at: String) {
         modelCache[at] = model
     }
+}
+
+extension FeedPresenter: FeedPresenterDelegate {
+    func didTapViewDiscussion(listing: Listing, model: FeedViewModel) {}
 }

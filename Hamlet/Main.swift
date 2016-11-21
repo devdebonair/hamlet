@@ -29,6 +29,7 @@ class Main {
         slideMenuController = SlideMenuViewController(main: feedNavigation, menu: listNavigation)
         
         listPresenter.delegate = self
+        feedPresenter.delegate = self
         slideMenuController.delegate = self
         
         listController.delegate = listPresenter
@@ -58,14 +59,6 @@ class Main {
             let albumController = AlbumViewController()
             albumController.delegate = albumPresenter
             weakSelf.feedNavigation.pushViewController(albumController, animated: true)
-            weakSelf.feedNavigation.setNavigationBarHidden(false, animated: true)
-        }
-        
-        feedPresenter.onDidTapViewDiscussion = { (listing: Listing, model: FeedViewModel) in
-            let discussionPresenter = ListingDiscussionPresenter(listingId: listing.id, subreddit: listing.subreddit, sort: .top, feedViewModel: model)
-            let discussionController = FeedDetailViewController()
-            discussionController.delegate = discussionPresenter
-            weakSelf.feedNavigation.pushViewController(discussionController, animated: true)
             weakSelf.feedNavigation.setNavigationBarHidden(false, animated: true)
         }
     }
@@ -101,5 +94,15 @@ extension Main: SubredditListPresenterDelegate {
                 self.feedController.reload()
             }
         })
+    }
+}
+
+extension Main: FeedPresenterDelegate {
+    func didTapViewDiscussion(listing: Listing, model: FeedViewModel) {
+        let discussionPresenter = ListingDiscussionPresenter(listingId: listing.id, subreddit: listing.subreddit, sort: .top, feedViewModel: model)
+        let discussionController = FeedDetailViewController()
+        discussionController.delegate = discussionPresenter
+        feedNavigation.pushViewController(discussionController, animated: true)
+        feedNavigation.setNavigationBarHidden(false, animated: true)
     }
 }
