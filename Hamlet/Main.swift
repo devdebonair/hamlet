@@ -89,6 +89,7 @@ extension Main: SubredditListPresenterDelegate {
                 self.feedController.reload()
                 
                 self.listController.searchController.searchBar.text = ""
+                self.listController.scrollToTop()
                 self.listPresenter.searchClear()
             }
         })
