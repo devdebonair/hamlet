@@ -17,78 +17,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
+        let main = Main()
+        main.run()
+        
         window = UIWindow(frame: UIScreen.main.bounds)
-        
-        let listPresenter = SubredditListPresenter()
-        let listController = SubredditListViewController()
-        listController.delegate = listPresenter
-        
-        
-        let listNavigation = ASNavigationController(rootViewController: listController)
-        listNavigation.navigationBar.alpha = 1.0
-        listNavigation.navigationBar.barTintColor = .white
-        listNavigation.navigationBar.tintColor = .darkText
-        listNavigation.navigationBar.titleTextAttributes = [
-            NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
-        
-        let feedPresenter = FeedPresenter(subredditID: "all", sort: .hot)
-        let feedController = FeedViewController()
-        feedController.delegate = feedPresenter
-        feedController.searchController.searchBar.placeholder = "Search Posts in r/all"
-        
-        let feedNavigation = ASNavigationController(rootViewController: feedController)
-        feedNavigation.navigationBar.alpha = 1.0
-        feedNavigation.navigationBar.barTintColor = .white
-        feedNavigation.navigationBar.tintColor = .darkText
-        feedNavigation.navigationBar.titleTextAttributes = [
-            NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
-        feedNavigation.hidesBarsOnSwipe = true
-        
-        feedNavigation.view.layer.shadowOpacity = 0.6
-        
-        let slideMenuController = SlideMenuViewController(main: feedNavigation, menu: listNavigation)
-        
-        feedPresenter.onDidTapFlashMessage = { (listing: Listing) in
-            let albumPresenter = AlbumPresenter(url: listing.url)
-            let albumController = AlbumViewController()
-            albumController.delegate = albumPresenter
-            feedNavigation.pushViewController(albumController, animated: true)
-            feedNavigation.setNavigationBarHidden(false, animated: true)
-        }
-        
-        feedPresenter.onDidTapViewDiscussion = { (listing: Listing, model: FeedViewModel) in
-            let discussionPresenter = ListingDiscussionPresenter(listingId: listing.id, subreddit: listing.subreddit, sort: .top, feedViewModel: model)
-            let discussionController = FeedDetailViewController()
-            discussionController.delegate = discussionPresenter
-            feedNavigation.pushViewController(discussionController, animated: true)
-            feedNavigation.setNavigationBarHidden(false, animated: true)
-        }
-        
-        listPresenter.onDidSelectSubreddit = { id in
-            
-            if feedNavigation.viewControllers.count != 1 {
-                feedNavigation.popToRootViewController(animated: true)
-            }
-            
-            feedPresenter.subreddit = id
-            
-            feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
-            feedController.searchController.searchBar.text = ""
-            
-            listController.searchController.searchBar.resignFirstResponder()
-            listController.searchController.searchBar.setShowsCancelButton(false, animated: true)
-            
-            feedNavigation.setNavigationBarHidden(false, animated: true)
-            
-            Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { (timer) in
-                slideMenuController.closeLeftPanel() { _ in
-                    feedController.clear()
-                    feedController.reload()
-                }
-            })
-        }
-        
-        window?.rootViewController = slideMenuController
+        window?.rootViewController = main.slideMenuController
         window?.makeKeyAndVisible()
         
         do {
@@ -98,7 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         setStatusBarBackgroundColor(color: .white)
-        
         return true
     }
     
