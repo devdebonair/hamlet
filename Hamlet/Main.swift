@@ -38,6 +38,7 @@ class Main {
         listNavigation.navigationBar.tintColor = .darkText
         listNavigation.navigationBar.titleTextAttributes = [
             NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
+        listNavigation.navigationBar.isTranslucent = false
 
         feedController.delegate = feedPresenter
         feedController.searchController.searchBar.placeholder = "Search Posts in r/all"
@@ -50,6 +51,7 @@ class Main {
         feedNavigation.hidesBarsOnSwipe = true
         feedNavigation.view.layer.shadowOffset = CGSize(width: -1.0, height: 0.0)
         feedNavigation.view.layer.shadowOpacity = 0.1
+        feedNavigation.navigationBar.isTranslucent = false
     }
 }
 
