@@ -83,6 +83,9 @@ class FeedDetailViewController: ASViewController<ASTableNode>, ASTableDelegate, 
                     cell.text.maximumNumberOfLines = 0
                     return cell
                 }
+                if let cell = cell as? CellNodeText, feedItem.getNodeTypeOrder()[indexPath.row] == .description {
+                    cell.text.maximumNumberOfLines = 0
+                }
                 return cell
             }
         }
