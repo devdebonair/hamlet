@@ -49,7 +49,7 @@ class Main {
         feedNavigation.navigationBar.titleTextAttributes = [
             NSFontAttributeName: UIFont.systemFont(ofSize: 16, weight: UIFontWeightSemibold)]
         feedNavigation.hidesBarsOnSwipe = true
-        feedNavigation.view.layer.shadowOffset = CGSize(width: -1.0, height: 0.0)
+        feedNavigation.view.layer.shadowOffset = CGSize(width: -0.2, height: 0.0)
         feedNavigation.view.layer.shadowOpacity = 0.4
         feedNavigation.navigationBar.isTranslucent = false
     }
