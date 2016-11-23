@@ -36,6 +36,8 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
     
     var delegate: SlideMenuViewControllerDelegate!
     
+    private let panRecognizer = UIPanGestureRecognizer()
+    
     init(main: ASNavigationController, menu: ASNavigationController) {
         self.main = main
         self.menu = menu
@@ -45,9 +47,9 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
         self.nodeMenu = ASDisplayNode(viewBlock: { () -> UIView in
             return menu.view
         })
-        
         super.init(node: ASDisplayNode())
         
+        self.panRecognizer.addTarget(self, action: #selector(self.drag))
         self.delegate = self
         
         node.addSubnode(nodeMenu)
@@ -58,15 +60,18 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
     }
     
     override func viewDidLoad() {
-        let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.drag))
         nodeMain.view.addGestureRecognizer(panRecognizer)
         nodeMain.isUserInteractionEnabled = true
         nodeMain.view.layer.shadowOpacity = 0.6
         menu.view.frame = CGRect(x: 0.0, y: 0.0, width: node.frame.width - OFFSET, height: node.frame.height)
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    func enableSwipe() {
+        panRecognizer.isEnabled = true
+    }
+    
+    func disableSwipe() {
+        panRecognizer.isEnabled = false
     }
     
     func openLeftPanel(completion: ((Bool)->Void)? = nil) {
@@ -135,6 +140,10 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
         default:
             break
         }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

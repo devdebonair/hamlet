@@ -26,6 +26,9 @@ protocol FeedControllerDelegate: class {
     func searchClear()
     
     func numberOfModels() -> Int
+    
+    func willAppear()
+    func willDisappear()
 }
 
 class FeedViewController: ASViewController<ASTableNode> {
@@ -47,6 +50,7 @@ class FeedViewController: ASViewController<ASTableNode> {
                 cell.videoPlayer.play()
             }
         }
+        delegate.willAppear()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -56,6 +60,7 @@ class FeedViewController: ASViewController<ASTableNode> {
                 cell.videoPlayer.pause()
             }
         }
+        delegate.willDisappear()
     }
     
     override func viewDidLoad() {

@@ -120,4 +120,12 @@ extension Main: FeedPresenterDelegate {
         feedNavigation.pushViewController(albumController, animated: true)
         feedNavigation.setNavigationBarHidden(false, animated: true)
     }
+    
+    func didDisappear() {
+        slideMenuController.disableSwipe()
+    }
+    
+    func didAppear() {
+        slideMenuController.enableSwipe()
+    }
 }

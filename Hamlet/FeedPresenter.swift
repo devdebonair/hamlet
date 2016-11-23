@@ -13,6 +13,8 @@ import AsyncDisplayKit
 protocol FeedPresenterDelegate {
     func didTapViewDiscussion(listing: Listing, model: FeedViewModel)
     func didTapFlashMessage(listing: Listing)
+    func didAppear()
+    func didDisappear()
 }
 
 class FeedPresenter {
@@ -103,6 +105,14 @@ class FeedPresenter {
 }
 
 extension FeedPresenter: FeedControllerDelegate {
+    
+    func willDisappear() {
+        delegate.didDisappear()
+    }
+    
+    func willAppear() {
+        delegate.didAppear()
+    }
     
     func searchClear() {
         cacheSearch.clear()
@@ -280,4 +290,6 @@ class FeedCache {
 extension FeedPresenter: FeedPresenterDelegate {
     func didTapViewDiscussion(listing: Listing, model: FeedViewModel) {}
     func didTapFlashMessage(listing: Listing) {}
+    func didAppear() {}
+    func didDisappear() {}
 }
