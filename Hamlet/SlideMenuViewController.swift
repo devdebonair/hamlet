@@ -62,7 +62,6 @@ class SlideMenuViewController: ASViewController<ASDisplayNode> {
     override func viewDidLoad() {
         nodeMain.view.addGestureRecognizer(panRecognizer)
         nodeMain.isUserInteractionEnabled = true
-        nodeMain.view.layer.shadowOpacity = 0.6
         menu.view.frame = CGRect(x: 0.0, y: 0.0, width: node.frame.width - OFFSET, height: node.frame.height)
     }
     
