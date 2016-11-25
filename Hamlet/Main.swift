@@ -52,6 +52,24 @@ class Main {
         feedNavigation.view.layer.shadowOffset = CGSize(width: -0.2, height: 0.0)
         feedNavigation.view.layer.shadowOpacity = 0.4
         feedNavigation.navigationBar.isTranslucent = false
+        
+        let barItems = [
+            UIBarButtonItem(title: "Sort", style: .plain, target: self, action: #selector(openSwag)),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            UIBarButtonItem(title: "Media", style: .plain, target: self, action: #selector(openSwag)),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            UIBarButtonItem(title: "Post", style: .plain, target: self, action: #selector(openSwag)),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(openSwag)),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            UIBarButtonItem(title: "About", style: .plain, target: self, action: #selector(openSwag))
+        ]
+        
+        for item in barItems {
+            item.tintColor = .black
+        }
+        
+        feedController.setToolbarItems(barItems, animated: true)
     }
 }
 
@@ -74,6 +92,7 @@ extension Main: SubredditListPresenterDelegate {
         }
         
         feedPresenter.subreddit = id
+        feedPresenter.sort = .hot
         
         feedController.searchController.searchBar.placeholder = "Search Posts in r/\(id)"
         feedController.searchController.searchBar.text = ""
@@ -102,6 +121,48 @@ extension Main: SubredditListPresenterDelegate {
     func didEndSearch() {
         slideMenuController.contractMenu()
     }
+    
+    @objc func openSwag() {
+        let actionController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let hotAction = UIAlertAction(title: "Hot", style: .default, handler: { _ in
+            guard self.feedPresenter.sort != .hot else { return }
+            self.feedPresenter.sort = .hot
+            self.feedController.refresh()
+        })
+        let newAction = UIAlertAction(title: "New", style: .default, handler: { _ in
+            guard self.feedPresenter.sort != .new else { return }
+            self.feedPresenter.sort = .new
+            self.feedController.refresh()
+        })
+        let risingAction = UIAlertAction(title: "Rising", style: .default, handler: { _ in
+            guard self.feedPresenter.sort != .rising else { return }
+            self.feedPresenter.sort = .rising
+            self.feedController.refresh()
+        })
+        let controversialAction = UIAlertAction(title: "Controversial", style: .default, handler: { _ in
+            guard self.feedPresenter.sort != .controversial else { return }
+            self.feedPresenter.sort = .controversial
+            self.feedController.refresh()
+        })
+        let topAction = UIAlertAction(title: "Top", style: .default, handler: { _ in
+            guard self.feedPresenter.sort != .top else { return }
+            self.feedPresenter.sort = .top
+            self.feedController.refresh()
+        })
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
+            actionController.dismiss(animated: true, completion: nil)
+        })
+        
+        actionController.addAction(hotAction)
+        actionController.addAction(newAction)
+        actionController.addAction(risingAction)
+        actionController.addAction(controversialAction)
+        actionController.addAction(topAction)
+        actionController.addAction(cancelAction)
+    
+        feedController.present(actionController, animated: true, completion: nil)
+    }
 }
 
 extension Main: FeedPresenterDelegate {
@@ -110,7 +171,6 @@ extension Main: FeedPresenterDelegate {
         let discussionController = FeedDetailViewController()
         discussionController.delegate = discussionPresenter
         feedNavigation.pushViewController(discussionController, animated: true)
-        feedNavigation.setNavigationBarHidden(false, animated: true)
     }
     
     func didTapFlashMessage(listing: Listing) {
@@ -118,15 +178,16 @@ extension Main: FeedPresenterDelegate {
         let albumController = AlbumViewController()
         albumController.delegate = albumPresenter
         feedNavigation.pushViewController(albumController, animated: true)
-        feedNavigation.setNavigationBarHidden(false, animated: true)
     }
     
     func didDisappear() {
+        feedNavigation.isToolbarHidden = true
         slideMenuController.disableSwipe()
     }
     
     func didAppear() {
         slideMenuController.enableSwipe()
-        feedController.navigationController?.isNavigationBarHidden = false
+        feedNavigation.isToolbarHidden = false
+        feedNavigation.isNavigationBarHidden = false
     }
 }
