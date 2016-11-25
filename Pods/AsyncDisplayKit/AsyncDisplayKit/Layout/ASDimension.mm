@@ -72,19 +72,13 @@ NSString *NSStringFromASDimension(ASDimension dimension)
 
 #pragma mark - ASLayoutSize
 
+ASLayoutSize const ASLayoutSizeAuto = {ASDimensionAuto, ASDimensionAuto};
+
 // ** Resolve this relative size relative to a parent size. */
 ASDISPLAYNODE_INLINE CGSize ASLayoutSizeResolveSize(ASLayoutSize layoutSize, CGSize parentSize, CGSize autoSize)
 {
   return CGSizeMake(ASDimensionResolve(layoutSize.width, parentSize.width, autoSize.width),
                     ASDimensionResolve(layoutSize.height, parentSize.height, autoSize.height));
-}
-
-// ** Returns a string formatted to contain the data from an ASLayoutSize. */
-ASDISPLAYNODE_INLINE NSString *NSStringFromASLayoutSize(ASLayoutSize size)
-{
-  return [NSString stringWithFormat:@"{%@, %@}",
-          NSStringFromASDimension(size.width),
-          NSStringFromASDimension(size.height)];
 }
 
 

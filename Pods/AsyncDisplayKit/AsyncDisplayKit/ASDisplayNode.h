@@ -8,11 +8,12 @@
 //  of patent rights can be found in the PATENTS file in the same directory.
 //
 
+#pragma once
+
 #import <UIKit/UIKit.h>
 
 #import <AsyncDisplayKit/_ASAsyncTransactionContainer.h>
 #import <AsyncDisplayKit/ASBaseDefines.h>
-#import <AsyncDisplayKit/ASDealloc2MainObject.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASAsciiArtBoxCreator.h>
 #import <AsyncDisplayKit/ASLayoutElement.h>
@@ -104,7 +105,7 @@ extern NSInteger const ASDefaultDrawingPriority;
  *
  */
 
-@interface ASDisplayNode : ASDealloc2MainObject <ASLayoutElement>
+@interface ASDisplayNode : NSObject <ASLayoutElement>
 
 /** @name Initializing a node object */
 
@@ -280,6 +281,8 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @warning Subclasses that implement -layoutSpecThatFits: must not also use .layoutSpecBlock. Doing so will trigger
  * an exception. A future version of the framework may support using both, calling them serially, with the
  * .layoutSpecBlock superseding any values set by the method override.
+ *
+ * @code ^ASLayoutSpec *(__kindof ASDisplayNode * _Nonnull node, ASSizeRange constrainedSize) {};
  */
 @property (nonatomic, readwrite, copy, nullable) ASLayoutSpecBlock layoutSpecBlock;
 
@@ -633,11 +636,11 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 /**
  * Marks the node as needing layout. Convenience for use whether the view / layer is loaded or not. Safe to call from a background thread.
- * 
- * If this node was measured, calling this method triggers an internal relayout: the calculated layout is invalidated,
- * and the supernode is notified or (if this node is the root one) a full measurement pass is executed using the old constrained size.
  *
- * Note: ASCellNode has special behavior in that calling this method will automatically notify 
+ * If the node determines its own desired layout size will change in the next layout pass, it will propagate this
+ * information up the tree so its parents can have a chance to consider and apply if necessary the new size onto the node.
+ *
+ * Note: ASCellNode has special behavior in that calling this method will automatically notify
  * the containing ASTableView / ASCollectionView that the cell should be resized, if necessary.
  */
 - (void)setNeedsLayout;
@@ -792,7 +795,7 @@ extern NSInteger const ASDefaultDrawingPriority;
 
 
 /**
- * @abstract Invalidates the current layout and begins a relayout of the node with the current `constrainedSize`. Must be called on main thread.
+ * @abstract Invalidates the layout and begins a relayout of the node with the current `constrainedSize`. Must be called on main thread.
  *
  * @discussion It is called right after the measurement and before -animateLayoutTransition:.
  *
@@ -811,45 +814,6 @@ extern NSInteger const ASDefaultDrawingPriority;
  * @abstract Cancels all performing layout transitions. Can be called on any thread.
  */
 - (void)cancelLayoutTransition;
-
-@end
-
-@interface ASDisplayNode (Deprecated) <ASStackLayoutElement, ASAbsoluteLayoutElement>
-
-#pragma mark - Deprecated
-
-/**
- * @abstract Asks the node to measure and return the size that best fits its subnodes.
- *
- * @param constrainedSize The maximum size the receiver should fit in.
- *
- * @return A new size that fits the receiver's subviews.
- *
- * @discussion Though this method does not set the bounds of the view, it does have side effects--caching both the
- * constraint and the result.
- *
- * @warning Subclasses must not override this; it calls -measureWithSizeRange: with zero min size.
- * -measureWithSizeRange: caches results from -calculateLayoutThatFits:.  Calling this method may
- * be expensive if result is not cached.
- *
- * @see measureWithSizeRange:
- * @see [ASDisplayNode(Subclassing) calculateLayoutThatFits:]
- *
- * @deprecated Deprecated in version 2.0: Use layoutThatFits: with a constrained size of (CGSizeZero, constrainedSize) and call size on the returned ASLayout
- */
-- (CGSize)measure:(CGSize)constrainedSize ASDISPLAYNODE_DEPRECATED;
-
-/**
- * @abstract Provides a default intrinsic content size for calculateSizeThatFits:. This is useful when laying out
- * a node that either has no intrinsic content size or should be laid out at a different size than its intrinsic content
- * size. For example, this property could be set on an ASImageNode to display at a size different from the underlying
- * image size.
- *
- * @return Try to create a CGSize for preferredFrameSize of this node from the width and height property of this node. It will return CGSizeZero if widht and height dimensions are not of type ASDimensionUnitPoints.
- *
- * @deprecated Deprecated in version 2.0: Just calls through to set the height and width property of the node. Convert to use sizing properties instead: height, minHeight, maxHeight, width, minWidth, maxWidth.
- */
-@property (nonatomic, assign, readwrite) CGSize preferredFrameSize ASDISPLAYNODE_DEPRECATED_MSG("Use .style.preferredSize instead OR set individual values with .style.height and .style.width.");
 
 @end
 

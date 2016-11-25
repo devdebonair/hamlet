@@ -31,6 +31,15 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 //#define LOG(...) NSLog(__VA_ARGS__)
 #define LOG(...)
 
+/**
+ * See note at the top of ASCollectionView.mm near declaration of macro GET_COLLECTIONNODE_OR_RETURN
+ */
+#define GET_TABLENODE_OR_RETURN(__var, __val) \
+  ASTableNode *__var = self.tableNode; \
+  if (__var == nil) { \
+    return __val; \
+  }
+
 #pragma mark -
 #pragma mark ASCellNode<->UITableViewCell bridging.
 
@@ -129,6 +138,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   BOOL _isDeallocating;
   BOOL _performingBatchUpdates;
   NSMutableSet *_cellsForVisibilityUpdates;
+
+  // The section index overlay view, if there is one present.
+  // This is useful because we need to measure our row nodes against (width - indexView.width).
+  __weak UIView *_sectionIndexView;
   
   struct {
     unsigned int scrollViewDidScroll:1;
@@ -181,6 +194,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     unsigned int tableNodeCanMoveRow:1;
     unsigned int tableViewMoveRow:1;
     unsigned int tableNodeMoveRow:1;
+    unsigned int sectionIndexMethods:1; // if both section index methods are implemented
   } _asyncDataSourceFlags;
 }
 
@@ -192,6 +206,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 @end
 
 @implementation ASTableView
+{
+  __weak id<ASTableDelegate> _asyncDelegate;
+  __weak id<ASTableDataSource> _asyncDataSource;
+}
 
 // Using _ASDisplayLayer ensures things like -layout are properly forwarded to ASTableNode.
 + (Class)layerClass
@@ -207,7 +225,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 #pragma mark -
 #pragma mark Lifecycle
 
-- (void)configureWithDataControllerClass:(Class)dataControllerClass
+- (void)configureWithDataControllerClass:(Class)dataControllerClass eventLog:(ASEventLog *)eventLog
 {
   _layoutController = [[ASFlowLayoutController alloc] initWithScrollOption:ASFlowLayoutDirectionVertical];
   
@@ -216,7 +234,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   _rangeController.dataSource = self;
   _rangeController.delegate = self;
   
-  _dataController = [[dataControllerClass alloc] initWithDataSource:self];
+  _dataController = [[dataControllerClass alloc] initWithDataSource:self eventLog:eventLog];
   _dataController.delegate = _rangeController;
   _dataController.environmentDelegate = self;
   
@@ -243,10 +261,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (instancetype)initWithFrame:(CGRect)frame style:(UITableViewStyle)style
 {
-  return [self _initWithFrame:frame style:style dataControllerClass:nil];
+  return [self _initWithFrame:frame style:style dataControllerClass:nil eventLog:nil];
 }
 
-- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass
+- (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass eventLog:(ASEventLog *)eventLog
 {
   if (!(self = [super initWithFrame:frame style:style])) {
     return nil;
@@ -256,7 +274,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     dataControllerClass = [[self class] dataControllerClass];
   }
   
-  [self configureWithDataControllerClass:dataControllerClass];
+  [self configureWithDataControllerClass:dataControllerClass eventLog:eventLog];
   
   if (!AS_AT_LEAST_IOS9) {
     _retainedLayer = self.layer;
@@ -273,10 +291,15 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (void)dealloc
 {
+  ASDisplayNodeAssertMainThread();
   // Sometimes the UIKit classes can call back to their delegate even during deallocation.
   _isDeallocating = YES;
   [self setAsyncDelegate:nil];
   [self setAsyncDataSource:nil];
+
+  // Data controller & range controller may own a ton of nodes, let's deallocate those off-main
+  ASPerformBackgroundDeallocation(_dataController);
+  ASPerformBackgroundDeallocation(_rangeController);
 }
 
 #pragma mark -
@@ -294,8 +317,16 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   ASDisplayNodeAssert(delegate == nil, @"ASTableView uses asyncDelegate, not UITableView's delegate property.");
 }
 
+- (id<ASTableDataSource>)asyncDataSource
+{
+  return _asyncDataSource;
+}
+
 - (void)setAsyncDataSource:(id<ASTableDataSource>)asyncDataSource
 {
+  // Changing super.dataSource will trigger a setNeedsLayout, so this must happen on the main thread.
+  ASDisplayNodeAssertMainThread();
+
   // Note: It's common to check if the value hasn't changed and short-circuit but we aren't doing that here to handle
   // the (common) case of nilling the asyncDataSource in the ViewController's dealloc. In this case our _asyncDataSource
   // will return as nil (ARC magic) even though the _proxyDataSource still exists. It's really important to hold a strong
@@ -321,6 +352,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     _asyncDataSourceFlags.tableNodeNodeBlockForRow = [_asyncDataSource respondsToSelector:@selector(tableNode:nodeBlockForRowAtIndexPath:)];
     _asyncDataSourceFlags.tableViewCanMoveRow = [_asyncDataSource respondsToSelector:@selector(tableView:canMoveRowAtIndexPath:)];
     _asyncDataSourceFlags.tableViewMoveRow = [_asyncDataSource respondsToSelector:@selector(tableView:moveRowAtIndexPath:toIndexPath:)];
+    _asyncDataSourceFlags.sectionIndexMethods = [_asyncDataSource respondsToSelector:@selector(sectionIndexTitlesForTableView:)] && [_asyncDataSource respondsToSelector:@selector(tableView:sectionForSectionIndexTitle:atIndex:)];
     
     ASDisplayNodeAssert(_asyncDataSourceFlags.tableViewNodeBlockForRow
                         || _asyncDataSourceFlags.tableViewNodeForRow
@@ -332,8 +364,16 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   super.dataSource = (id<UITableViewDataSource>)_proxyDataSource;
 }
 
+- (id<ASTableDelegate>)asyncDelegate
+{
+  return _asyncDelegate;
+}
+
 - (void)setAsyncDelegate:(id<ASTableDelegate>)asyncDelegate
 {
+  // Changing super.delegate will trigger a setNeedsLayout, so this must happen on the main thread.
+  ASDisplayNodeAssertMainThread();
+
   // Note: It's common to check if the value hasn't changed and short-circuit but we aren't doing that here to handle
   // the (common) case of nilling the asyncDelegate in the ViewController's dealloc. In this case our _asyncDelegate
   // will return as nil (ARC magic) even though the _proxyDataSource still exists. It's really important to hold a strong
@@ -464,14 +504,43 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
 - (NSIndexPath *)convertIndexPathFromTableNode:(NSIndexPath *)indexPath waitingIfNeeded:(BOOL)wait
 {
-  ASCellNode *node = [_dataController nodeAtIndexPath:indexPath];
-  return [self indexPathForNode:node waitingIfNeeded:wait];
+  // If this is a section index path, we don't currently have a method
+  // to do a mapping.
+  if (indexPath.row == NSNotFound) {
+    return indexPath;
+  } else {
+    ASCellNode *node = [_dataController nodeAtIndexPath:indexPath];
+    return [self indexPathForNode:node waitingIfNeeded:wait];
+  }
 }
 
 - (NSIndexPath *)convertIndexPathToTableNode:(NSIndexPath *)indexPath
 {
-  ASCellNode *node = [self nodeForRowAtIndexPath:indexPath];
-  return [_dataController indexPathForNode:node];
+  // If this is a section index path, we don't currently have a method
+  // to do a mapping.
+  if (indexPath.row == NSNotFound) {
+    return indexPath;
+  } else {
+    ASCellNode *node = [self nodeForRowAtIndexPath:indexPath];
+    return [_dataController indexPathForNode:node];
+  }
+}
+
+- (NSArray<NSIndexPath *> *)convertIndexPathsToTableNode:(NSArray<NSIndexPath *> *)indexPaths
+{
+  if (indexPaths == nil) {
+    return nil;
+  }
+
+  NSMutableArray<NSIndexPath *> *indexPathsArray = [NSMutableArray new];
+
+  for (NSIndexPath *indexPathInView in indexPaths) {
+    NSIndexPath *indexPath = [self convertIndexPathToTableNode:indexPathInView];
+    if (indexPath != nil) {
+      [indexPathsArray addObject:indexPath];
+    }
+  }
+  return indexPathsArray;
 }
 
 - (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode
@@ -528,51 +597,11 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   [_dataController waitUntilAllUpdatesAreCommitted];
 }
 
-/**
- * TODO: This method was built when the distinction between data source
- * index paths and view index paths was unclear. For compatibility, it
- * still expects data source index paths for the time being.
- * When the behavior is changed (to use the view index path directly)
- * we should also remove the @c convertIndexPathFromTableNode: method.
- */
-- (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UITableViewScrollPosition)scrollPosition animated:(BOOL)animated
-{
-  ASDisplayNodeAssertMainThread();
-
-  indexPath = [self convertIndexPathFromTableNode:indexPath waitingIfNeeded:YES];
-  if (indexPath != nil) {
-    [super scrollToRowAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated];
-  } else {
-    NSLog(@"Warning: Ignoring request to scroll to row at index path %@ because the item did not reach the table view.", indexPath);
-  }
-}
-
-/**
- * TODO: This method was built when the distinction between data source
- * index paths and view index paths was unclear. For compatibility, it
- * still expects data source index paths for the time being.
- */
-- (void)selectRowAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated scrollPosition:(UITableViewScrollPosition)scrollPosition
-{
-  ASDisplayNodeAssertMainThread();
-  // If they passed nil, just forward it and be done.
-  if (indexPath == nil) {
-    [super selectRowAtIndexPath:indexPath animated:animated scrollPosition:scrollPosition];
-    return;
-  }
-  
-  indexPath = [self convertIndexPathFromTableNode:indexPath waitingIfNeeded:YES];
-  if (indexPath != nil) {
-    [super selectRowAtIndexPath:indexPath animated:YES scrollPosition:scrollPosition];
-  } else {
-    NSLog(@"Warning: Ignoring request to select row at index path %@ because the item did not reach the table view.", indexPath);
-  }
-}
-
 - (void)layoutSubviews
 {
-  if (_nodesConstrainedWidth != self.bounds.size.width) {
-    _nodesConstrainedWidth = self.bounds.size.width;
+  CGFloat constrainedWidth = self.bounds.size.width - [self sectionIndexWidth];
+  if (_nodesConstrainedWidth != constrainedWidth) {
+    _nodesConstrainedWidth = constrainedWidth;
 
     // First width change occurs during initial configuration. An expensive relayout pass is unnecessary at that time
     // and should be avoided, assuming that the initial data loading automatically runs shortly afterward.
@@ -783,7 +812,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   ASDisplayNodeAssertNotNil(cellNode, @"Expected node associated with cell that will be displayed not to be nil. indexPath: %@", indexPath);
 
   if (_asyncDelegateFlags.tableNodeWillDisplayNodeForRow) {
-    [_asyncDelegate tableNode:self.tableNode willDisplayRowWithNode:cellNode];
+    GET_TABLENODE_OR_RETURN(tableNode, (void)0);
+    [_asyncDelegate tableNode:tableNode willDisplayRowWithNode:cellNode];
   } else if (_asyncDelegateFlags.tableViewWillDisplayNodeForRow) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -812,7 +842,9 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 
   ASDisplayNodeAssertNotNil(cellNode, @"Expected node associated with removed cell not to be nil.");
   if (_asyncDelegateFlags.tableNodeDidEndDisplayingNodeForRow) {
-    [_asyncDelegate tableNode:self.tableNode didEndDisplayingRowWithNode:cellNode];
+    if (ASTableNode *tableNode = self.tableNode) {
+    	[_asyncDelegate tableNode:tableNode didEndDisplayingRowWithNode:cellNode];
+    }
   } else if (_asyncDelegateFlags.tableViewDidEndDisplayingNodeForRow) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -828,12 +860,13 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.tableNodeWillSelectRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, indexPath);
     NSIndexPath *result = [self convertIndexPathToTableNode:indexPath];
     // If this item was is gone, just let the table view do its default behavior and select.
     if (result == nil) {
       return indexPath;
     } else {
-      result = [_asyncDelegate tableNode:self.tableNode willSelectRowAtIndexPath:result];
+      result = [_asyncDelegate tableNode:tableNode willSelectRowAtIndexPath:result];
       result = [self convertIndexPathFromTableNode:result waitingIfNeeded:YES];
       return result;
     }
@@ -850,9 +883,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.tableNodeDidSelectRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, (void)0);
     indexPath = [self convertIndexPathToTableNode:indexPath];
     if (indexPath != nil) {
-      [_asyncDelegate tableNode:self.tableNode didSelectRowAtIndexPath:indexPath];
+      [_asyncDelegate tableNode:tableNode didSelectRowAtIndexPath:indexPath];
     }
   } else if (_asyncDelegateFlags.tableViewDidSelectRow) {
 #pragma clang diagnostic push
@@ -865,12 +899,13 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (NSIndexPath *)tableView:(UITableView *)tableView willDeselectRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.tableNodeWillDeselectRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, indexPath);
     NSIndexPath *result = [self convertIndexPathToTableNode:indexPath];
     // If this item was is gone, just let the table view do its default behavior and deselect.
     if (result == nil) {
       return indexPath;
     } else {
-      result = [_asyncDelegate tableNode:self.tableNode willDeselectRowAtIndexPath:result];
+      result = [_asyncDelegate tableNode:tableNode willDeselectRowAtIndexPath:result];
       result = [self convertIndexPathFromTableNode:result waitingIfNeeded:YES];
       return result;
     }
@@ -886,9 +921,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.tableNodeDidDeselectRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, (void)0);
     indexPath = [self convertIndexPathToTableNode:indexPath];
     if (indexPath != nil) {
-      [_asyncDelegate tableNode:self.tableNode didDeselectRowAtIndexPath:indexPath];
+      [_asyncDelegate tableNode:tableNode didDeselectRowAtIndexPath:indexPath];
     }
   } else if (_asyncDelegateFlags.tableViewDidDeselectRow) {
 #pragma clang diagnostic push
@@ -901,9 +937,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.tableNodeShouldHighlightRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, NO);
     indexPath = [self convertIndexPathToTableNode:indexPath];
     if (indexPath != nil) {
-      return [_asyncDelegate tableNode:self.tableNode shouldHighlightRowAtIndexPath:indexPath];
+      return [_asyncDelegate tableNode:tableNode shouldHighlightRowAtIndexPath:indexPath];
     }
   } else if (_asyncDelegateFlags.tableViewShouldHighlightRow) {
 #pragma clang diagnostic push
@@ -917,9 +954,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)tableView:(UITableView *)tableView didHighlightRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.tableNodeDidHighlightRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, (void)0);
     indexPath = [self convertIndexPathToTableNode:indexPath];
     if (indexPath != nil) {
-      return [_asyncDelegate tableNode:self.tableNode didHighlightRowAtIndexPath:indexPath];
+      return [_asyncDelegate tableNode:tableNode didHighlightRowAtIndexPath:indexPath];
     }
   } else if (_asyncDelegateFlags.tableViewDidHighlightRow) {
 #pragma clang diagnostic push
@@ -932,9 +970,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)tableView:(UITableView *)tableView didUnhighlightRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.tableNodeDidHighlightRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, (void)0);
     indexPath = [self convertIndexPathToTableNode:indexPath];
     if (indexPath != nil) {
-      return [_asyncDelegate tableNode:self.tableNode didUnhighlightRowAtIndexPath:indexPath];
+      return [_asyncDelegate tableNode:tableNode didUnhighlightRowAtIndexPath:indexPath];
     }
   } else if (_asyncDelegateFlags.tableViewDidUnhighlightRow) {
 #pragma clang diagnostic push
@@ -947,9 +986,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (BOOL)tableView:(UITableView *)tableView shouldShowMenuForRowAtIndexPath:(nonnull NSIndexPath *)indexPath
 {
   if (_asyncDelegateFlags.tableNodeShouldShowMenuForRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, NO);
     indexPath = [self convertIndexPathToTableNode:indexPath];
     if (indexPath != nil) {
-      return [_asyncDelegate tableNode:self.tableNode shouldShowMenuForRowAtIndexPath:indexPath];
+      return [_asyncDelegate tableNode:tableNode shouldShowMenuForRowAtIndexPath:indexPath];
     }
   } else if (_asyncDelegateFlags.tableViewShouldShowMenuForRow) {
 #pragma clang diagnostic push
@@ -963,9 +1003,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (BOOL)tableView:(UITableView *)tableView canPerformAction:(nonnull SEL)action forRowAtIndexPath:(nonnull NSIndexPath *)indexPath withSender:(nullable id)sender
 {
   if (_asyncDelegateFlags.tableNodeCanPerformActionForRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, NO);
     indexPath = [self convertIndexPathToTableNode:indexPath];
     if (indexPath != nil) {
-      return [_asyncDelegate tableNode:self.tableNode canPerformAction:action forRowAtIndexPath:indexPath withSender:sender];
+      return [_asyncDelegate tableNode:tableNode canPerformAction:action forRowAtIndexPath:indexPath withSender:sender];
     }
   } else if (_asyncDelegateFlags.tableViewCanPerformActionForRow) {
 #pragma clang diagnostic push
@@ -979,9 +1020,10 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (void)tableView:(UITableView *)tableView performAction:(nonnull SEL)action forRowAtIndexPath:(nonnull NSIndexPath *)indexPath withSender:(nullable id)sender
 {
   if (_asyncDelegateFlags.tableNodePerformActionForRow) {
+    GET_TABLENODE_OR_RETURN(tableNode, (void)0);
     indexPath = [self convertIndexPathToTableNode:indexPath];
     if (indexPath != nil) {
-      [_asyncDelegate tableNode:self.tableNode performAction:action forRowAtIndexPath:indexPath withSender:sender];
+      [_asyncDelegate tableNode:tableNode performAction:action forRowAtIndexPath:indexPath withSender:sender];
     }
   } else if (_asyncDelegateFlags.tableViewPerformActionForRow) {
 #pragma clang diagnostic push
@@ -1110,7 +1152,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   // if the delegate does not respond to this method, there is no point in starting to fetch
   BOOL canFetch = _asyncDelegateFlags.tableNodeWillBeginBatchFetch || _asyncDelegateFlags.tableViewWillBeginBatchFetch;
   if (canFetch && _asyncDelegateFlags.shouldBatchFetchForTableNode) {
-    return [_asyncDelegate shouldBatchFetchForTableNode:self.tableNode];
+    GET_TABLENODE_OR_RETURN(tableNode, NO);
+    return [_asyncDelegate shouldBatchFetchForTableNode:tableNode];
   } else if (canFetch && _asyncDelegateFlags.shouldBatchFetchForTableView) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -1156,7 +1199,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   [_batchContext beginBatchFetching];
   if (_asyncDelegateFlags.tableNodeWillBeginBatchFetch) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      [_asyncDelegate tableNode:self.tableNode willBeginBatchFetchWithContext:_batchContext];
+      GET_TABLENODE_OR_RETURN(tableNode, (void)0);
+      [_asyncDelegate tableNode:tableNode willBeginBatchFetchWithContext:_batchContext];
     });
   } else if (_asyncDelegateFlags.tableViewWillBeginBatchFetch) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -1392,9 +1436,14 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   ASCellNodeBlock block = nil;
 
   if (_asyncDataSourceFlags.tableNodeNodeBlockForRow) {
-    block = [_asyncDataSource tableNode:self.tableNode nodeBlockForRowAtIndexPath:indexPath];
+    if (ASTableNode *tableNode = self.tableNode) {
+      block = [_asyncDataSource tableNode:tableNode nodeBlockForRowAtIndexPath:indexPath];
+    }
   } else if (_asyncDataSourceFlags.tableNodeNodeForRow) {
-    ASCellNode *node = [_asyncDataSource tableNode:self.tableNode nodeForRowAtIndexPath:indexPath];
+    ASCellNode *node = nil;
+    if (ASTableNode *tableNode = self.tableNode) {
+    	node = [_asyncDataSource tableNode:tableNode nodeForRowAtIndexPath:indexPath];
+    }
     if ([node isKindOfClass:[ASCellNode class]]) {
       block = ^{
         return node;
@@ -1444,7 +1493,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 {
   ASSizeRange constrainedSize = kInvalidSizeRange;
   if (_asyncDelegateFlags.tableNodeConstrainedSizeForRow) {
-    ASSizeRange delegateConstrainedSize = [_asyncDelegate tableNode:self.tableNode constrainedSizeForRowAtIndexPath:indexPath];
+    GET_TABLENODE_OR_RETURN(tableNode, constrainedSize);
+    ASSizeRange delegateConstrainedSize = [_asyncDelegate tableNode:tableNode constrainedSizeForRowAtIndexPath:indexPath];
     // ignore widths in the returned size range (for TableView)
     constrainedSize = ASSizeRangeMake(CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.min.height),
                                       CGSizeMake(_nodesConstrainedWidth, delegateConstrainedSize.max.height));
@@ -1466,7 +1516,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (NSUInteger)dataController:(ASDataController *)dataController rowsInSection:(NSUInteger)section
 {
   if (_asyncDataSourceFlags.tableNodeNumberOfRowsInSection) {
-    return [_asyncDataSource tableNode:self.tableNode numberOfRowsInSection:section];
+    GET_TABLENODE_OR_RETURN(tableNode, 0);
+    return [_asyncDataSource tableNode:tableNode numberOfRowsInSection:section];
   } else if (_asyncDataSourceFlags.tableViewNumberOfRowsInSection) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -1480,7 +1531,8 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 - (NSUInteger)numberOfSectionsInDataController:(ASDataController *)dataController
 {
   if (_asyncDataSourceFlags.numberOfSectionsInTableNode) {
-    return [_asyncDataSource numberOfSectionsInTableNode:self.tableNode];
+    GET_TABLENODE_OR_RETURN(tableNode, 0);
+    return [_asyncDataSource numberOfSectionsInTableNode:tableNode];
   } else if (_asyncDataSourceFlags.numberOfSectionsInTableView) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -1514,7 +1566,7 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
   // Normally the content view width equals to the constrained size width (which equals to the table view width).
   // If there is a mismatch between these values, for example after the table view entered or left editing mode,
   // content view width is preferred and used to re-measure the cell node.
-  if (contentViewWidth != constrainedSize.max.width) {
+  if (CGSizeEqualToSize(node.calculatedSize, CGSizeZero) == NO && contentViewWidth != constrainedSize.max.width) {
     constrainedSize.min.width = contentViewWidth;
     constrainedSize.max.width = contentViewWidth;
 
@@ -1524,10 +1576,15 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
     // is the same for all cells (because there is no easy way to get that individual value before the node being assigned to a _ASTableViewCell).
     // Also, in many cases, some nodes may not need to be re-measured at all, such as when user enters and then immediately leaves editing mode.
     // To avoid premature optimization and making such assumption, as well as to keep ASTableView simple, re-measurement is strictly done on main.
-    [self beginUpdates];
+    CGSize oldSize = node.bounds.size;
     const CGSize calculatedSize = [node layoutThatFits:constrainedSize].size;
-    node.frame = CGRectMake(0, 0, calculatedSize.width, calculatedSize.height);
-    [self endUpdates];
+    node.frame = { .size = calculatedSize };
+
+    // If the node height changed, trigger a height requery.
+    if (oldSize.height != calculatedSize.height) {
+      [self beginUpdates];
+      [self endUpdates];
+    }
   }
 }
 
@@ -1590,6 +1647,31 @@ static NSString * const kCellReuseIdentifier = @"_ASTableViewCell";
 }
 
 #pragma mark - Helper Methods
+
+// Note: This is called every layout, and so it is very performance sensitive.
+- (CGFloat)sectionIndexWidth
+{
+  // If they don't implement the methods, then there's no section index.
+  if (_asyncDataSourceFlags.sectionIndexMethods == NO) {
+    return 0;
+  }
+
+  UIView *indexView = _sectionIndexView;
+  if (indexView.superview == self) {
+    return indexView.frame.size.width;
+  }
+
+  CGRect bounds = self.bounds;
+  for (UIView *view in self.subviews) {
+    CGRect frame = view.frame;
+    // Section index is right-aligned and less than half-width.
+    if (CGRectGetMaxX(frame) == CGRectGetMaxX(bounds) && frame.size.width * 2 < bounds.size.width) {
+      _sectionIndexView = view;
+      return frame.size.width;
+    }
+  }
+  return 0;
+}
 
 /// @note This should be a UIKit index path.
 - (BOOL)isIndexPath:(NSIndexPath *)indexPath immediateSuccessorOfIndexPath:(NSIndexPath *)anchor

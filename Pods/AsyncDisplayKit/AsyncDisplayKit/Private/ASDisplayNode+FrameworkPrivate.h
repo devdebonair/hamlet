@@ -13,7 +13,6 @@
 // These methods must never be called or overridden by other classes.
 //
 
-#import "_AS-objc-internal.h"
 #import "ASDisplayNode.h"
 #import "ASThread.h"
 
@@ -46,7 +45,8 @@ typedef NS_OPTIONS(NSUInteger, ASHierarchyState)
   ASHierarchyStateTransitioningSupernodes = 1 << 2,
   /** One of the supernodes of this node is performing a transition.
       Any layout calculated during this state should not be applied immediately, but pending until later. */
-  ASHierarchyStateLayoutPending           = 1 << 3
+  ASHierarchyStateLayoutPending           = 1 << 3,
+  ASHierarchyStateVisualizeLayout         = 1 << 4
 };
 
 ASDISPLAYNODE_INLINE BOOL ASHierarchyStateIncludesLayoutPending(ASHierarchyState hierarchyState)
@@ -57,6 +57,11 @@ ASDISPLAYNODE_INLINE BOOL ASHierarchyStateIncludesLayoutPending(ASHierarchyState
 ASDISPLAYNODE_INLINE BOOL ASHierarchyStateIncludesRangeManaged(ASHierarchyState hierarchyState)
 {
     return ((hierarchyState & ASHierarchyStateRangeManaged) == ASHierarchyStateRangeManaged);
+}
+
+ASDISPLAYNODE_INLINE BOOL ASHierarchyStateIncludesVisualizeLayout(ASHierarchyState hierarchyState)
+{
+  return ((hierarchyState & ASHierarchyStateVisualizeLayout) == ASHierarchyStateVisualizeLayout);
 }
 
 ASDISPLAYNODE_INLINE BOOL ASHierarchyStateIncludesRasterized(ASHierarchyState hierarchyState)
@@ -168,6 +173,20 @@ __unused static NSString * _Nonnull NSStringFromASHierarchyState(ASHierarchyStat
  * @abstract Checks whether a node should be scheduled for display, considering its current and new interface states.
  */
 - (BOOL)shouldScheduleDisplayWithNewInterfaceState:(ASInterfaceState)newInterfaceState;
+
+/**
+ * @abstract Informs the root node that the intrinsic size of the receiver is no longer valid.
+ *
+ * @discussion The size of a root node is determined by each subnode. Calling invalidateSize will let the root node know
+ * that the intrinsic size of the receiver node is no longer valid and a resizing of the root node needs to happen.
+ */
+- (void)setNeedsLayoutFromAbove;
+
+/**
+ * @abstract Subclass hook for nodes that are acting as root nodes. This method is called if one of the subnodes
+ * size is invalidated and may need to result in a different size as the current calculated size.
+ */
+- (void)_locked_displayNodeDidInvalidateSizeNewSize:(CGSize)newSize;
 
 @end
 

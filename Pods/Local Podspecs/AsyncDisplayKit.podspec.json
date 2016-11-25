@@ -1,18 +1,17 @@
 {
   "name": "AsyncDisplayKit",
-  "version": "2.0-beta.1",
+  "version": "2.0-beta.2",
   "license": {
     "type": "BSD"
   },
   "homepage": "http://asyncdisplaykit.org",
   "authors": {
-    "Scott Goodson": "scottgoodson@gmail.com",
-    "Ryan Nystrom": "rnystrom@fb.com"
+    "Scott Goodson": "scottgoodson@gmail.com"
   },
   "summary": "Smooth asynchronous user interfaces for iOS apps.",
   "source": {
     "git": "https://github.com/facebook/AsyncDisplayKit.git",
-    "tag": "1.9.90"
+    "tag": "2.0-beta.2"
   },
   "documentation_url": "http://asyncdisplaykit.org/appledoc/",
   "frameworks": "AssetsLibrary",
@@ -25,7 +24,7 @@
     "ios": "7.0"
   },
   "default_subspecs": "PINRemoteImage",
-  "social_media_url": "https://twitter.com/fbOpenSource",
+  "social_media_url": "https://twitter.com/AsyncDisplayKit",
   "libraries": "c++",
   "pod_target_xcconfig": {
     "CLANG_CXX_LANGUAGE_STANDARD": "c++11",
@@ -39,6 +38,7 @@
         "AsyncDisplayKit/Details/**/*.h",
         "AsyncDisplayKit/Layout/*.h",
         "Base/*.h",
+        "AsyncDisplayKit/Debug/ASLayoutElementInspectorNode.h",
         "AsyncDisplayKit/TextKit/ASTextNodeTypes.h",
         "AsyncDisplayKit/TextKit/ASTextKitComponents.h"
       ],
@@ -74,7 +74,10 @@
       },
       "dependencies": {
         "PINRemoteImage/iOS": [
-          "= 3.0.0-beta.5"
+          "= 3.0.0-beta.6"
+        ],
+        "PINRemoteImage/PINCache": [
+
         ],
         "AsyncDisplayKit/Core": [
 

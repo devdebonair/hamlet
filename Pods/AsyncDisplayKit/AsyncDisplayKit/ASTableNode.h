@@ -105,6 +105,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType;
 
 /**
+ * Scrolls the table to the given row.
+ *
+ * @param indexPath The index path of the row.
+ * @param scrollPosition Where the row should end up after the scroll.
+ * @param animated Whether the scroll should be animated or not.
+ *
+ * This method must be called on the main thread.
+ */
+- (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UITableViewScrollPosition)scrollPosition animated:(BOOL)animated;
+
+/**
  * Reload everything from scratch, destroying the working range and all cached nodes.
  *
  * @param completion block to run on completion of asynchronous loading or nil. If supplied, the block is run on
@@ -280,7 +291,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)deselectRowAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
 
-
 #pragma mark - Querying Data
 
 /**
@@ -298,9 +308,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSInteger numberOfSections;
 
 /**
+ * Similar to -visibleCells.
+ *
+ * @return an array containing the nodes being displayed on screen. This must be called on the main thread.
+ */
+@property (nonatomic, readonly) NSArray<__kindof ASCellNode *> *visibleNodes;
+
+/**
  * Retrieves the node for the row at the given index path.
  */
-- (nullable ASCellNode *)nodeForRowAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
+- (nullable __kindof ASCellNode *)nodeForRowAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
 
 /**
  * Similar to -indexPathForCell:.
@@ -315,6 +332,76 @@ NS_ASSUME_NONNULL_BEGIN
  *   to any item in the data source and will be removed soon.
  */
 - (nullable NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode AS_WARN_UNUSED_RESULT;
+
+/**
+ * Similar to -[UITableView rectForRowAtIndexPath:]
+ *
+ * @param indexPath An index path identifying a row in the table view.
+ *
+ * @return A rectangle defining the area in which the table view draws the row or CGRectZero if indexPath is invalid.
+ *
+ * @discussion This method must be called from the main thread.
+ */
+- (CGRect)rectForRowAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
+
+/**
+ * Similar to -[UITableView cellForRowAtIndexPath:]
+ *
+ * @param indexPath An index path identifying a row in the table view.
+ *
+ * @return An object representing a cell of the table, or nil if the cell is not visible or indexPath is out of range.
+ *
+ * @discussion This method must be called from the main thread.
+ */
+- (nullable __kindof UITableViewCell *)cellForRowAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
+
+/**
+ * Similar to UITableView.indexPathForSelectedRow
+ *
+ * @return The value of this property is an index path identifying the row and section
+ *   indexes of the selected row, or nil if the index path is invalid. If there are multiple selections,
+ *   this property contains the first index-path object in the array of row selections;
+ *   this object has the lowest index values for section and row.
+ *
+ * @discussion This method must be called from the main thread.
+ */
+@property (nonatomic, readonly, nullable) NSIndexPath *indexPathForSelectedRow;
+
+@property (nonatomic, readonly, nullable) NSArray<NSIndexPath *> *indexPathsForSelectedRows;
+
+/**
+ * Similar to -[UITableView indexPathForRowAtPoint:]
+ *
+ * @param point A point in the local coordinate system of the table view (the table view’s bounds).
+ *
+ * @return An index path representing the row and section associated with point, 
+ *  or nil if the point is out of the bounds of any row.
+ *
+ * @discussion This method must be called from the main thread.
+ */
+- (nullable NSIndexPath *)indexPathForRowAtPoint:(CGPoint)point AS_WARN_UNUSED_RESULT;
+
+/**
+ * Similar to -[UITableView indexPathsForRowsInRect:]
+ *
+ * @param rect A rectangle defining an area of the table view in local coordinates.
+ *
+ * @return An array of NSIndexPath objects each representing a row and section index identifying a row within rect.
+ *  Returns an empty array if there aren’t any rows to return.
+ *
+ * @discussion This method must be called from the main thread.
+ */
+- (nullable NSArray<NSIndexPath *> *)indexPathsForRowsInRect:(CGRect)rect AS_WARN_UNUSED_RESULT;
+
+/**
+ * Similar to -[UITableView indexPathsForVisibleRows]
+ *
+ * @return The value of this property is an array of NSIndexPath objects each representing a row index and section index
+ *  that together identify a visible row in the table view. If no rows are visible, the value is nil.
+ *
+ * @discussion This method must be called from the main thread.
+ */
+- (NSArray<NSIndexPath *> *)indexPathsForVisibleRows AS_WARN_UNUSED_RESULT;
 
 @end
 
@@ -338,13 +425,6 @@ NS_ASSUME_NONNULL_BEGIN
  * @see @c numberOfSectionsInTableView:
  */
 - (NSInteger)tableNode:(ASTableNode *)tableNode numberOfRowsInSection:(NSInteger)section;
-
-/**
- * Similar to -visibleCells.
- *
- * @return an array containing the nodes being displayed on screen. This must be called on the main thread.
- */
-@property(readonly, copy) NSArray<__kindof ASCellNode *> *visibleNodes;
 
 /**
  * Asks the data source for a block to create a node to represent the row at the given index path.

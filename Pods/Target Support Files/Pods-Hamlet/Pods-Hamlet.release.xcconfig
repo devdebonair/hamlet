@@ -1,8 +1,11 @@
+ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
 EMBEDDED_CONTENT_CONTAINS_SWIFT = YES
+FRAMEWORK_SEARCH_PATHS = $(inherited) "$PODS_CONFIGURATION_BUILD_DIR/Alamofire" "$PODS_CONFIGURATION_BUILD_DIR/AsyncDisplayKit" "$PODS_CONFIGURATION_BUILD_DIR/ModelMapper" "$PODS_CONFIGURATION_BUILD_DIR/NVActivityIndicatorView" "$PODS_CONFIGURATION_BUILD_DIR/PINCache" "$PODS_CONFIGURATION_BUILD_DIR/PINRemoteImage" "$PODS_CONFIGURATION_BUILD_DIR/SnapKit"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1 $(inherited) PIN_REMOTE_IMAGE=1
 LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/Frameworks' '@loader_path/Frameworks'
-OTHER_CFLAGS = $(inherited) -iquote "$CONFIGURATION_BUILD_DIR/Alamofire.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/AsyncDisplayKit.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/Mapper.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/NVActivityIndicatorView.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/PINCache.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/PINRemoteImage.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/SnapKit.framework/Headers"
+OTHER_CFLAGS = $(inherited) -iquote "$PODS_CONFIGURATION_BUILD_DIR/Alamofire/Alamofire.framework/Headers" -iquote "$PODS_CONFIGURATION_BUILD_DIR/AsyncDisplayKit/AsyncDisplayKit.framework/Headers" -iquote "$PODS_CONFIGURATION_BUILD_DIR/ModelMapper/Mapper.framework/Headers" -iquote "$PODS_CONFIGURATION_BUILD_DIR/NVActivityIndicatorView/NVActivityIndicatorView.framework/Headers" -iquote "$PODS_CONFIGURATION_BUILD_DIR/PINCache/PINCache.framework/Headers" -iquote "$PODS_CONFIGURATION_BUILD_DIR/PINRemoteImage/PINRemoteImage.framework/Headers" -iquote "$PODS_CONFIGURATION_BUILD_DIR/SnapKit/SnapKit.framework/Headers"
 OTHER_LDFLAGS = $(inherited) -framework "Alamofire" -framework "AsyncDisplayKit" -framework "Mapper" -framework "NVActivityIndicatorView" -framework "PINCache" -framework "PINRemoteImage" -framework "SnapKit"
 OTHER_SWIFT_FLAGS = $(inherited) "-D" "COCOAPODS"
-PODS_FRAMEWORK_BUILD_PATH = $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Pods-Hamlet
+PODS_BUILD_DIR = $BUILD_DIR
+PODS_CONFIGURATION_BUILD_DIR = $PODS_BUILD_DIR/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
 PODS_ROOT = ${SRCROOT}/Pods

@@ -13,6 +13,7 @@
 #import "ASTableNode.h"
 #import "ASTableViewInternal.h"
 #import "ASEnvironmentInternal.h"
+#import "ASDisplayNodeInternal.h"
 #import "ASDisplayNode+Subclasses.h"
 #import "ASInternalHelpers.h"
 #import "ASCellNode+Internal.h"
@@ -78,8 +79,10 @@
 
 - (instancetype)_initWithFrame:(CGRect)frame style:(UITableViewStyle)style dataControllerClass:(Class)dataControllerClass
 {
+  __weak __typeof__(self) weakSelf = self;
   ASDisplayNodeViewBlock tableViewBlock = ^UIView *{
-    return [[ASTableView alloc] _initWithFrame:frame style:style dataControllerClass:dataControllerClass];
+    __typeof__(self) strongSelf = weakSelf;
+    return [[ASTableView alloc] _initWithFrame:frame style:style dataControllerClass:dataControllerClass eventLog:ASDisplayNodeGetEventLog(strongSelf)];
   };
 
   if (self = [super initWithViewBlock:tableViewBlock]) {
@@ -120,12 +123,6 @@
       [view.rangeController updateCurrentRangeWithMode:pendingState.rangeMode];
     }
   }
-}
-
-- (void)dealloc
-{
-  self.delegate = nil;
-  self.dataSource = nil;
 }
 
 - (ASTableView *)view
@@ -194,7 +191,15 @@
     _pendingState.delegate = delegate;
   } else {
     ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded if pendingState doesn't exist");
-    self.view.asyncDelegate = delegate;
+
+    // Manually trampoline to the main thread. The view requires this be called on main
+    // and asserting here isn't an option – it is a common pattern for users to clear
+    // the delegate/dataSource in dealloc, which may be running on a background thread.
+    // It is important that we avoid retaining self in this block, so that this method is dealloc-safe.
+    ASTableView *view = (ASTableView *)_view;
+    ASPerformBlockOnMainThread(^{
+      view.asyncDelegate = delegate;
+    });
   }
 }
 
@@ -213,7 +218,15 @@
     _pendingState.dataSource = dataSource;
   } else {
     ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded if pendingState doesn't exist");
-    self.view.asyncDataSource = dataSource;
+
+    // Manually trampoline to the main thread. The view requires this be called on main
+    // and asserting here isn't an option – it is a common pattern for users to clear
+    // the delegate/dataSource in dealloc, which may be running on a background thread.
+    // It is important that we avoid retaining self in this block, so that this method is dealloc-safe.
+    ASTableView *view = (ASTableView *)_view;
+    ASPerformBlockOnMainThread(^{
+      view.asyncDataSource = dataSource;
+    });
   }
 }
 
@@ -346,28 +359,67 @@ ASEnvironmentCollectionTableSetEnvironmentState(_environmentStateLock)
 - (void)selectRowAtIndexPath:(nullable NSIndexPath *)indexPath animated:(BOOL)animated scrollPosition:(UITableViewScrollPosition)scrollPosition
 {
   ASDisplayNodeAssertMainThread();
-  // TODO: Solve this in a way to be able to remove this restriction (https://github.com/facebook/AsyncDisplayKit/pull/2453#discussion_r84515457)
-  ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded before calling selectRowAtIndexPath");
-  [self.view selectRowAtIndexPath:indexPath animated:animated scrollPosition:scrollPosition];
+  ASTableView *tableView = self.view;
+
+  indexPath = [tableView convertIndexPathFromTableNode:indexPath waitingIfNeeded:YES];
+  if (indexPath != nil) {
+    [tableView selectRowAtIndexPath:indexPath animated:animated scrollPosition:scrollPosition];
+  } else {
+    NSLog(@"Failed to select row at index path %@ because the row never reached the view.", indexPath);
+  }
+
 }
 
 - (void)deselectRowAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated
 {
   ASDisplayNodeAssertMainThread();
-  // TODO: Solve this in a way to be able to remove this restriction (https://github.com/facebook/AsyncDisplayKit/pull/2453#discussion_r84515457)
-  ASDisplayNodeAssert([self isNodeLoaded], @"ASTableNode should be loaded before calling deselectRowAtIndexPath");
-  [self.view deselectRowAtIndexPath:indexPath animated:animated];
+  ASTableView *tableView = self.view;
+
+  indexPath = [tableView convertIndexPathFromTableNode:indexPath waitingIfNeeded:YES];
+  if (indexPath != nil) {
+    [tableView deselectRowAtIndexPath:indexPath animated:animated];
+  } else {
+    NSLog(@"Failed to deselect row at index path %@ because the row never reached the view.", indexPath);
+  }
+}
+
+- (void)scrollToRowAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UITableViewScrollPosition)scrollPosition animated:(BOOL)animated
+{
+  ASDisplayNodeAssertMainThread();
+  ASTableView *tableView = self.view;
+
+  indexPath = [tableView convertIndexPathFromTableNode:indexPath waitingIfNeeded:YES];
+
+  if (indexPath != nil) {
+    [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated];
+  } else {
+    NSLog(@"Failed to scroll to row at index path %@ because the row never reached the view.", indexPath);
+  }
 }
 
 #pragma mark - Querying Data
 
+- (void)reloadDataInitiallyIfNeeded
+{
+  ASDisplayNodeAssertMainThread();
+  if (!self.dataController.initialReloadDataHasBeenCalled) {
+    // Note: Just calling reloadData isn't enough here – we need to
+    // ensure that _nodesConstrainedWidth is updated first.
+    [self.view layoutIfNeeded];
+  }
+}
+
 - (NSInteger)numberOfRowsInSection:(NSInteger)section
 {
+  ASDisplayNodeAssertMainThread();
+  [self reloadDataInitiallyIfNeeded];
   return [self.dataController numberOfRowsInSection:section];
 }
 
 - (NSInteger)numberOfSections
 {
+  ASDisplayNodeAssertMainThread();
+  [self reloadDataInitiallyIfNeeded];
   return [self.dataController numberOfSections];
 }
 
@@ -384,7 +436,81 @@ ASEnvironmentCollectionTableSetEnvironmentState(_environmentStateLock)
 
 - (ASCellNode *)nodeForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  [self reloadDataInitiallyIfNeeded];
   return [self.dataController nodeAtIndexPath:indexPath];
+}
+
+- (CGRect)rectForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  ASDisplayNodeAssertMainThread();
+  ASTableView *tableView = self.view;
+
+  indexPath = [tableView convertIndexPathFromTableNode:indexPath waitingIfNeeded:YES];
+  return [tableView rectForRowAtIndexPath:indexPath];
+}
+
+- (nullable __kindof UITableViewCell *)cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  ASDisplayNodeAssertMainThread();
+  ASTableView *tableView = self.view;
+
+  indexPath = [tableView convertIndexPathFromTableNode:indexPath waitingIfNeeded:YES];
+  if (indexPath == nil) {
+    return nil;
+  }
+  return [tableView cellForRowAtIndexPath:indexPath];
+}
+
+- (nullable NSIndexPath *)indexPathForSelectedRow
+{
+  ASDisplayNodeAssertMainThread();
+  ASTableView *tableView = self.view;
+
+  NSIndexPath *indexPath = tableView.indexPathForSelectedRow;
+  if (indexPath != nil) {
+    return [tableView convertIndexPathToTableNode:indexPath];
+  }
+  return indexPath;
+}
+
+- (NSArray<NSIndexPath *> *)indexPathsForSelectedRows
+{
+  ASDisplayNodeAssertMainThread();
+  ASTableView *tableView = self.view;
+
+  return [tableView convertIndexPathsToTableNode:tableView.indexPathsForSelectedRows];
+}
+
+- (nullable NSIndexPath *)indexPathForRowAtPoint:(CGPoint)point
+{
+  ASDisplayNodeAssertMainThread();
+  ASTableView *tableView = self.view;
+
+  NSIndexPath *indexPath = [tableView indexPathForRowAtPoint:point];
+  if (indexPath != nil) {
+    return [tableView convertIndexPathToTableNode:indexPath];
+  }
+  return indexPath;
+}
+
+- (nullable NSArray<NSIndexPath *> *)indexPathsForRowsInRect:(CGRect)rect
+{
+  ASDisplayNodeAssertMainThread();
+  ASTableView *tableView = self.view;
+  return [tableView convertIndexPathsToTableNode:[tableView indexPathsForRowsInRect:rect]];
+}
+
+- (NSArray<NSIndexPath *> *)indexPathsForVisibleRows
+{
+  ASDisplayNodeAssertMainThread();
+  NSMutableArray *indexPathsArray = [NSMutableArray new];
+  for (ASCellNode *cell in [self visibleNodes]) {
+    NSIndexPath *indexPath = [self indexPathForNode:cell];
+    if (indexPath) {
+      [indexPathsArray addObject:indexPath];
+    }
+  }
+  return indexPathsArray;
 }
 
 #pragma mark - Editing
@@ -407,7 +533,9 @@ ASEnvironmentCollectionTableSetEnvironmentState(_environmentStateLock)
 - (void)performBatchAnimated:(BOOL)animated updates:(void (^)())updates completion:(void (^)(BOOL))completion
 {
   [self.view beginUpdates];
-  updates();
+  if (updates) {
+    updates();
+  }
   [self.view endUpdatesAnimated:animated completion:completion];
 }
 
@@ -459,6 +587,16 @@ ASEnvironmentCollectionTableSetEnvironmentState(_environmentStateLock)
 - (void)waitUntilAllUpdatesAreCommitted
 {
   [self.view waitUntilAllUpdatesAreCommitted];
+}
+
+#pragma mark - Debugging (Private)
+
+- (NSMutableArray<NSDictionary *> *)propertiesForDebugDescription
+{
+  NSMutableArray<NSDictionary *> *result = [super propertiesForDebugDescription];
+  [result addObject:@{ @"dataSource" : ASObjectDescriptionMakeTiny(self.dataSource) }];
+  [result addObject:@{ @"delegate" : ASObjectDescriptionMakeTiny(self.delegate) }];
+  return result;
 }
 
 @end

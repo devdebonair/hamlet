@@ -11,11 +11,17 @@
 #pragma once
 
 #import <UIKit/UIKit.h>
-#import <AsyncDisplayKit/ASDealloc2MainObject.h>
 #import <AsyncDisplayKit/ASDimension.h>
 #import <AsyncDisplayKit/ASFlowLayoutController.h>
+#import <AsyncDisplayKit/ASEventLog.h>
 
 NS_ASSUME_NONNULL_BEGIN
+
+#if ASEVENTLOG_ENABLE
+#define ASDataControllerLogEvent(dataController, ...) [dataController.eventLog logEventWithBacktrace:(AS_SAVE_EVENT_BACKTRACES ? [NSThread callStackSymbols] : nil) format:__VA_ARGS__]
+#else
+#define ASDataControllerLogEvent(dataController, ...)
+#endif
 
 @class ASCellNode;
 @class ASDataController;
@@ -107,9 +113,9 @@ FOUNDATION_EXPORT NSString * const ASDataControllerRowNodeKind;
  * For each data updating, the corresponding methods in delegate will be called.
  */
 @protocol ASFlowLayoutControllerDataSource;
-@interface ASDataController : ASDealloc2MainObject <ASFlowLayoutControllerDataSource>
+@interface ASDataController : NSObject <ASFlowLayoutControllerDataSource>
 
-- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithDataSource:(id<ASDataControllerSource>)dataSource eventLog:(nullable ASEventLog *)eventLog NS_DESIGNATED_INITIALIZER;
 
 /**
  Data source for fetching data info.
@@ -134,6 +140,13 @@ FOUNDATION_EXPORT NSString * const ASDataControllerRowNodeKind;
  * This must be called on the main thread.
  */
 @property (nonatomic, readonly) BOOL initialReloadDataHasBeenCalled;
+
+#if ASEVENTLOG_ENABLE
+/*
+ * @abstract The primitive event tracing object. You shouldn't directly use it to log event. Use the ASDataControllerLogEvent macro instead.
+ */
+@property (nonatomic, strong, readonly) ASEventLog *eventLog;
+#endif
 
 /** @name Data Updating */
 

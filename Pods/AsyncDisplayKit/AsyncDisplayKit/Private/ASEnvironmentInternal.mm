@@ -144,6 +144,9 @@ ASEnvironmentState ASEnvironmentMergeObjectAndState(ASEnvironmentState environme
     if (parentLayoutOptionsState.flexGrow == defaultState.flexGrow) {
       parentLayoutOptionsState.flexGrow = layoutOptionsState.flexGrow;
     }
+    if (parentLayoutOptionsState.flexShrink == defaultState.flexShrink) {
+      parentLayoutOptionsState.flexShrink = layoutOptionsState.flexShrink;
+    }
     if (ASDimensionEqualToDimension(parentLayoutOptionsState.flexBasis, defaultState.flexBasis)) {
       parentLayoutOptionsState.flexBasis = layoutOptionsState.flexBasis;
     }
@@ -152,6 +155,9 @@ ASEnvironmentState ASEnvironmentMergeObjectAndState(ASEnvironmentState environme
     }
     if (parentLayoutOptionsState.ascender == defaultState.ascender) {
       parentLayoutOptionsState.ascender = layoutOptionsState.ascender;
+    }
+    if (parentLayoutOptionsState.descender == defaultState.descender) {
+      parentLayoutOptionsState.descender = layoutOptionsState.descender;
     }
     
     if (CGPointEqualToPoint(parentLayoutOptionsState.layoutPosition, defaultState.layoutPosition)) {

@@ -190,7 +190,7 @@ struct ASImageNodeDrawParameters {
   ASDN::MutexLocker l(__instanceLock__);
 
   if (_image == nil) {
-    return constrainedSize;
+    return [super calculateSizeThatFits:constrainedSize];
   }
 
   return _image.size;
@@ -204,7 +204,7 @@ struct ASImageNodeDrawParameters {
   if (!ASObjectIsEqual(_image, image)) {
     _image = image;
     
-    [self invalidateCalculatedLayout];
+    [self setNeedsLayout];
     if (image) {
       [self setNeedsDisplay];
       

@@ -39,24 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ASCollectionView : UICollectionView
 
 /**
- * The object that acts as the asynchronous delegate of the collection view
- *
- * @discussion The delegate must adopt the ASCollectionDelegate protocol. The collection view maintains a weak reference to the delegate object.
- *
- * The delegate object is responsible for providing size constraints for nodes and indicating whether batch fetching should begin.
- */
-@property (nonatomic, weak) id<ASCollectionDelegate>   asyncDelegate;
-
-/**
- * The object that acts as the asynchronous data source of the collection view
- *
- * @discussion The datasource must adopt the ASCollectionDataSource protocol. The collection view maintains a weak reference to the datasource object.
- *
- * The datasource object is responsible for providing nodes or node creation blocks to the collection view.
- */
-@property (nonatomic, weak) id<ASCollectionDataSource> asyncDataSource;
-
-/**
  * Returns the corresponding ASCollectionNode
  *
  * @return collectionNode The corresponding ASCollectionNode, if one exists.
@@ -139,6 +121,24 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ASCollectionView (Deprecated)
 
 /**
+ * The object that acts as the asynchronous delegate of the collection view
+ *
+ * @discussion The delegate must adopt the ASCollectionDelegate protocol. The collection view maintains a weak reference to the delegate object.
+ *
+ * The delegate object is responsible for providing size constraints for nodes and indicating whether batch fetching should begin.
+ */
+@property (nonatomic, weak) id<ASCollectionDelegate> asyncDelegate ASDISPLAYNODE_DEPRECATED_MSG("Please use ASCollectionNode's .delegate property instead.");
+
+/**
+ * The object that acts as the asynchronous data source of the collection view
+ *
+ * @discussion The datasource must adopt the ASCollectionDataSource protocol. The collection view maintains a weak reference to the datasource object.
+ *
+ * The datasource object is responsible for providing nodes or node creation blocks to the collection view.
+ */
+@property (nonatomic, weak) id<ASCollectionDataSource> asyncDataSource ASDISPLAYNODE_DEPRECATED_MSG("Please use ASCollectionNode's .dataSource property instead.");
+
+/**
  * Initializes an ASCollectionView
  *
  * @discussion Initializes and returns a newly allocated collection view object with the specified layout.
@@ -204,6 +204,16 @@ NS_ASSUME_NONNULL_BEGIN
  * @see ASLayoutRangeType
  */
 - (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
+
+- (nullable __kindof UICollectionViewCell *)cellForItemAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
+
+- (void)scrollToItemAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UICollectionViewScrollPosition)scrollPosition animated:(BOOL)animated ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
+
+- (void)selectItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated scrollPosition:(UICollectionViewScrollPosition)scrollPosition ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode method instead.");
+
+@property (nonatomic, readonly) NSArray<NSIndexPath *> *indexPathsForVisibleItems ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead.");
+
+@property (nonatomic, readonly, nullable) NSArray<NSIndexPath *> *indexPathsForSelectedItems ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode property instead.");
 
 /**
  *  Perform a batch of updates asynchronously, optionally disabling all animations in the batch. This method must be called from the main thread.

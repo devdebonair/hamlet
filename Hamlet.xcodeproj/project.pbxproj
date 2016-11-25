@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		55CC3F678EE7C4E3B2278B2E /* Pods_Hamlet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 652DF315F77A61E37614AEB8 /* Pods_Hamlet.framework */; };
 		56173B7A1DBB2C0D009A0563 /* CellNodeAvatarListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B791DBB2C0D009A0563 /* CellNodeAvatarListItem.swift */; };
 		56173B7C1DBB2F42009A0563 /* SubredditListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B7B1DBB2F42009A0563 /* SubredditListViewController.swift */; };
 		56173B7E1DBB3237009A0563 /* SubredditListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56173B7D1DBB3237009A0563 /* SubredditListViewModel.swift */; };
@@ -58,10 +57,10 @@
 		56CB7E6C1DA0360A008AA2CB /* Math.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56CB7E6B1DA0360A008AA2CB /* Math.swift */; };
 		56D161741D9CE6A80027553A /* Listing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D161731D9CE6A80027553A /* Listing.swift */; };
 		56D161761D9CEAB90027553A /* Media.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56D161751D9CEAB90027553A /* Media.swift */; };
+		BB47DB80D911DB1CBBDA89C7 /* Pods_Hamlet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E58A1A729A539CBEC0CCE511 /* Pods_Hamlet.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		45162716B5E74825E4396D91 /* Pods-Hamlet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hamlet.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet.release.xcconfig"; sourceTree = "<group>"; };
 		56173B791DBB2C0D009A0563 /* CellNodeAvatarListItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellNodeAvatarListItem.swift; sourceTree = "<group>"; };
 		56173B7B1DBB2F42009A0563 /* SubredditListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubredditListViewController.swift; sourceTree = "<group>"; };
 		56173B7D1DBB3237009A0563 /* SubredditListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubredditListViewModel.swift; sourceTree = "<group>"; };
@@ -115,8 +114,9 @@
 		56CB7E6B1DA0360A008AA2CB /* Math.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Math.swift; sourceTree = "<group>"; };
 		56D161731D9CE6A80027553A /* Listing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Listing.swift; sourceTree = "<group>"; };
 		56D161751D9CEAB90027553A /* Media.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Media.swift; sourceTree = "<group>"; };
-		5DA60A4BB2CA1EAAF4F82D8E /* Pods-Hamlet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hamlet.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet.debug.xcconfig"; sourceTree = "<group>"; };
-		652DF315F77A61E37614AEB8 /* Pods_Hamlet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Hamlet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C84747E66FE2DABD80AB6563 /* Pods-Hamlet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hamlet.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet.debug.xcconfig"; sourceTree = "<group>"; };
+		E58A1A729A539CBEC0CCE511 /* Pods_Hamlet.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Hamlet.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF7CFB96C6DE9748D32EA0E4 /* Pods-Hamlet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Hamlet.release.xcconfig"; path = "Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,19 +124,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				55CC3F678EE7C4E3B2278B2E /* Pods_Hamlet.framework in Frameworks */,
+				BB47DB80D911DB1CBBDA89C7 /* Pods_Hamlet.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1D1F962107FC36F84F49BC81 /* Frameworks */ = {
+		14D6627697633F577A44EF0A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				652DF315F77A61E37614AEB8 /* Pods_Hamlet.framework */,
+				E58A1A729A539CBEC0CCE511 /* Pods_Hamlet.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		161EE3DF18FC465D39200F9A /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C84747E66FE2DABD80AB6563 /* Pods-Hamlet.debug.xcconfig */,
+				FF7CFB96C6DE9748D32EA0E4 /* Pods-Hamlet.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 		56173B781DBB2BC8009A0563 /* Nodes */ = {
@@ -171,8 +180,8 @@
 			children = (
 				568119B41D9CC9D100B31FCB /* Hamlet */,
 				568119B31D9CC9D100B31FCB /* Products */,
-				68ED0D5E607537E592EE6E22 /* Pods */,
-				1D1F962107FC36F84F49BC81 /* Frameworks */,
+				161EE3DF18FC465D39200F9A /* Pods */,
+				14D6627697633F577A44EF0A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -280,15 +289,6 @@
 			name = Models;
 			sourceTree = "<group>";
 		};
-		68ED0D5E607537E592EE6E22 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				5DA60A4BB2CA1EAAF4F82D8E /* Pods-Hamlet.debug.xcconfig */,
-				45162716B5E74825E4396D91 /* Pods-Hamlet.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -296,12 +296,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 568119C41D9CC9D100B31FCB /* Build configuration list for PBXNativeTarget "Hamlet" */;
 			buildPhases = (
-				C9117118516D92B1F23D2085 /* Check Pods Manifest.lock */,
+				67A152B4422277FCD621577F /* [CP] Check Pods Manifest.lock */,
 				568119AE1D9CC9D100B31FCB /* Sources */,
 				568119AF1D9CC9D100B31FCB /* Frameworks */,
 				568119B01D9CC9D100B31FCB /* Resources */,
-				A1BFDFA1B8A28058456BB167 /* Embed Pods Frameworks */,
-				8302C17CFF328423E33EC6EA /* Copy Pods Resources */,
+				CF3BF097A947715D9144B3BE /* [CP] Embed Pods Frameworks */,
+				D4C6472D5116973B3A054131 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -324,7 +324,7 @@
 				TargetAttributes = {
 					568119B11D9CC9D100B31FCB = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = 8L4W325NFA;
+						DevelopmentTeam = PG246JM739;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -360,29 +360,29 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		8302C17CFF328423E33EC6EA /* Copy Pods Resources */ = {
+		67A152B4422277FCD621577F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet-resources.sh\"\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		A1BFDFA1B8A28058456BB167 /* Embed Pods Frameworks */ = {
+		CF3BF097A947715D9144B3BE /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -390,19 +390,19 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C9117118516D92B1F23D2085 /* Check Pods Manifest.lock */ = {
+		D4C6472D5116973B3A054131 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Hamlet/Pods-Hamlet-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -574,11 +574,11 @@
 		};
 		568119C51D9CC9D100B31FCB /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5DA60A4BB2CA1EAAF4F82D8E /* Pods-Hamlet.debug.xcconfig */;
+			baseConfigurationReference = C84747E66FE2DABD80AB6563 /* Pods-Hamlet.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 8L4W325NFA;
+				DEVELOPMENT_TEAM = PG246JM739;
 				INFOPLIST_FILE = Hamlet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -591,11 +591,11 @@
 		};
 		568119C61D9CC9D100B31FCB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 45162716B5E74825E4396D91 /* Pods-Hamlet.release.xcconfig */;
+			baseConfigurationReference = FF7CFB96C6DE9748D32EA0E4 /* Pods-Hamlet.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = 8L4W325NFA;
+				DEVELOPMENT_TEAM = PG246JM739;
 				INFOPLIST_FILE = Hamlet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

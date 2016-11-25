@@ -102,10 +102,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   if (self = [super init]) {
     // Load default values from superclass.
     _shadowOffset = [super shadowOffset];
-    CGColorRef superColor = [super shadowColor];
-    if (superColor != NULL) {
-      _shadowColor = CGColorRetain(superColor);
-    }
+    _shadowColor = CGColorRetain([super shadowColor]);
     _shadowOpacity = [super shadowOpacity];
     _shadowRadius = [super shadowRadius];
 
@@ -140,10 +137,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
 
 - (void)dealloc
 {
-  if (_shadowColor != NULL) {
-    CGColorRelease(_shadowColor);
-  }
-  
+  CGColorRelease(_shadowColor);
+
   [self _invalidateRenderer];
 
   if (_longPressGestureRecognizer) {
@@ -322,7 +317,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   BOOL needsUpdate = !UIEdgeInsetsEqualToEdgeInsets(textContainerInset, _textContainerInset);
   if (needsUpdate) {
     _textContainerInset = textContainerInset;
-    [self invalidateCalculatedLayout];
     [self setNeedsLayout];
   }
 }
@@ -359,12 +353,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     // as this would essentially serve to set its constrainedSize to be its calculatedSize (unnecessary).
     ASLayout *layout = self.calculatedLayout;
     if (layout != nil && CGSizeEqualToSize(boundsSize, layout.size)) {
-      if (boundsSize.width != rendererConstrainedSize.width) {
-        // Don't bother changing _constrainedSize, as ASDisplayNode's -measure: method would have a cache miss
-        // and ask us to recalculate layout if it were called with the same calculatedSize that got us to this point!
-        _renderer.constrainedSize = boundsSize;
-      }
-      return NO;
+      return (boundsSize.width != rendererConstrainedSize.width);
     } else {
       return YES;
     }
@@ -387,7 +376,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     
     if (CGSizeEqualToSize(_constrainedSize, layoutSize) == NO) {
       _constrainedSize = layoutSize;
-      _renderer.constrainedSize = layoutSize;
+      [self _invalidateRenderer];
     }
   }
 }
@@ -408,9 +397,9 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   _constrainedSize = constrainedSize;
   
-  // Instead of invalidating the renderer, in case this is a new call with a different constrained size,
-  // just update the size of the NSTextContainer that is owned by the renderer's internal context object.
-  [self _renderer].constrainedSize = _constrainedSize;
+  if (_renderer != nil && CGSizeEqualToSize(constrainedSize, _renderer.constrainedSize) == NO) {
+    [self _invalidateRenderer];
+  }
 
   [self setNeedsDisplay];
   
@@ -484,7 +473,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   }
 
   // Tell the display node superclasses that the cached layout is incorrect now
-  [self invalidateCalculatedLayout];
+  [self setNeedsLayout];
 
   // Force display to create renderer with new size and redisplay with new string
   [self setNeedsDisplay];
@@ -507,7 +496,7 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   
   _exclusionPaths = [exclusionPaths copy];
   [self _invalidateRenderer];
-  [self invalidateCalculatedLayout];
+  [self setNeedsLayout];
   [self setNeedsDisplay];
 }
 
@@ -548,9 +537,6 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
   CGContextTranslateCTM(context, _textContainerInset.left, _textContainerInset.top);
   
   ASTextKitRenderer *renderer = [self _rendererWithBounds:drawParameterBounds];
-  UIEdgeInsets shadowPadding = [self shadowPaddingWithRenderer:renderer];
-  CGPoint boundsOrigin = drawParameterBounds.origin;
-  CGPoint textOrigin = CGPointMake(boundsOrigin.x - shadowPadding.left, boundsOrigin.y - shadowPadding.top);
   
   // Fill background
   if (backgroundColor != nil) {
@@ -558,12 +544,8 @@ static NSArray *DefaultLinkAttributeNames = @[ NSLinkAttributeName ];
     UIRectFillUsingBlendMode(CGContextGetClipBoundingBox(context), kCGBlendModeCopy);
   }
   
-  // Draw shadow
-  [renderer.shadower setShadowInContext:context];
-  
   // Draw text
-  bounds.origin = textOrigin;
-  [renderer drawInContext:context bounds:bounds];
+  [renderer drawInContext:context bounds:drawParameterBounds];
   
   CGContextRestoreGState(context);
 }
@@ -1133,14 +1115,9 @@ static CGRect ASTextNodeAdjustRenderRectForShadowPadding(CGRect rendererRect, UI
 {
   ASDN::MutexLocker l(__instanceLock__);
   
-  if (_shadowColor != shadowColor) {
-    if (shadowColor != NULL) {
-      CGColorRetain(shadowColor);
-    }
-    if (_shadowColor != NULL) {
-      CGColorRelease(_shadowColor);
-    }
-    _shadowColor = shadowColor;
+  if (_shadowColor != shadowColor && CGColorEqualToColor(shadowColor, _shadowColor) == NO) {
+    CGColorRelease(_shadowColor);
+    _shadowColor = CGColorRetain(shadowColor);
     _cachedShadowUIColor = [UIColor colorWithCGColor:shadowColor];
     [self _invalidateRenderer];
     [self setNeedsDisplay];

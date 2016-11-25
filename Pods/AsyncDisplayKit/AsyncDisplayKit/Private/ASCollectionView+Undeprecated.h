@@ -20,6 +20,24 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ASCollectionView (Undeprecated)
 
 /**
+ * The object that acts as the asynchronous delegate of the collection view
+ *
+ * @discussion The delegate must adopt the ASCollectionDelegate protocol. The collection view maintains a weak reference to the delegate object.
+ *
+ * The delegate object is responsible for providing size constraints for nodes and indicating whether batch fetching should begin.
+ */
+@property (nonatomic, weak) id<ASCollectionDelegate> asyncDelegate;
+
+/**
+ * The object that acts as the asynchronous data source of the collection view
+ *
+ * @discussion The datasource must adopt the ASCollectionDataSource protocol. The collection view maintains a weak reference to the datasource object.
+ *
+ * The datasource object is responsible for providing nodes or node creation blocks to the collection view.
+ */
+@property (nonatomic, weak) id<ASCollectionDataSource> asyncDataSource;
+
+/**
  * Initializes an ASCollectionView
  *
  * @discussion Initializes and returns a newly allocated collection view object with the specified layout.
@@ -85,6 +103,23 @@ NS_ASSUME_NONNULL_BEGIN
  * @see ASLayoutRangeType
  */
 - (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType;
+
+- (nullable __kindof UICollectionViewCell *)cellForItemAtIndexPath:(NSIndexPath *)indexPath;
+
+@property (nonatomic, readonly) NSArray<NSIndexPath *> *indexPathsForVisibleItems;
+
+@property (nonatomic, readonly, nullable) NSArray<NSIndexPath *> *indexPathsForSelectedItems;
+
+/**
+ * Scrolls the collection to the given item.
+ *
+ * @param indexPath The index path of the item.
+ * @param scrollPosition Where the row should end up after the scroll.
+ * @param animated Whether the scroll should be animated or not.
+ */
+- (void)scrollToItemAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UICollectionViewScrollPosition)scrollPosition animated:(BOOL)animated;
+
+- (void)selectItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated scrollPosition:(UICollectionViewScrollPosition)scrollPosition;
 
 /**
  *  Perform a batch of updates asynchronously, optionally disabling all animations in the batch. This method must be called from the main thread.

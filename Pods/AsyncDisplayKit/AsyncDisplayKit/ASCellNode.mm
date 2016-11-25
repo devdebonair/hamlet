@@ -36,6 +36,12 @@
   ASDisplayNode *_viewControllerNode;
   UIViewController *_viewController;
   BOOL _suspendInteractionDelegate;
+
+  struct {
+    unsigned int isTableNode:1;
+    unsigned int isCollectionNode:1;
+  } _owningNodeType;
+
 }
 
 @end
@@ -52,6 +58,7 @@ static NSMutableSet *__cellClassesForVisibilityNotifications = nil; // See +init
   // Use UITableViewCell defaults
   _selectionStyle = UITableViewCellSelectionStyleDefault;
   self.clipsToBounds = YES;
+
   return self;
 }
 
@@ -111,15 +118,13 @@ static NSMutableSet *__cellClassesForVisibilityNotifications = nil; // See +init
   _viewControllerNode.frame = self.bounds;
 }
 
-- (void)__setNeedsLayout
+- (void)_locked_displayNodeDidInvalidateSizeNewSize:(CGSize)newSize
 {
-  CGSize oldSize = self.calculatedSize;
-  [super __setNeedsLayout];
-  
-  //Adding this lock because lock used to be held when this method was called. Not sure if it's necessary for
-  //didRelayoutFromOldSize:toNewSize:
-  ASDN::MutexLocker l(__instanceLock__);
-  [self didRelayoutFromOldSize:oldSize toNewSize:self.calculatedSize];
+  CGSize oldSize = self.bounds.size;
+  if (CGSizeEqualToSize(oldSize, newSize) == NO) {
+    self.frame = {self.frame.origin, newSize};
+    [self didRelayoutFromOldSize:oldSize toNewSize:newSize];
+  }
 }
 
 - (void)transitionLayoutWithAnimation:(BOOL)animated
@@ -186,6 +191,19 @@ static NSMutableSet *__cellClassesForVisibilityNotifications = nil; // See +init
   }
 }
 
+- (void)setOwningNode:(ASDisplayNode *)owningNode
+{
+  _owningNode = owningNode;
+
+  memset(&_owningNodeType, 0, sizeof(_owningNodeType));
+
+  if ([owningNode isKindOfClass:[ASTableNode class]]) {
+    _owningNodeType.isTableNode      = 1;
+  } else if ([owningNode isKindOfClass:[ASCollectionNode class]]) {
+    _owningNodeType.isCollectionNode = 1;
+  }
+}
+
 - (void)__setSelectedFromUIKit:(BOOL)selected;
 {
   if (selected != _selected) {
@@ -202,6 +220,30 @@ static NSMutableSet *__cellClassesForVisibilityNotifications = nil; // See +init
     self.highlighted = highlighted;
     _suspendInteractionDelegate = NO;
   }
+}
+
+- (NSIndexPath *)indexPath
+{
+  ASDisplayNodeAssertMainThread();
+
+  if (_owningNodeType.isTableNode) {
+    return [(ASTableNode *)self.owningNode indexPathForNode:self];
+  } else if (_owningNodeType.isCollectionNode) {
+    return [(ASCollectionNode *)self.owningNode indexPathForNode:self];
+  }
+
+  return nil;
+}
+
+- (UIViewController *)viewController
+{
+  ASDisplayNodeAssertMainThread();
+  // Force the view to load so that we will create the
+  // view controller if we haven't already.
+  if (self.isNodeLoaded == NO) {
+    [self view];
+  }
+  return _viewController;
 }
 
 #pragma clang diagnostic push

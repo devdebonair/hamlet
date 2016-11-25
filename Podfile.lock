@@ -1,26 +1,34 @@
 PODS:
   - Alamofire (4.0.1)
-  - AsyncDisplayKit (2.0-beta.1):
-    - AsyncDisplayKit/PINRemoteImage (= 2.0-beta.1)
-  - AsyncDisplayKit/ASDealloc2MainObject (2.0-beta.1)
-  - AsyncDisplayKit/Core (2.0-beta.1):
+  - AsyncDisplayKit (2.0-beta.2):
+    - AsyncDisplayKit/PINRemoteImage (= 2.0-beta.2)
+  - AsyncDisplayKit/ASDealloc2MainObject (2.0-beta.2)
+  - AsyncDisplayKit/Core (2.0-beta.2):
     - AsyncDisplayKit/ASDealloc2MainObject
-  - AsyncDisplayKit/PINRemoteImage (2.0-beta.1):
+  - AsyncDisplayKit/PINRemoteImage (2.0-beta.2):
     - AsyncDisplayKit/Core
-    - PINRemoteImage/iOS (= 3.0.0-beta.5)
-  - ModelMapper (5.0.0-beta.2)
+    - PINRemoteImage/iOS (= 3.0.0-beta.6)
+    - PINRemoteImage/PINCache
+  - ModelMapper (5.0.0)
   - NVActivityIndicatorView (3.0)
-  - PINCache (3.0.1-beta)
-  - PINRemoteImage/Core (3.0.0-beta.5):
-    - PINCache (= 3.0.1-beta)
-  - PINRemoteImage/iOS (3.0.0-beta.5):
+  - PINCache (3.0.1-beta.2):
+    - PINCache/Arc-exception-safe (= 3.0.1-beta.2)
+    - PINCache/Core (= 3.0.1-beta.2)
+  - PINCache/Arc-exception-safe (3.0.1-beta.2):
+    - PINCache/Core
+  - PINCache/Core (3.0.1-beta.2)
+  - PINRemoteImage/Core (3.0.0-beta.6)
+  - PINRemoteImage/iOS (3.0.0-beta.6):
     - PINRemoteImage/Core
-  - SnapKit (3.0.1)
+  - PINRemoteImage/PINCache (3.0.0-beta.6):
+    - PINCache (= 3.0.1-beta.2)
+    - PINRemoteImage/Core
+  - SnapKit (3.0.2)
 
 DEPENDENCIES:
   - Alamofire (~> 4.0.1)
   - AsyncDisplayKit (from `https://github.com/facebook/AsyncDisplayKit`, branch `master`)
-  - ModelMapper (from `https://github.com/lyft/mapper`, branch `swift-3.0`)
+  - ModelMapper (~> 5.0.0)
   - NVActivityIndicatorView (~> 3.0)
   - SnapKit (~> 3.0.0)
 
@@ -28,25 +36,21 @@ EXTERNAL SOURCES:
   AsyncDisplayKit:
     :branch: master
     :git: https://github.com/facebook/AsyncDisplayKit
-  ModelMapper:
-    :branch: swift-3.0
-    :git: https://github.com/lyft/mapper
 
 CHECKOUT OPTIONS:
   AsyncDisplayKit:
-    :commit: 12534ee6fbd09e999f8c6cf5525cd363e329abf8
+    :commit: aefff563bdfa2b482e403a5a99e0efd8ed887362
     :git: https://github.com/facebook/AsyncDisplayKit
-  ModelMapper:
-    :commit: eead7f57eacbcda5257925e3ceb99cd73a611fac
-    :git: https://github.com/lyft/mapper
 
 SPEC CHECKSUMS:
   Alamofire: 7682d43245de14874acd142ec137b144aa1dd335
-  AsyncDisplayKit: 4ef1ca0fac766193f4ccdea5b01e42b82b675683
-  ModelMapper: b306e689e231331896d447a36a54643c5da0bacd
+  AsyncDisplayKit: 1e82c2896ba0400da61607f8bacf026a081a0646
+  ModelMapper: 89ced1f51ec6360e93f6889d08c818d4cad526a3
   NVActivityIndicatorView: 81953b5e65093ba79edf4fe7268e002039ca5268
-  PINCache: 6911fe422a633e18b3d3ddf2bd4f0e55e36e2892
-  PINRemoteImage: 20ca800843e5fb326bc33fa6eb528c3b861d8bd6
-  SnapKit: f818b8326d45b4e1c777d0ab27b5c0a3624bfdeb
+  PINCache: 6d273a6e0754bd26e3f12a38a90dde73cc6a42b2
+  PINRemoteImage: 60156f185c9360ca4e93832cd490d6f6c7afbd9a
+  SnapKit: 2e456761aa92d4d4067a7a5594c18769d451a8ad
 
-COCOAPODS: 0.39.0
+PODFILE CHECKSUM: 8ad95c1b779f23b83881cd438a6e5580c9789202
+
+COCOAPODS: 1.1.1

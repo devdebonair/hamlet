@@ -136,6 +136,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)setTuningParameters:(ASRangeTuningParameters)tuningParameters forRangeMode:(ASLayoutRangeMode)rangeMode rangeType:(ASLayoutRangeType)rangeType;
 
+/**
+ * Scrolls the collection to the given item.
+ *
+ * @param indexPath The index path of the item.
+ * @param scrollPosition Where the item should end up after the scroll.
+ * @param animated Whether the scroll should be animated or not.
+ *
+ * This method must be called on the main thread.
+ */
+- (void)scrollToItemAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UICollectionViewScrollPosition)scrollPosition animated:(BOOL)animated;
+
 #pragma mark - Editing
 
 /**
@@ -289,6 +300,11 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Selection
 
 /**
+ * The index paths of the selected items, or @c nil if no items are selected.
+ */
+@property (nonatomic, readonly, nullable) NSArray<NSIndexPath *> *indexPathsForSelectedItems;
+
+/**
  * Selects the item at the specified index path and optionally scrolls it into view.
  * If the `allowsSelection` property is NO, calling this method has no effect. If there is an existing selection with a different index path and the `allowsMultipleSelection` property is NO, calling this method replaces the previous selection.
  * This method does not cause any selection-related delegate methods to be called.
@@ -337,7 +353,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return an array containing the nodes being displayed on screen. This must be called on the main thread.
  */
-@property(readonly, copy) NSArray<__kindof ASCellNode *> *visibleNodes;
+@property (nonatomic, readonly) NSArray<__kindof ASCellNode *> *visibleNodes;
 
 /**
  * Retrieves the node for the item at the given index path.
@@ -346,7 +362,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return The node for the given item, or @c nil if no item exists at the specified path.
  */
-- (nullable ASCellNode *)nodeForItemAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
+- (nullable __kindof ASCellNode *)nodeForItemAtIndexPath:(NSIndexPath *)indexPath AS_WARN_UNUSED_RESULT;
 
 /**
  * Retrieve the index path for the item with the given node.
@@ -362,7 +378,25 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return an array containing the index paths of all visible items. This must be called on the main thread.
  */
-- (NSArray<__kindof NSIndexPath *> *)indexPathsForVisibleItems AS_WARN_UNUSED_RESULT;
+@property (nonatomic, readonly) NSArray<NSIndexPath *> *indexPathsForVisibleItems;
+
+/**
+ * Retrieve the index path of the item at the given point.
+ *
+ * @param point The point of the requested item.
+ *
+ * @return The indexPath for the item at the given point. This must be called on the main thread.
+ */
+- (nullable NSIndexPath *)indexPathForItemAtPoint:(CGPoint)point AS_WARN_UNUSED_RESULT;
+
+/**
+ * Retrieve the cell at the given index path.
+ *
+ * @param indexPath The index path of the requested item.
+ *
+ * @return The cell for the given index path. This must be called on the main thread.
+ */
+- (nullable UICollectionViewCell *)cellForItemAtIndexPath:(NSIndexPath *)indexPath;
 
 /**
  * Retrieves the context object for the given section, as provided by the data source in
@@ -390,7 +424,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @deprecated This method is deprecated in 2.0. Use @c reloadDataWithCompletion: and
  *   then @c waitUntilAllUpdatesAreCommitted instead.
  */
-- (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use -reloadDataWithCompletion: followed by -waitUntilAllUpdatesAreCommitted instead.");
+- (void)reloadDataImmediately ASDISPLAYNODE_DEPRECATED_MSG("Use -reloadData / -reloadDataWithCompletion: followed by -waitUntilAllUpdatesAreCommitted instead.");
 
 @end
 
@@ -593,7 +627,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @return A constrained size range for layout the node at this index path.
  */
-- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's constrainedSizeForItemAtIndexPath: instead.");
+- (ASSizeRange)collectionView:(ASCollectionView *)collectionView constrainedSizeForNodeAtIndexPath:(NSIndexPath *)indexPath ASDISPLAYNODE_DEPRECATED_MSG("Use ASCollectionNode's constrainedSizeForItemAtIndexPath: instead. PLEASE NOTE the very subtle method name change.");
 
 /**
  * Informs the delegate that the collection view will add the given node

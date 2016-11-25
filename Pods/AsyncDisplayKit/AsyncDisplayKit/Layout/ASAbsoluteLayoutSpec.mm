@@ -100,29 +100,6 @@
 
 @end
 
-#pragma mark - ASEnvironment
-
-@implementation ASAbsoluteLayoutSpec (ASEnvironment)
-
-- (BOOL)supportsUpwardPropagation
-{
-  return NO;
-}
-
-@end
-
-#pragma mark - Debugging
-
-@implementation ASAbsoluteLayoutSpec (Debugging)
-
-- (NSString *)debugBoxString
-{
-  return [ASLayoutSpec asciiArtStringForChildren:self.children parentName:[self asciiArtName]];
-}
-
-@end
-
-
 #pragma mark - ASStaticLayoutSpec
 
 @implementation ASStaticLayoutSpec : ASAbsoluteLayoutSpec

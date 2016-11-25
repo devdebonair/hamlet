@@ -13,6 +13,7 @@
 #import "ASCollectionInternal.h"
 #import "ASCollectionViewLayoutFacilitatorProtocol.h"
 #import "ASCollectionNode.h"
+#import "ASDisplayNodeInternal.h"
 #import "ASDisplayNode+Subclasses.h"
 #import "ASEnvironmentInternal.h"
 #import "ASInternalHelpers.h"
@@ -120,20 +121,16 @@
 
 - (instancetype)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout layoutFacilitator:(id<ASCollectionViewLayoutFacilitatorProtocol>)layoutFacilitator
 {
+  __weak __typeof__(self) weakSelf = self;
   ASDisplayNodeViewBlock collectionViewBlock = ^UIView *{
-    return [[ASCollectionView alloc] _initWithFrame:frame collectionViewLayout:layout layoutFacilitator:layoutFacilitator];
+    __typeof__(self) strongSelf = weakSelf;
+    return [[ASCollectionView alloc] _initWithFrame:frame collectionViewLayout:layout layoutFacilitator:layoutFacilitator eventLog:ASDisplayNodeGetEventLog(strongSelf)];
   };
 
   if (self = [super initWithViewBlock:collectionViewBlock]) {
     return self;
   }
   return nil;
-}
-
-- (void)dealloc
-{
-  self.delegate = nil;
-  self.dataSource = nil;
 }
 
 #pragma mark ASDisplayNode
@@ -225,7 +222,15 @@
     _pendingState.delegate = delegate;
   } else {
     ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded if pendingState doesn't exist");
-    self.view.asyncDelegate = delegate;
+
+    // Manually trampoline to the main thread. The view requires this be called on main
+    // and asserting here isn't an option – it is a common pattern for users to clear
+    // the delegate/dataSource in dealloc, which may be running on a background thread.
+    // It is important that we avoid retaining self in this block, so that this method is dealloc-safe.
+    ASCollectionView *view = (ASCollectionView *)_view;
+    ASPerformBlockOnMainThread(^{
+      view.asyncDelegate = delegate;
+    });
   }
 }
 
@@ -244,7 +249,14 @@
     _pendingState.dataSource = dataSource;
   } else {
     ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded if pendingState doesn't exist");
-    self.view.asyncDataSource = dataSource;
+    // Manually trampoline to the main thread. The view requires this be called on main
+    // and asserting here isn't an option – it is a common pattern for users to clear
+    // the delegate/dataSource in dealloc, which may be running on a background thread.
+    // It is important that we avoid retaining self in this block, so that this method is dealloc-safe.
+    ASCollectionView *view = (ASCollectionView *)_view;
+    ASPerformBlockOnMainThread(^{
+      view.asyncDataSource = dataSource;
+    });
   }
 }
 
@@ -319,31 +331,73 @@
 
 #pragma mark - Selection
 
+- (NSArray<NSIndexPath *> *)indexPathsForSelectedItems
+{
+  ASDisplayNodeAssertMainThread();
+  ASCollectionView *view = self.view;
+  return [view convertIndexPathsToCollectionNode:view.indexPathsForSelectedItems];
+}
+
 - (void)selectItemAtIndexPath:(nullable NSIndexPath *)indexPath animated:(BOOL)animated scrollPosition:(UICollectionViewScrollPosition)scrollPosition
 {
   ASDisplayNodeAssertMainThread();
-  // TODO: Solve this in a way to be able to remove this restriction (https://github.com/facebook/AsyncDisplayKit/pull/2453#discussion_r84515457)
-  ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded before calling selectItemAtIndexPath");
-  [self.view selectItemAtIndexPath:indexPath animated:animated scrollPosition:scrollPosition];
+  ASCollectionView *collectionView = self.view;
+
+  indexPath = [collectionView convertIndexPathFromCollectionNode:indexPath waitingIfNeeded:YES];
+
+  if (indexPath != nil) {
+    [collectionView selectItemAtIndexPath:indexPath animated:animated scrollPosition:scrollPosition];
+  } else {
+    NSLog(@"Failed to select item at index path %@ because the item never reached the view.", indexPath);
+  }
 }
 
 - (void)deselectItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated
 {
   ASDisplayNodeAssertMainThread();
-  // TODO: Solve this in a way to be able to remove this restriction (https://github.com/facebook/AsyncDisplayKit/pull/2453#discussion_r84515457)
-  ASDisplayNodeAssert([self isNodeLoaded], @"ASCollectionNode should be loaded before calling deselectItemAtIndexPath");
-  [self.view deselectItemAtIndexPath:indexPath animated:animated];
+  ASCollectionView *collectionView = self.view;
+
+  indexPath = [collectionView convertIndexPathFromCollectionNode:indexPath waitingIfNeeded:YES];
+
+  if (indexPath != nil) {
+    [collectionView deselectItemAtIndexPath:indexPath animated:animated];
+  } else {
+    NSLog(@"Failed to deselect item at index path %@ because the item never reached the view.", indexPath);
+  }
+}
+
+- (void)scrollToItemAtIndexPath:(NSIndexPath *)indexPath atScrollPosition:(UICollectionViewScrollPosition)scrollPosition animated:(BOOL)animated
+{
+  ASDisplayNodeAssertMainThread();
+  ASCollectionView *collectionView = self.view;
+
+  indexPath = [collectionView convertIndexPathFromCollectionNode:indexPath waitingIfNeeded:YES];
+
+  if (indexPath != nil) {
+    [collectionView scrollToItemAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated];
+  } else {
+    NSLog(@"Failed to scroll to item at index path %@ because the item never reached the view.", indexPath);
+  }
 }
 
 #pragma mark - Querying Data
 
+- (void)reloadDataInitiallyIfNeeded
+{
+  if (!self.dataController.initialReloadDataHasBeenCalled) {
+    [self reloadData];
+  }
+}
+
 - (NSInteger)numberOfItemsInSection:(NSInteger)section
 {
+  [self reloadDataInitiallyIfNeeded];
   return [self.dataController numberOfRowsInSection:section];
 }
 
 - (NSInteger)numberOfSections
 {
+  [self reloadDataInitiallyIfNeeded];
   return [self.dataController numberOfSections];
 }
 
@@ -353,13 +407,20 @@
   return self.isNodeLoaded ? [self.view visibleNodes] : @[];
 }
 
+- (ASCellNode *)nodeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [self reloadDataInitiallyIfNeeded];
+  return [self.dataController nodeAtIndexPath:indexPath];
+}
+
 - (NSIndexPath *)indexPathForNode:(ASCellNode *)cellNode
 {
   return [self.dataController indexPathForNode:cellNode];
 }
 
-- (NSArray<__kindof NSIndexPath *> *)indexPathsForVisibleItems
+- (NSArray<NSIndexPath *> *)indexPathsForVisibleItems
 {
+  ASDisplayNodeAssertMainThread();
   NSMutableArray *indexPathsArray = [NSMutableArray new];
   for (ASCellNode *cell in [self visibleNodes]) {
     NSIndexPath *indexPath = [self indexPathForNode:cell];
@@ -370,10 +431,28 @@
   return indexPathsArray;
 }
 
-
-- (ASCellNode *)nodeForItemAtIndexPath:(NSIndexPath *)indexPath
+- (nullable NSIndexPath *)indexPathForItemAtPoint:(CGPoint)point
 {
-  return [self.dataController nodeAtIndexPath:indexPath];
+  ASDisplayNodeAssertMainThread();
+  ASCollectionView *collectionView = self.view;
+
+  NSIndexPath *indexPath = [collectionView indexPathForItemAtPoint:point];
+  if (indexPath != nil) {
+    return [collectionView convertIndexPathToCollectionNode:indexPath];
+  }
+  return indexPath;
+}
+
+- (nullable UICollectionViewCell *)cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  ASDisplayNodeAssertMainThread();
+  ASCollectionView *collectionView = self.view;
+
+  indexPath = [collectionView convertIndexPathFromCollectionNode:indexPath waitingIfNeeded:YES];
+  if (indexPath == nil) {
+    return nil;
+  }
+  return [collectionView cellForItemAtIndexPath:indexPath];
 }
 
 - (id<ASSectionContext>)contextForSection:(NSInteger)section
@@ -493,5 +572,15 @@
 #pragma mark ASEnvironment
 
 ASEnvironmentCollectionTableSetEnvironmentState(_environmentStateLock)
+
+#pragma mark - Debugging (Private)
+
+- (NSMutableArray<NSDictionary *> *)propertiesForDebugDescription
+{
+  NSMutableArray<NSDictionary *> *result = [super propertiesForDebugDescription];
+  [result addObject:@{ @"dataSource" : ASObjectDescriptionMakeTiny(self.dataSource) }];
+  [result addObject:@{ @"delegate" : ASObjectDescriptionMakeTiny(self.delegate) }];
+  return result;
+}
 
 @end

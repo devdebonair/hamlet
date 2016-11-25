@@ -12,6 +12,11 @@
 #import "ASLayoutSpecPrivate.h"
 #import "ASLayoutSpec+Subclasses.h"
 #import "ASLayoutElementStylePrivate.h"
+#import "ASLayoutSpec+Debug.h"
+
+#import <objc/runtime.h>
+#import <map>
+#import <vector>
 
 @implementation ASLayoutSpec
 
@@ -60,7 +65,34 @@
 
 - (id<ASLayoutElement>)finalLayoutElement
 {
-  return self;
+  if (ASLayoutElementGetCurrentContext().needsVisualizeNode && !self.neverShouldVisualize) {
+    return [[ASLayoutSpecVisualizerNode alloc] initWithLayoutSpec:self];
+  } else {
+    return self;
+  }
+}
+
+- (void)recursivelySetShouldVisualize:(BOOL)visualize
+{
+  NSMutableArray *mutableChildren = [self.children mutableCopy];
+  
+  for (id<ASLayoutElement>layoutElement in self.children) {
+    if (layoutElement.layoutElementType == ASLayoutElementTypeLayoutSpec) {
+      ASLayoutSpec *layoutSpec = (ASLayoutSpec *)layoutElement;
+      
+      [mutableChildren replaceObjectAtIndex:[mutableChildren indexOfObjectIdenticalTo:layoutSpec]
+                                 withObject:[[ASLayoutSpecVisualizerNode alloc] initWithLayoutSpec:layoutSpec]];
+      
+      [layoutSpec recursivelySetShouldVisualize:visualize];
+      layoutSpec.shouldVisualize = visualize;
+    }
+  }
+  
+  if ([mutableChildren count] == 1) {         // HACK for wrapper layoutSpecs (e.g. insetLayoutSpec)
+    self.child = mutableChildren[0];
+  } else if ([mutableChildren count] > 1) {
+    self.children = mutableChildren;
+  }
 }
 
 #pragma mark - Style
@@ -105,31 +137,20 @@
   return [ASLayout layoutWithLayoutElement:self size:constrainedSize.min];
 }
 
-
-#pragma mark - Parent
-
-- (void)setParent:(id<ASLayoutElement>)parent
-{
-  // FIXME: Locking should be evaluated here.  _parent is not widely used yet, though.
-  _parent = parent;
-  
-  if ([parent supportsUpwardPropagation]) {
-    ASEnvironmentStatePropagateUp(parent, self.environmentState.layoutOptionsState);
-  }
-}
-
 #pragma mark - Child
 
 - (void)setChild:(id<ASLayoutElement>)child
 {
   ASDisplayNodeAssert(self.isMutable, @"Cannot set properties when layout spec is not mutable");
   ASDisplayNodeAssert(_childrenArray.count < 2, @"This layout spec does not support more than one child. Use the setChildren: or the setChild:AtIndex: API");
-  
+ 
   if (child) {
+    if (child.layoutElementType == ASLayoutElementTypeLayoutSpec) {
+      [(ASLayoutSpec *)child setShouldVisualize:self.shouldVisualize];
+    }
     id<ASLayoutElement> finalLayoutElement = [self layoutElementToAddFromLayoutElement:child];
     if (finalLayoutElement) {
       _childrenArray[0] = finalLayoutElement;
-      [self propagateUpLayoutElement:finalLayoutElement];
     }
   } else {
     if (_childrenArray.count) {
@@ -150,13 +171,17 @@
 - (void)setChildren:(NSArray<id<ASLayoutElement>> *)children
 {
   ASDisplayNodeAssert(self.isMutable, @"Cannot set properties when layout spec is not mutable");
-  
+
   [_childrenArray removeAllObjects];
   
   NSUInteger i = 0;
   for (id<ASLayoutElement> child in children) {
     ASDisplayNodeAssert([child conformsToProtocol:NSProtocolFromString(@"ASLayoutElement")], @"Child %@ of spec %@ is not an ASLayoutElement!", child, self);
-    _childrenArray[i] = [self layoutElementToAddFromLayoutElement:child];
+    id <ASLayoutElement> finalLayoutElement = [self layoutElementToAddFromLayoutElement:child];
+    if (finalLayoutElement.layoutElementType == ASLayoutElementTypeLayoutSpec) {
+      [(ASLayoutSpec *)finalLayoutElement setShouldVisualize:self.shouldVisualize];
+    }
+    _childrenArray[i] = finalLayoutElement;
     i += 1;
   }
 }
@@ -185,26 +210,9 @@
   _environmentState = environmentState;
 }
 
-// Subclasses can override this method to return NO, because upward propagation is not enabled if a layout
-// specification has more than one child. Currently ASStackLayoutSpec and ASAbsoluteLayoutSpec are currently
-// the specifications that are known to have more than one.
-- (BOOL)supportsUpwardPropagation
-{
-  return ASEnvironmentStatePropagationEnabled();
-}
-
 - (BOOL)supportsTraitsCollectionPropagation
 {
   return ASEnvironmentStateTraitCollectionPropagationEnabled();
-}
-
-- (void)propagateUpLayoutElement:(id<ASLayoutElement>)layoutElement
-{
-  if ([layoutElement isKindOfClass:[ASLayoutSpec class]]) {
-    [(ASLayoutSpec *)layoutElement setParent:self]; // This will trigger upward propogation if needed.
-  } else if ([self supportsUpwardPropagation]) {
-    ASEnvironmentStatePropagateUp(self, layoutElement.environmentState.layoutOptionsState); // Probably an ASDisplayNode
-  }
 }
 
 - (ASEnvironmentTraitCollection)environmentTraitCollection
@@ -293,8 +301,6 @@ ASEnvironmentLayoutExtensibilityForwarding
   return [self layoutThatFits:constrainedSize];
 }
 
-ASLayoutElementStyleForwarding
-
 @end
 
 #pragma mark - ASWrapperLayoutSpec
@@ -378,7 +384,7 @@ ASLayoutElementStyleForwarding
 
 - (NSString *)asciiArtString
 {
-  NSArray *children = self.child ? @[self.child] : self.children;
+  NSArray *children = self.children.count < 2 && self.child ? @[self.child] : self.children;
   return [ASLayoutSpec asciiArtStringForChildren:children parentName:[self asciiArtName]];
 }
 
@@ -390,5 +396,13 @@ ASLayoutElementStyleForwarding
   }
   return string;
 }
+
+@end
+
+#pragma mark - ASLayoutSpec (Deprecated)
+
+@implementation ASLayoutSpec (Deprecated)
+
+ASLayoutElementStyleForwarding
 
 @end

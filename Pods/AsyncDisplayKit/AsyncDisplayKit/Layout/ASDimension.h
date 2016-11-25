@@ -192,6 +192,8 @@ typedef struct {
   ASDimension height;
 } ASLayoutSize;
 
+extern ASLayoutSize const ASLayoutSizeAuto;
+
 /*
  * Creates an ASLayoutSize with provided min and max dimensions.
  */
@@ -206,7 +208,12 @@ ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT ASLayoutSize ASLayoutSizeMake(ASDimen
 /*
  * Returns a string representation of a relative size.
  */
-ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSStringFromASLayoutSize(ASLayoutSize size);
+ASDISPLAYNODE_INLINE AS_WARN_UNUSED_RESULT NSString *NSStringFromASLayoutSize(ASLayoutSize size)
+{
+  return [NSString stringWithFormat:@"{%@, %@}",
+          NSStringFromASDimension(size.width),
+          NSStringFromASDimension(size.height)];
+}
 
 #pragma mark - ASSizeRange
 
@@ -358,9 +365,9 @@ typedef NS_ENUM(NSInteger, ASRelativeDimensionType) {
 #define ASRelativeDimensionMakeWithFraction ASDimensionMakeWithFraction
 
 /**
- * Function is deprecated. Use ASSizeRangeMakeWithExactCGSize instead.
+ * Function is deprecated. Use ASSizeRangeMake instead.
  */
-extern AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMakeExactSize(CGSize size) ASDISPLAYNODE_DEPRECATED_MSG("Use ASSizeRangeMakeWithExactCGSize instead.");
+extern AS_WARN_UNUSED_RESULT ASSizeRange ASSizeRangeMakeExactSize(CGSize size) ASDISPLAYNODE_DEPRECATED_MSG("Use ASSizeRangeMake instead.");
 
 /**
  Expresses an inclusive range of relative sizes. Used to provide additional constraint to layout.
