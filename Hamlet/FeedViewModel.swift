@@ -111,7 +111,7 @@ extension FeedViewModel {
             let string = NSAttributedString(
                 string: description.htmlDecodedString,
                 attributes: [
-                    NSFontAttributeName: UIFont.systemFont(ofSize: 12, weight: UIFontWeightRegular),
+                    NSFontAttributeName: UIFont.systemFont(ofSize: 14, weight: UIFontWeightRegular),
                     NSParagraphStyleAttributeName: paragraphStyle
                 ])
             
