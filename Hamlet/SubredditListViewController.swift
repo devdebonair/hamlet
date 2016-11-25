@@ -83,7 +83,7 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     
     func scrollToTop(animated: Bool = false) {
         guard !dataSource.isEmpty else { return }
-        node.view.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: animated)
+        node.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: animated)
     }
 }
 

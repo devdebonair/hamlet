@@ -44,7 +44,7 @@ class FeedViewController: ASViewController<ASTableNode> {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        let cells = node.view.visibleNodes()
+        let cells = node.visibleNodes
         for cell in cells {
             if let cell = cell as? CellNodeVideo {
                 cell.videoPlayer.play()
@@ -54,7 +54,7 @@ class FeedViewController: ASViewController<ASTableNode> {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        let cells = node.view.visibleNodes()
+        let cells = node.visibleNodes
         for cell in cells {
             if let cell = cell as? CellNodeVideo {
                 cell.videoPlayer.pause()

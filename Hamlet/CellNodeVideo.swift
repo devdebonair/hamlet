@@ -52,7 +52,7 @@ class CellNodeVideo: ASCellNode, ASVideoNodeDelegate {
         
         videoPlayer.style.preferredSize = CGSize(width: constrainedSize.max.width, height: height)
         spinnerNode.style.preferredSize = CGSize(width: 24, height: 24)
-        spinnerNode.style.layoutPosition = CGPoint(x: videoPlayer.preferredFrameSize.width - 40, y: 20)
+        spinnerNode.style.layoutPosition = CGPoint(x: videoPlayer.style.preferredSize.width - 40, y: 20)
 
         let videoLayout = ASAbsoluteLayoutSpec(children: [videoPlayer])
         let spinnerLayout = ASAbsoluteLayoutSpec(children: [spinnerNode])

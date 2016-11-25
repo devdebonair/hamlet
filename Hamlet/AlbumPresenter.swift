@@ -41,7 +41,7 @@ class AlbumPresenter: AlbumViewControllerDelegate {
                     return AlbumViewModel(media: media, description: image.description)
                 })
                 self.albumModels = albumMapping
-                tableNode.view.reloadData()
+                tableNode.reloadData()
             })
         }
     }

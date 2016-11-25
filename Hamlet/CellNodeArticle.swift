@@ -20,7 +20,7 @@ class CellNodeArticle: ASCellNode {
         self.spacing = spacing
         self.textNodes = textArray.map({
             let textNode = ASTextNode()
-            textNode.attributedString = $0
+            textNode.attributedText = $0
             textNode.maximumNumberOfLines = 0
             return textNode
         })
