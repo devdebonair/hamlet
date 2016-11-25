@@ -45,8 +45,6 @@ class FeedDetailViewController: ASViewController<ASTableNode>, ASTableDelegate, 
         delegate.didLoad(tableNode: node)
     }
     
-    override func viewWillDisappear(_ animated: Bool) { navigationController?.interactivePopGestureRecognizer?.delegate = nil }
-    
     func numberOfSections(in tableNode: ASTableNode) -> Int {
         return delegate.numberOfRootComments() + 1
     }

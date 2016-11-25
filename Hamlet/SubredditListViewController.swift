@@ -38,6 +38,7 @@ class SubredditListViewController: ASViewController<ASTableNode>, ASTableDelegat
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         navigationItem.titleView = searchController.searchBar
     }
     

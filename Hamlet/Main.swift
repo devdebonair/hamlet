@@ -127,5 +127,6 @@ extension Main: FeedPresenterDelegate {
     
     func didAppear() {
         slideMenuController.enableSwipe()
+        feedController.navigationController?.isNavigationBarHidden = false
     }
 }

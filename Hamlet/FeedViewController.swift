@@ -44,6 +44,7 @@ class FeedViewController: ASViewController<ASTableNode> {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         let cells = node.visibleNodes
         for cell in cells {
             if let cell = cell as? CellNodeVideo {
@@ -54,6 +55,7 @@ class FeedViewController: ASViewController<ASTableNode> {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         let cells = node.visibleNodes
         for cell in cells {
             if let cell = cell as? CellNodeVideo {

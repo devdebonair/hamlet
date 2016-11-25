@@ -38,10 +38,6 @@ class AlbumViewController: ASViewController<ASTableNode>, ASTableDelegate, ASTab
         node.dataSource = self
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        navigationController?.interactivePopGestureRecognizer?.delegate = nil
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.interactivePopGestureRecognizer?.delegate = self
