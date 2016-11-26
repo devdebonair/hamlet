@@ -284,6 +284,9 @@ class FeedCache {
     
     func add(model: FeedModelContainer, at: String) {
         modelCache[at] = model
+        if let media = model.feedItem.media {
+            add(media: media, at: model.listing.name)
+        }
     }
 }
 

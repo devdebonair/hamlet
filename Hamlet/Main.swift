@@ -56,7 +56,7 @@ class Main {
         let barItems = [
             UIBarButtonItem(title: "Sort", style: .plain, target: self, action: #selector(openSwag)),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            UIBarButtonItem(title: "Media", style: .plain, target: self, action: #selector(openSwag)),
+            UIBarButtonItem(title: "Media", style: .plain, target: self, action: #selector(openSwagger)),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(title: "Post", style: .plain, target: self, action: #selector(openSwag)),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
@@ -70,6 +70,7 @@ class Main {
         }
         
         feedController.setToolbarItems(barItems, animated: true)
+        feedNavigation.toolbar.isTranslucent = false
     }
 }
 
@@ -162,6 +163,25 @@ extension Main: SubredditListPresenterDelegate {
         actionController.addAction(cancelAction)
     
         feedController.present(actionController, animated: true, completion: nil)
+    }
+    
+    @objc func openSwagger() {
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { _ in
+            let controller = MediaViewController()
+            
+            let barItemClose = UIBarButtonItem(title: "Close", style: .plain, target: controller, action: #selector(controller.close))
+            controller.navigationItem.leftBarButtonItem = barItemClose
+            controller.navigationItem.title = "Media"
+            
+            let navigationController = ASNavigationController(rootViewController: controller)
+            navigationController.navigationBar.isTranslucent = false
+            navigationController.navigationBar.tintColor = .black
+            
+            let presenter = MediaPresenter(feedPresenter: self.feedPresenter)
+            controller.delegate = presenter
+            
+            self.feedNavigation.present(navigationController, animated: true, completion: nil)
+        })
     }
 }
 
