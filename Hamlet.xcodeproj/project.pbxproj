@@ -234,6 +234,7 @@
 		56A125191DA4B7C3001715BA /* Presenters */ = {
 			isa = PBXGroup;
 			children = (
+				566D65731DE955930093896C /* MediaPresenter.swift */,
 				56AA2BB71DC31B5900E99C3A /* ListingDiscussionPresenter.swift */,
 				569E95AF1DBCECFD001AABD5 /* AlbumPresenter.swift */,
 				56173B7F1DBB454A009A0563 /* SubredditListPresenter.swift */,
@@ -251,7 +252,6 @@
 				56173B7D1DBB3237009A0563 /* SubredditListViewModel.swift */,
 				564319861DBC9CAB0048D239 /* AlbumViewModel.swift */,
 				562FB8BC1DC9CCB900740848 /* FeedDetailCommentViewModel.swift */,
-				566D65731DE955930093896C /* MediaPresenter.swift */,
 			);
 			name = ViewModel;
 			sourceTree = "<group>";
