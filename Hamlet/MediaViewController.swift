@@ -34,6 +34,7 @@ class MediaViewController: ASViewController<ASCollectionNode>, UICollectionViewD
     }
     
     override func viewDidLoad() {
+        node.view.contentInset = UIEdgeInsets(top: 2.0, left: 0.0, bottom: 0.0, right: 0.0)
         delegate.dataFetch(tableNode: node)
     }
     
