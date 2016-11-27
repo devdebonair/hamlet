@@ -54,15 +54,15 @@ class Main {
         feedNavigation.navigationBar.isTranslucent = false
         
         let barItems = [
-            UIBarButtonItem(title: "Sort", style: .plain, target: self, action: #selector(openSwag)),
+            UIBarButtonItem(image: #imageLiteral(resourceName: "sort"), style: .plain, target: self, action: #selector(openSwag)),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            UIBarButtonItem(title: "Media", style: .plain, target: self, action: #selector(openSwagger)),
+            UIBarButtonItem(image: #imageLiteral(resourceName: "media"), style: .plain, target: self, action: #selector(openSwagger)),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            UIBarButtonItem(title: "Post", style: .plain, target: self, action: #selector(openSwag)),
+            UIBarButtonItem(image: #imageLiteral(resourceName: "compose"), style: .plain, target: self, action: #selector(openSwag)),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            UIBarButtonItem(title: "Settings", style: .plain, target: self, action: #selector(openSwag)),
+            UIBarButtonItem(image: #imageLiteral(resourceName: "settings"), style: .plain, target: self, action: #selector(openSwag)),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            UIBarButtonItem(title: "About", style: .plain, target: self, action: #selector(openSwag))
+            UIBarButtonItem(image: #imageLiteral(resourceName: "info"), style: .plain, target: self, action: #selector(openSwag))
         ]
         
         for item in barItems {
