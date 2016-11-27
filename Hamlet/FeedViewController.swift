@@ -17,7 +17,7 @@ protocol FeedControllerDelegate: class {
     func didTapViewDiscussion(tableNode: ASTableNode, atKey key: String)
 
     func dataClear()
-    func dataFetch(tableNode: ASTableNode)
+    func dataFetch(completion: @escaping ()->Void)
     func dataFetchNext(completion: @escaping ()->Void)
     func dataFetchNextSearch(text: String, completion: @escaping ()->Void)
     func dataModel(key: String) -> FeedViewModel
@@ -93,7 +93,10 @@ class FeedViewController: ASViewController<ASTableNode> {
     }
     
     func reload() {
-        delegate.dataFetch(tableNode: node)
+        delegate.dataFetch {
+            self.node.insertSections(IndexSet(integersIn: 0..<self.delegate.numberOfModels()), with: .middle)
+        }
+        
     }
     
     func clear() {

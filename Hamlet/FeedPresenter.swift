@@ -139,7 +139,9 @@ extension FeedPresenter: FeedControllerDelegate {
     }
 
     func didLoad(tableNode: ASTableNode) {
-        dataFetch(tableNode: tableNode)
+        dataFetch() {
+            tableNode.insertSections(IndexSet(integersIn: 0..<self.numberOfModels()), with: .middle)
+        }
     }
     
     func didTapFlashMessage(tableNode: ASTableNode, atKey: String) {
@@ -172,11 +174,11 @@ extension FeedPresenter: FeedControllerDelegate {
         }
     }
     
-    func dataFetch(tableNode: ASTableNode) {
+    func dataFetch(completion: @escaping ()->Void) {
         let weakSelf = self
         fetchData(cache: cacheModel, sort: sort, after: nil) { models in
             weakSelf.fetchRemoteMedia(cache: weakSelf.cacheModel, models: models) {
-                tableNode.insertSections(IndexSet(integersIn: 0..<models.count), with: .middle)
+                completion()
             }
         }
     }
