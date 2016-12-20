@@ -17,9 +17,9 @@ protocol FeedControllerDelegate: class {
     func didTapViewDiscussion(tableNode: ASTableNode, atKey key: String)
 
     func dataClear()
-    func dataFetch(completion: @escaping ()->Void)
-    func dataFetchNext(completion: @escaping ()->Void)
-    func dataFetchNextSearch(text: String, completion: @escaping ()->Void)
+    func dataFetch(completion: @escaping (CountableRange<Int>)->Void)
+    func dataFetchNext(completion: @escaping (CountableRange<Int>)->Void)
+    func dataFetchNextSearch(text: String, completion: @escaping (CountableRange<Int>)->Void)
     func dataModel(key: String) -> FeedViewModel
     func dataKeyOrder() -> [String]
     
@@ -93,8 +93,8 @@ class FeedViewController: ASViewController<ASTableNode> {
     }
     
     func reload() {
-        delegate.dataFetch {
-            self.node.insertSections(IndexSet(integersIn: 0..<self.delegate.numberOfModels()), with: .middle)
+        delegate.dataFetch { range in
+            self.node.insertSections(IndexSet(integersIn: range), with: .middle)
         }
         
     }
@@ -171,22 +171,15 @@ extension FeedViewController: ASTableDelegate, ASTableDataSource {
     }
     
     func tableNode(_ tableNode: ASTableNode, willBeginBatchFetchWith context: ASBatchContext) {
-        let beforeFetchCount = numberOfSections(in: tableNode.view)
-        let weakSelf = self
-        
         if let query = searchController.searchBar.text, !query.isEmpty {
-            delegate.dataFetchNextSearch(text: query) { _ in
-                let lower = beforeFetchCount
-                let upper = beforeFetchCount + (weakSelf.delegate.numberOfModels() - beforeFetchCount)
-                let set = IndexSet(integersIn: lower..<upper)
+            delegate.dataFetchNextSearch(text: query) { range in
+                let set = IndexSet(integersIn: range)
                 tableNode.insertSections(set, with: .fade)
                 context.completeBatchFetching(true)
             }
         } else {
-            delegate.dataFetchNext { _ in
-                let lower = beforeFetchCount
-                let upper = beforeFetchCount + (weakSelf.delegate.numberOfModels() - beforeFetchCount)
-                let set = IndexSet(integersIn: lower..<upper)
+            delegate.dataFetchNext { range in
+                let set = IndexSet(integersIn: range)
                 tableNode.insertSections(set, with: .fade)
                 context.completeBatchFetching(true)
             }

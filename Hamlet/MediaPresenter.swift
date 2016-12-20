@@ -10,12 +10,19 @@ import Foundation
 import UIKit
 import AsyncDisplayKit
 
+protocol MediaPresenterDelegate {
+    func didFetchItems(range: CountableRange<Int>)
+}
+
 class MediaPresenter {
     
     var feedPresenter: FeedPresenter
+    var delegate: MediaPresenterDelegate!
+    
     var cache: [String:Media] {
         return feedPresenter.cacheModel.mediaCache
     }
+    
     var keys: [String] {
         var tempKeys = [String]()
         for key in feedPresenter.cacheModel.order {
@@ -28,6 +35,7 @@ class MediaPresenter {
     
     init(feedPresenter: FeedPresenter) {
         self.feedPresenter = feedPresenter
+        self.delegate = self
     }
     
 }
@@ -48,11 +56,20 @@ extension MediaPresenter: MediaViewControllerDelegate {
         return
     }
     
-    func dataFetchNext(completion: @escaping () -> Void) {
-        feedPresenter.dataFetchNext(completion: completion)
+    func dataFetchNext(completion: @escaping (CountableRange<Int>) -> Void) {
+        let lower = numberOfItems()
+        feedPresenter.dataFetchNext { range in
+            let upper = lower + (self.numberOfItems() - lower)
+            self.delegate.didFetchItems(range: range)
+            completion(lower..<upper)
+        }
     }
     
     func numberOfItems() -> Int {
         return cache.count
     }
+}
+
+extension MediaPresenter: MediaPresenterDelegate {
+    func didFetchItems(range: CountableRange<Int>) {}
 }

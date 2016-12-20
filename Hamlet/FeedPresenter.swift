@@ -139,7 +139,7 @@ extension FeedPresenter: FeedControllerDelegate {
     }
 
     func didLoad(tableNode: ASTableNode) {
-        dataFetch() {
+        dataFetch() { _ in 
             tableNode.insertSections(IndexSet(integersIn: 0..<self.numberOfModels()), with: .middle)
         }
     }
@@ -156,29 +156,35 @@ extension FeedPresenter: FeedControllerDelegate {
         }
     }
     
-    func dataFetchNext(completion: @escaping () -> Void) {
+    func dataFetchNext(completion: @escaping (CountableRange<Int>) -> Void) {
         let weakSelf = self
+        let lowerBound = numberOfModels()
         fetchData(cache: cacheModel, sort: sort, after: cacheModel.order[cacheModel.order.count - 1]) { models in
             weakSelf.fetchRemoteMedia(cache: weakSelf.cacheModel, models: models) {
-                completion()
+                let upperBound = lowerBound + (self.numberOfModels() - lowerBound)
+                completion(lowerBound..<upperBound)
             }
         }
     }
     
-    func dataFetchNextSearch(text: String, completion: @escaping () -> Void) {
+    func dataFetchNextSearch(text: String, completion: @escaping (CountableRange<Int>) -> Void) {
         let weakSelf = self
+        let lowerBound = numberOfModels()
         fetchSearchData(cache: cacheSearch, sort: sort, query: text, after: cacheSearch.order[cacheSearch.order.count - 1]) { models in
             weakSelf.fetchRemoteMedia(cache: weakSelf.cacheSearch, models: models) {
-                completion()
+                let upperBound = lowerBound + (self.numberOfModels() - lowerBound)
+                completion(lowerBound..<upperBound)
             }
         }
     }
     
-    func dataFetch(completion: @escaping ()->Void) {
+    func dataFetch(completion: @escaping (CountableRange<Int>)->Void) {
         let weakSelf = self
+        let lowerBound = numberOfModels()
         fetchData(cache: cacheModel, sort: sort, after: nil) { models in
             weakSelf.fetchRemoteMedia(cache: weakSelf.cacheModel, models: models) {
-                completion()
+                let upperBound = lowerBound + (self.numberOfModels() - lowerBound)
+                completion(lowerBound..<upperBound)
             }
         }
     }

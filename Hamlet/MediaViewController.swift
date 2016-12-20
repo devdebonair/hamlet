@@ -15,7 +15,7 @@ protocol MediaViewControllerDelegate {
     func dataSource() -> [String]
     func dataAt(key: String) -> MediaViewModel
     func dataFetch(tableNode: ASCollectionNode)
-    func dataFetchNext(completion: @escaping ()->Void)
+    func dataFetchNext(completion: @escaping (CountableRange<Int>)->Void)
 }
 
 class MediaViewController: ASViewController<ASCollectionNode>, UICollectionViewDelegateFlowLayout, ASCollectionDelegate, ASCollectionDataSource {
@@ -34,6 +34,7 @@ class MediaViewController: ASViewController<ASCollectionNode>, UICollectionViewD
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         node.view.contentInset = UIEdgeInsets(top: 2.0, left: 0.0, bottom: 0.0, right: 0.0)
         delegate.dataFetch(tableNode: node)
     }
@@ -82,18 +83,13 @@ class MediaViewController: ASViewController<ASCollectionNode>, UICollectionViewD
     }
     
     func shouldBatchFetch(for collectionNode: ASCollectionNode) -> Bool {
-        return true
+        return false
     }
     
     func collectionNode(_ collectionNode: ASCollectionNode, willBeginBatchFetchWith context: ASBatchContext) {
-        let beforeFetchCount = delegate.numberOfItems()
-        let weakSelf = self
-        
-        delegate.dataFetchNext {
-            let lower = beforeFetchCount
-            let upper = beforeFetchCount + (weakSelf.delegate.numberOfItems() - beforeFetchCount)
+        delegate.dataFetchNext { range in
             var indexes = [IndexPath]()
-            for index in lower..<upper {
+            for index in range.lowerBound..<range.upperBound {
                 let path = IndexPath(row: index, section: 0)
                 indexes.append(path)
             }
@@ -108,5 +104,5 @@ extension MediaViewController: MediaViewControllerDelegate {
     func numberOfItems() -> Int { return 0 }
     func dataSource() -> [String] { return [] }
     func dataAt(key: String) -> MediaViewModel { return MediaViewModel(media: Media(url: nil, height: 0, width: 0), primaryKey: "") }
-    func dataFetchNext(completion: @escaping ()->Void) {}
+    func dataFetchNext(completion: @escaping (CountableRange<Int>)->Void) {}
 }

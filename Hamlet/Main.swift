@@ -86,6 +86,14 @@ extension Main: SlideMenuViewControllerDelegate {
     }
 }
 
+extension Main: MediaPresenterDelegate {
+    func didFetchItems(range: CountableRange<Int>) {
+        print("swagger")
+        let indexSet = IndexSet(integersIn: range)
+        feedController.node.insertSections(indexSet, with: .none)
+    }
+}
+
 extension Main: SubredditListPresenterDelegate {
     func didSelectSubreddit(id: String) {
         if feedNavigation.viewControllers.count != 1 {
@@ -166,22 +174,17 @@ extension Main: SubredditListPresenterDelegate {
     }
     
     @objc func openSwagger() {
-        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { _ in
-            let controller = MediaViewController()
-            
-            let barItemClose = UIBarButtonItem(title: "Close", style: .plain, target: controller, action: #selector(controller.close))
-            controller.navigationItem.leftBarButtonItem = barItemClose
-            controller.navigationItem.title = "Media"
-            
-            let navigationController = ASNavigationController(rootViewController: controller)
-            navigationController.navigationBar.isTranslucent = false
-            navigationController.navigationBar.tintColor = .black
-            
-            let presenter = MediaPresenter(feedPresenter: self.feedPresenter)
-            controller.delegate = presenter
-            
-            self.feedNavigation.present(navigationController, animated: true, completion: nil)
-        })
+        let presenter = MediaPresenter(feedPresenter: feedPresenter)
+        let controller = MediaViewController()
+        controller.navigationItem.title = "Media"
+        controller.delegate = presenter
+        feedNavigation.pushViewController(controller, animated: true)
+    }
+}
+
+extension ASNavigationController {
+    func close() {
+        self.dismiss(animated: true, completion: nil)
     }
 }
 
